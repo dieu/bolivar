@@ -1,0 +1,8 @@
+*.iml
+*.iws
+*.ipr
+*.sql
+data
+logs
+target
+statistics
