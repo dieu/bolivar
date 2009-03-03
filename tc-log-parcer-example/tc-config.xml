@@ -27,17 +27,17 @@
         <dso>
             <instrumented-classes>
                 <include>
-                    <class-expression>com.griddynamics.terracotta.ParserLogWork</class-expression>
+                    <class-expression>com.griddynamics.terracotta.ParserLogWorkOld</class-expression>
                 </include>
             </instrumented-classes>
             <locks>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.ParserLogWork.get*(..)
+                    <method-expression>* com.griddynamics.terracotta.ParserLogWorkOld.get*(..)
                     </method-expression>
                     <lock-level>read</lock-level>
                 </autolock>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.ParserLogWork.set*(..)
+                    <method-expression>* com.griddynamics.terracotta.ParserLogWorkOld.set*(..)
                     </method-expression>
                     <lock-level>write</lock-level>
                 </autolock>
