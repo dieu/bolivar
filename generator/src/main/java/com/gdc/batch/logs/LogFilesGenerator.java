@@ -19,8 +19,8 @@ import java.io.File;
 public class LogFilesGenerator {
 
     private List<RandomValue> randomGeneratorsList;
-    private int nThreads = Integer.valueOf(Config.getInstance().getProperties().getProperty("thread.number"));
-    private String filenamePrefix = Config.getInstance().getProperties().getProperty("filename.prefix");
+    private int nThreads = Integer.valueOf(Config.getProperty("thread.number"));
+    private String filenamePrefix = Config.getProperty("filename.prefix");
 
     public LogFilesGenerator() {
         ConfigFormatParser configParser = new ConfigFormatParser();
@@ -38,7 +38,7 @@ public class LogFilesGenerator {
     public void generateAsync() throws IllegalAccessException, InstantiationException, IOException, InterruptedException {
         prepareLogsDirectory();
 
-        long fileNum = Long.valueOf(Config.getInstance().getProperties().getProperty("files.number"));
+        long fileNum = Long.valueOf(Config.getProperty("files.number"));
         System.out.println("Generation started.");
         long sTime = System.nanoTime();
 
@@ -55,7 +55,7 @@ public class LogFilesGenerator {
     public void generateSync() throws InterruptedException, IOException {
         prepareLogsDirectory();
 
-        long fileNum = Long.valueOf(Config.getInstance().getProperties().getProperty("files.number"));
+        long fileNum = Long.valueOf(Config.getProperty("files.number"));
         System.out.println("Sync generation started.");
         long sTime = System.nanoTime();
         for (long i = 0; i < fileNum; ++i) {
@@ -66,9 +66,9 @@ public class LogFilesGenerator {
     }
 
     private void prepareLogsDirectory() {
-        File logsDir = new File(Config.getInstance().getProperties().getProperty("files.location"));
+        File logsDir = new File(Config.getProperty("files.location"));
         if (logsDir.isDirectory()) {
-            if (Config.getInstance().getProperties().getProperty("do.clean.before.launch").equals("1")) {
+            if (Config.getProperty("do.clean.before.launch").equals("1")) {
                 System.out.println("Cleaning logs directory.");
                 deleteFilesInDirectory(logsDir);
             }
@@ -101,8 +101,8 @@ public class LogFilesGenerator {
 
         private void createFile() throws IOException {
             System.out.println("Writing to file " + filename + "...");
-            long recordsNum = Long.valueOf(Config.getInstance().getProperties().getProperty("records.number"));
-            String filePath = Config.getInstance().getProperties().getProperty("files.location") + File.separator + filename;
+            long recordsNum = Long.valueOf(Config.getProperty("records.number"));
+            String filePath = Config.getProperty("files.location") + File.separator + filename;
 
             FileWriter fstream = new FileWriter(filePath, true);
             BufferedWriter out = new BufferedWriter(fstream);

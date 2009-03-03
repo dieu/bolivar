@@ -12,10 +12,6 @@ public class Config {
     private static final Config instance = new Config();
     private Properties properties;
 
-    public static Config getInstance() {
-        return instance;
-    }
-
     private Config() {
         properties = new Properties();
         try {
@@ -25,8 +21,8 @@ public class Config {
         }
     }
 
-    public Properties getProperties() {
-        return properties;
+    public static String getProperty(String key){
+        return instance.properties.getProperty(key);
     }
 }
 
