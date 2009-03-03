@@ -26,4 +26,21 @@ public class Aggregator {
     public String toString() {
         return statistics.toString();
     }
+
+
+    public Long getUserStat(String ip){
+        return statistics.get(ip).longValue();
+    }
+
+    public String getMaxIp() {
+        String maxIp = null;
+        Long sum = Long.MIN_VALUE;
+        for(String ip:statistics.keySet()){
+            if (sum < statistics.get(ip).longValue()){
+                sum = statistics.get(ip).longValue();
+                maxIp = ip;
+            }
+        }
+        return maxIp;
+    }
 }

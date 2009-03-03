@@ -29,6 +29,9 @@
                 <include>
                     <class-expression>com.griddynamics.terracotta.ParserLogWorkOld</class-expression>
                 </include>
+                <include>
+                    <class-expression>com.griddynamics.terracotta.Aggregator</class-expression>
+                </include>
             </instrumented-classes>
             <locks>
                 <autolock>

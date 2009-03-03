@@ -46,6 +46,7 @@ public class Example {
         }
 
         staticWorkManager.waitForAll(workItems,Long.MAX_VALUE);
-        System.out.println("aggregation " + aggregator);
+        String ip = aggregator.getMaxIp();
+        System.out.println("Ip " + ip + " has maximal traffic " + aggregator.getUserStat(ip));
     }
 }
