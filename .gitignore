@@ -3,6 +3,5 @@
 *.ipr
 *.sql
 data
-
 target
 statistics
