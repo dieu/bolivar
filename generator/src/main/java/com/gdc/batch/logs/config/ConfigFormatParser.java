@@ -18,37 +18,15 @@ import java.util.ArrayList;
  */
 public class ConfigFormatParser {
 
-    Map<String, Class> classMap = new HashMap<String, Class>();
-
-    public ConfigFormatParser() {
-        init();
-    }
+    AbstractStringToClassMapper<RandomValue> stringToClassMapper = new RandomValueStringToClassMapper();
 
     public List<RandomValue> parseConfig() throws InstantiationException, IllegalAccessException {
         List<RandomValue> res = new ArrayList<RandomValue>();
-        String confString = Config.getInstance().getProperties().getProperty("format");
+        String confString = Config.getProperty("format");
         String[] tokens = confString.split(" ");
         for (String classKey : tokens) {
-            res.add(getRandomInstance(classKey));
+            res.add(stringToClassMapper.getInstanceByKey(classKey));
         }
         return res;
-    }
-
-    private RandomValue getRandomInstance(String classKey) throws IllegalAccessException, InstantiationException {
-        Class classOfRandom = classMap.get(classKey);
-        int lenght = 5;
-        if (classOfRandom == null) {
-            classOfRandom = classMap.get(classKey.substring(0, classKey.length() - 1));
-            lenght = Integer.valueOf(classKey.charAt(classKey.length() - 1) + "");
-        }
-        RandomValue res = (RandomValue) classOfRandom.newInstance();
-        res.setLength(lenght);
-        return res;
-    }
-
-    private void init() {
-        classMap.put("d", RandomNumber.class);
-        classMap.put("ip", RandomIp.class);
-        classMap.put("localIp", RandomLocalIp.class);
     }
 }
