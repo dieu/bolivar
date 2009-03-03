@@ -2,6 +2,7 @@
 *.iws
 *.ipr
 *.sql
+output
 data
 target
 statistics
