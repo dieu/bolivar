@@ -1,0 +1,14 @@
+To run the Logs-generator follow these steps:
+
+1. Build the project
+	
+	mvn clean package
+
+2. Go to the appeared target directory and run
+
+	java -jar generator-1.0-SNAPSHOT.jar
+
+Also you can adjust some options of the generator. There is a generator.properties file
+inside the generator-1.0-SNAPSHOT.jar. All options are self explanatory and there is a 
+comments for every of them.
+
