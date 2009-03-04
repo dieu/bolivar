@@ -98,9 +98,9 @@
                     <activeNodes>sheduler,node1,node2</activeNodes>
                     <processes>
                         <process nodeName="node1"
-                                 className="com.griddynamics.terracotta.Node1" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1" />
                         <process nodeName="node2"
-                                 className="com.griddynamics.terracotta.Node2" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1" />
                         <process nodeName="sheduler"
                                  className="com.griddynamics.terracotta.StartSheduler" count="1" />
                     </processes>

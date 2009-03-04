@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta;
+package com.griddynamics.terracotta.parser;
 
 import commonj.work.Work;
 
@@ -7,7 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.net.URL;
+
+import com.griddynamics.terracotta.parser.Aggregator;
 
 
 public class ParserLogWorkOld implements Work {
@@ -33,6 +36,8 @@ public class ParserLogWorkOld implements Work {
 
     public void run() {
         try {
+            HashMap<String, Long> sum = new HashMap<String, Long>();
+
             InputStreamReader inputStreamReader = null;
             if(pathToFile.startsWith("http")) {
                 inputStreamReader = new InputStreamReader(new URL(pathToFile).openStream());
@@ -63,7 +68,7 @@ public class ParserLogWorkOld implements Work {
                                         n *= 10;
                                         n += newArray[k] - '0';
                                     }
-                                    aggregator.addStatitics(ip,n);
+                                    addSum(sum, ip, n);
                                 }
                             } else {
                                 chunckCount++;
@@ -81,7 +86,7 @@ public class ParserLogWorkOld implements Work {
                                         n *= 10;
                                         n += newArray[k] - '0';
                                     }
-                                    aggregator.addStatitics(ip,n);
+                                    addSum(sum, ip, n);
                                 }
                             }
                         }
@@ -102,10 +107,23 @@ public class ParserLogWorkOld implements Work {
             //if (chunckCount % 8 == 4) sum += Long.parseLong(new String(Arrays.copyOfRange(newArray, oldOffset, oldI)));
 
             //System.out.println("------------------" + sum + "-----------------");
+            for(String ip2:sum.keySet()){
+               aggregator.addStatitics(ip2,sum.get(ip2)); 
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addSum(HashMap<String, Long> sum, String ip, long n) {
+        Long ipSum = sum.get(ip);
+        if (ipSum == null){
+            ipSum = n;
+        }else{
+            ipSum += n;
+        }
+        sum.put(ip,ipSum);
     }
 }

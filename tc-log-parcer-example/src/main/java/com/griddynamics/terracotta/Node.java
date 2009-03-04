@@ -1,10 +1,11 @@
 package com.griddynamics.terracotta;
 
 
-public class Node2 {
-
+public class Node {
+    
      public static void main(String[] args) throws Exception {
         Example example = new Example();
-        example.startWorker("node2");     
+        Thread.sleep(20000L);  
+        example.startWorker();
     }
 }

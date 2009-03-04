@@ -27,42 +27,24 @@
         <dso>
             <instrumented-classes>
                 <include>
-                    <class-expression>com.griddynamics.terracotta.ParserLogWorkOld</class-expression>
+                    <class-expression>com.griddynamics.terracotta.parser.ParserLogWorkOld</class-expression>
                 </include>
                 <include>
-                    <class-expression>com.griddynamics.terracotta.Aggregator</class-expression>
+                    <class-expression>com.griddynamics.terracotta.parser.Aggregator</class-expression>
                 </include>
             </instrumented-classes>
             <locks>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.ParserLogWorkOld.get*(..)
+                    <method-expression>* com.griddynamics.terracotta.parser.ParserLogWorkOld.get*(..)
                     </method-expression>
                     <lock-level>read</lock-level>
                 </autolock>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.ParserLogWorkOld.set*(..)
+                    <method-expression>* com.griddynamics.terracotta.parser.ParserLogWorkOld.set*(..)
                     </method-expression>
                     <lock-level>write</lock-level>
                 </autolock>
-                <!--<autolock>-->
-                <!--<method-expression>* com.griddynamics.terracotta.works.CalculationPerUserWork.*Time(..)-->
-                <!--</method-expression>-->
-                <!--</autolock>-->
-                <!--<autolock>-->
-                <!--<method-expression>* com.griddynamics.terracotta.works.CalculationPerNodeWork.*Result(..)-->
-                <!--</method-expression>-->
-                <!--</autolock>-->
-                <!--<autolock>-->
-                <!--<method-expression>* com.griddynamics.terracotta.core.StatisticCalculator.addCurrentUserStat(..)-->
-                <!--</method-expression>-->
-                <!--</autolock>-->
             </locks>
-
-            <!--<transient-fields>-->
-                <!--<field-name>com.griddynamics.terracotta.BatchWork.context</field-name>-->
-                <!--<field-name>com.griddynamics.terracotta.BatchWork.launcher</field-name>-->
-                <!--<field-name>com.griddynamics.terracotta.BatchWork.jobLocator</field-name>-->
-            <!--</transient-fields>-->
 
         </dso>
     </application>
