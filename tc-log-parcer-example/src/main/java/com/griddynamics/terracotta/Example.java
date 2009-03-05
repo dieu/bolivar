@@ -32,6 +32,7 @@ public class Example {
         if (!file.exists()) throw new IOException("Directory not exists");
         if (!file.isDirectory()) throw new IOException("It is not directory");
 
+        Long start = System.currentTimeMillis();
         Aggregator aggregator = new Aggregator();
 
         for(String fileName:file.list()){
@@ -43,6 +44,7 @@ public class Example {
 
         workManager.waitForAll(workItems,Long.MAX_VALUE);
         String ip = aggregator.getMaxIp();
+        System.out.println("Finished work in " + (System.currentTimeMillis() - start));
         System.out.println("Ip " + ip + " has maximal traffic " + aggregator.getUserStat(ip));
     }
 }
