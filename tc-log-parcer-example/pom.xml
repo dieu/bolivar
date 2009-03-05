@@ -42,6 +42,29 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.griddynamics.terracotta.StartSheduler</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -62,11 +85,11 @@
                     <activeNodes>sheduler,node1,node2</activeNodes>
                     <processes>
                         <process nodeName="node1"
-                                 className="com.griddynamics.terracotta.Node" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1"/>
                         <process nodeName="node2"
-                                 className="com.griddynamics.terracotta.Node" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1"/>
                         <process nodeName="sheduler"
-                                 className="com.griddynamics.terracotta.StartSheduler" count="1" />
+                                 className="com.griddynamics.terracotta.StartSheduler" count="1"/>
                     </processes>
                 </configuration>
             </plugin>
