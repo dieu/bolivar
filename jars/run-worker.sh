@@ -1,1 +1,2 @@
-java -Xbootclasspath/p:./dso-boot.jar -Dtc.install-root=/home/alexander/dist/terracotta-2.7.2  -Dtc.server=localhost -Dtc.config=./tc-config.xml -jar node.jar
+. ./env.sh
+java -Xbootclasspath/p:./dso-boot.jar -Dtc.install-root=$TC_HOME  -Dtc.server=TC_SERVER_ADDR -Dtc.config=./tc-config.xml -jar node.jar
