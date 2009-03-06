@@ -1,0 +1,37 @@
+set :user, 'guest'
+set :password, 'guest'
+
+role :workers, "192.168.18.59", "192.168.18.46"
+
+TARGET_DIR = "bolivar"
+JARS_DIR = "jars"
+WORKER_JARS = ["dso-boot.jar", "node.jar"]
+
+def scp(src, dst)
+  body = File.open(src, "rb") { |f| f.read }
+  put(body, File.join(TARGET_DIR, dst))
+end
+
+def target(dir)
+  File.join(TARGET_DIR, dir)
+end
+
+task :upload_jars do
+  run "mkdir -p #{JARS_DIR}"
+  WORKER_JARS.each do |jar|
+    scp(jar, File.join(JARS_DIR, jar))
+  end
+
+  run "ls #{File.join(TARGET_DIR, JARS_DIR)}"
+end
+
+task :upload_tc do
+  tc_dir = "terracotta-2.7.2"
+  tc_tar = tc_dir + ".tar.gz"
+  scp(tc_tar, tc_tar)
+  run "cd #{TARGET_DIR} && tar xzf #{tc_tar}"
+end
+
+task :clean do
+  run "rm -rf #{TARGET_DIR}"
+end
