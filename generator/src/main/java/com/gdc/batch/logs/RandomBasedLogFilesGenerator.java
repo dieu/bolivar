@@ -16,13 +16,13 @@ import java.io.File;
  * Date: 27.02.2009
  * Time: 11:17:36
  */
-public class LogFilesGenerator {
+public class RandomBasedLogFilesGenerator {
 
     private List<RandomValue> randomGeneratorsList;
     private int nThreads = Integer.valueOf(Config.getProperty("thread.number"));
     private String filenamePrefix = Config.getProperty("filename.prefix");
 
-    public LogFilesGenerator() {
+    public RandomBasedLogFilesGenerator() {
         ConfigFormatParser configParser = new ConfigFormatParser();
         try {
             randomGeneratorsList = configParser.parseConfig();

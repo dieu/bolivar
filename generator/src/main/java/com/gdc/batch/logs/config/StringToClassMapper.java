@@ -8,10 +8,10 @@ import java.util.HashMap;
  * Date: 03.03.2009
  * Time: 16:15:21
  */
-abstract public class AbstractStringToClassMapper<T> {
+abstract public class StringToClassMapper<T> {
     Map<String, Class> classMap = new HashMap<String, Class>();
 
-    protected AbstractStringToClassMapper() {
+    protected StringToClassMapper() {
         loadClassMapping();
     }
 
