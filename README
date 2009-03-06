@@ -1,0 +1,33 @@
+h1. Overview
+
+Project Bolivar is the codename for Grid Dynamics project to create a batch processing demo using Terracotta running on servers in the Go Grid cloud.
+
+Many businesses still rely heavily on batch processing for functions that are core to running their businesses, and has been a frequent topic of questions by Terracotta customers. Also, because can be parallelized and is periodically scheduled, it can benefit from running on a cloud / pay-per-use infrastructure.
+
+This project demonstrates the ease of using Terracotta to scale out a Java-based batch processing application, and show how to do this using the Go Grid's infrastructure on demand utility payment model.
+
+Terracotta and Grid Dynamics are defining a partnership by which Grid Dynamics will provide services around the Terracotta product. This services offered will initially begin at a more tactical level (help customers move applications into production), and then grow to be able to provide Center of Excellence to help customers adopt Terracotta across the Enterprise.
+
+h2. TJunction Log Processing with Terracotta
+
+TJunction is an in-house application that monitors network traffic in the Russian office and can limit individual user traffic (amount of MB per user per day). Project Bolivar provides analysis of the logs that it creates, providing statistics. Using Terracotta, it is easy to scale-out the application as the number of users, and the size of the logs increase.
+
+!Bolivar_2.jpg!
+
+The solution uses the Terracotta Integration Module TIM-Messaging. It contains several components, a Log File Generator, a Master Node and one or more Worker Nodes. This follows the Master/Worker pattern - the Master Node and Worker Nodes communicate using Terracotta clustered objects, so that processing can be transparently extended from one to multiple JVMs.
+
+h1. Workflow
+
+The main use case is to start the batch process - generate log files to parse, configure the number of workers, and startup the Terracotta cluster. The number of workers is selected when the cluster is started up (scenario can be rerun a second time, for example, with more workers to demonstrate completing faster or processing more log files in near same amout of time.)
+
+The Master Node scans the logs directory and creates one work item for each file it finds.Worker Nodes remove work items from the queue to process; for each one, the Worker Node opens and parses the corresponding log file, and calculates traffic usage for each unique IP address in the log file. The updates are stored locally during processing, and then updated on a global, clustered Map, shared using Terracotta, after processing. After completion of the job, the we are also able to identify the user who has used the most traffic from the begining of recording logs.
+
+h2. Moving to GoGrid Cloud
+
+Project Bolivar is moved to a cloud environment. This uses GoGrid cloud to enable the batch processing to be done in a cloud environment that takes advantage of the flex capabilities to enable scale-out and also the utility / pay-per-use model, which are both great fit for the periodic nature of batch processing. GoGrid is selected as the cloud provider.
+
+When moving the application to the cloud, one of the main considerations was access to the log files. First attempts were to move these to
+
+Many Enterprise customers will have requirements around application components, such as database, that are not a good fit for cloud computing. One of the main advantages to using GoGrid is that it enables tight integration with dedicated, colo server. This is demonstrated when moving Project Bolivar to the cloud.
+
+The Log Generator is hosted on a dedicated, colocated server in ServePath, along with the log files that it creates. During processing, the log files are parsed by the Workers, which access the files using the fast GigE connection between the dedicated server and the Go Grid cloud. !Bolivar.jpg!
