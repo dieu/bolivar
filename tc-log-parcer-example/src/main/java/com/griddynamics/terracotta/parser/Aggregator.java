@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta;
+package com.griddynamics.terracotta.parser;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;

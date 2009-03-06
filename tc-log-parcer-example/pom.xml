@@ -21,45 +21,9 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.0.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.batch</groupId>
-            <artifactId>spring-batch-core</artifactId>
-            <version>2.0.0.M4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>2.5.5</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-            <version>3.2.5.ga</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-annotations</artifactId>
-            <version>3.2.1.ga</version>
         </dependency>
 
         <dependency>
@@ -78,6 +42,29 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.griddynamics.terracotta.StartSheduler</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -98,11 +85,11 @@
                     <activeNodes>sheduler,node1,node2</activeNodes>
                     <processes>
                         <process nodeName="node1"
-                                 className="com.griddynamics.terracotta.Node1" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1"/>
                         <process nodeName="node2"
-                                 className="com.griddynamics.terracotta.Node2" count="1" />
+                                 className="com.griddynamics.terracotta.Node" count="1"/>
                         <process nodeName="sheduler"
-                                 className="com.griddynamics.terracotta.StartSheduler" count="1" />
+                                 className="com.griddynamics.terracotta.StartSheduler" count="1"/>
                     </processes>
                 </configuration>
             </plugin>

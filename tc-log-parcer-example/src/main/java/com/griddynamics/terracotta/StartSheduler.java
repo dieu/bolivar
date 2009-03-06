@@ -1,5 +1,7 @@
 package com.griddynamics.terracotta;
 
+import java.util.Properties;
+
 
 public class StartSheduler {
 
@@ -7,7 +9,13 @@ public class StartSheduler {
 
     public static void main(String[] args) throws Exception {
         Example example = new Example();
-        example.lunchJob("node1","node2");
+        Properties properties = new Properties();
+        try {
+            properties.load(ClassLoader.getSystemResourceAsStream("sheduler.properties"));
+        }catch (Exception e){
+            System.exit(1);
+        }        
+        example.lunchJob(properties.getProperty("localDir"),properties.getProperty("httpUrl"));
     }
 
     
