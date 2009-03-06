@@ -1,7 +1,7 @@
 set :user, 'guest'
 set :password, 'guest'
 
-role :workers, "192.168.18.46", "192.168.18.45"
+role :workers, "192.168.21.4", "192.168.18.46", "192.168.18.45", "192.168.18.59"
 
 TARGET_DIR = "bolivar"
 WORKER_JARS = ["dso-boot.jar", "node.jar"]
@@ -19,6 +19,7 @@ def target(dir)
   File.join(TARGET_DIR, dir)
 end
 
+desc "Uploads tc-config.xml to all nodes"
 task :upload_config do
   scp(CONFIG, CONFIG)
 end
@@ -28,6 +29,14 @@ task :upload_jars do
 end
 
 task :upload_tc do
+  tc_tar = TC_DIR + ".tar.gz"
+  scp(tc_tar, tc_tar)
+  run "cd #{TARGET_DIR} && tar xzf #{tc_tar}"
+end
+
+task :upload_all do
+  scp(CONFIG, CONFIG)
+  WORKER_JARS.each { |jar| scp(jar, jar) }
   tc_tar = TC_DIR + ".tar.gz"
   scp(tc_tar, tc_tar)
   run "cd #{TARGET_DIR} && tar xzf #{tc_tar}"
