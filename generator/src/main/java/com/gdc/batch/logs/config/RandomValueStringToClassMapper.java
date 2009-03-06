@@ -10,7 +10,7 @@ import com.gdc.batch.logs.random.RandomLocalIp;
  * Date: 03.03.2009
  * Time: 16:18:35
  */
-public class RandomValueStringToClassMapper extends AbstractStringToClassMapper<RandomValue> {
+public class RandomValueStringToClassMapper extends StringToClassMapper<RandomValue> {
 
     @Override
     public RandomValue getInstanceByKey(String classKey) throws InstantiationException, IllegalAccessException {
@@ -23,7 +23,6 @@ public class RandomValueStringToClassMapper extends AbstractStringToClassMapper<
         RandomValue res = (RandomValue) classOfRandom.newInstance();
         res.setLength(lenght);
         return res;
-
     }
 
     @Override

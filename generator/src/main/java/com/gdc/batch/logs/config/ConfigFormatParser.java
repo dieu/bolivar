@@ -1,13 +1,8 @@
 package com.gdc.batch.logs.config;
 
 import com.gdc.batch.logs.random.RandomValue;
-import com.gdc.batch.logs.random.RandomNumber;
-import com.gdc.batch.logs.random.RandomIp;
-import com.gdc.batch.logs.random.RandomLocalIp;
 import com.gdc.batch.logs.config.Config;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -18,7 +13,7 @@ import java.util.ArrayList;
  */
 public class ConfigFormatParser {
 
-    AbstractStringToClassMapper<RandomValue> stringToClassMapper = new RandomValueStringToClassMapper();
+    StringToClassMapper<RandomValue> stringToClassMapper = new RandomValueStringToClassMapper();
 
     public List<RandomValue> parseConfig() throws InstantiationException, IllegalAccessException {
         List<RandomValue> res = new ArrayList<RandomValue>();

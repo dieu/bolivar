@@ -5,7 +5,7 @@ import java.io.IOException;
 public class App
 {
     public static void main( String[] args ) throws InstantiationException, IllegalAccessException, IOException, InterruptedException {
-        LogFilesGenerator generator = new LogFilesGenerator();
+        RandomBasedLogFilesGenerator generator = new RandomBasedLogFilesGenerator();
         generator.generateAsync();
 //        generator.generateSync();
     }

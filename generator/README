@@ -1,0 +1,51 @@
+To run the Logs-generator follow these steps:
+
+1. Build the project
+	
+	mvn clean package
+
+2. Go to the appeared target directory and run
+
+	java -jar generator-1.0-SNAPSHOT.jar
+
+You can adjust some options of the generator. There is a generator.properties file
+inside the generator-1.0-SNAPSHOT.jar.
+
+Log generator will generate ${files.number} of log files each of which will contain ${records.number} records.
+All generated files will be placed to the ${files.location} directory. Names of these log files will start from
+${filename.prefix}. Also this config allows you to adjust format of the logs. See below the description of "format"
+option.
+
+Here the possible options:
+
+#Number of records per file.
+records.number=10000000
+
+#Number of files to generate.
+files.number=10
+
+#Output directory for logs.
+files.location=output
+
+#1 means that logs directory would be cleaned up before launch.
+#If no directory with ${files.location} name exists it will be created.
+do.clean.before.launch=1
+
+#Filename prefix of genereated files. In case bellow filenames would start from "traf-log-".
+filename.prefix=traf-log-
+
+#Number of threads for log-generator. Best performance would be achived
+#when this number is equal to number of cpu core of your system.
+thread.number=2
+
+#Format of the generated logs 3 kind of placeholders supported: "ip", "localIp" and "d".
+#Placeholder "d" should be used only with digits from 1 to 9.
+# ip stands for String with ip address
+# localIP stands for ip address which start with 192.168.
+# d5 stands for five-digit number
+format=ip localIp d2 d5 d5 d4 d2
+#format=ip ip d2 d5 d5 d4 d2 d1 ip d5 d7 ip
+
+
+
+

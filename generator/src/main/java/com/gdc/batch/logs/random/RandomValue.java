@@ -18,4 +18,20 @@ public abstract class RandomValue {
 
     public abstract String getRandomValue();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RandomValue)) return false;
+
+        RandomValue that = (RandomValue) o;
+
+        return length == that.length;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = length;
+        result = 31 * result + (rnd != null ? rnd.hashCode() : 0);
+        return result;
+    }
 }
