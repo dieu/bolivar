@@ -51,7 +51,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <mainClass>com.griddynamics.terracotta.StartSheduler</mainClass>
+                            <mainClass>com.griddynamics.terracotta.Node</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
