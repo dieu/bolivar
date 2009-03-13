@@ -1,2 +1,2 @@
 . env.sh
-java -Xbootclasspath/p:./dso-boot.jar -Dtc.install-root=$TC_HOME  -Dtc.server=localhost -Dtc.config=./tc-config.xml -jar sheduler.jar -DlocalDir=/var/www/logs2 -DhttpUrl=http://192.168.18.59/logs2/
+$JAVA_HOME/bin/java -Xbootclasspath/p:./dso-boot.jar -Dtc.install-root=$TC_HOME  -Dtc.server=$TC_SERVER_ADDR -Dtc.config=./tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://$TC_SERVER_ADDR/logs/ -jar sheduler-unit.jar
