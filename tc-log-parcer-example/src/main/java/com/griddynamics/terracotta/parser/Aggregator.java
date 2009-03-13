@@ -9,17 +9,17 @@ public class Aggregator {
     private ConcurrentMap<String, AtomicLong> statistics;
 
     public Aggregator() {
-        statistics = new ConcurrentHashMap<String,AtomicLong>();
+        statistics = new ConcurrentHashMap<String, AtomicLong>();
     }
 
-    public void addStatitics(String ip,Long count){
+    public void addStatitics(String ip, Long count) {
         AtomicLong oldSum = statistics.get(ip);
-        if(oldSum == null){
+        if (oldSum == null) {
             oldSum = new AtomicLong(0L);
-            statistics.putIfAbsent(ip,oldSum);
+            statistics.putIfAbsent(ip, oldSum);
             oldSum = statistics.get(ip);
         }
-        oldSum.addAndGet(count);           
+        oldSum.addAndGet(count);
     }
 
     @Override
@@ -28,15 +28,15 @@ public class Aggregator {
     }
 
 
-    public Long getUserStat(String ip){
+    public Long getUserStat(String ip) {
         return statistics.get(ip).longValue();
     }
 
     public String getMaxIp() {
         String maxIp = null;
         Long sum = Long.MIN_VALUE;
-        for(String ip:statistics.keySet()){
-            if (sum < statistics.get(ip).longValue()){
+        for (String ip : statistics.keySet()) {
+            if (sum < statistics.get(ip).longValue()) {
                 sum = statistics.get(ip).longValue();
                 maxIp = ip;
             }

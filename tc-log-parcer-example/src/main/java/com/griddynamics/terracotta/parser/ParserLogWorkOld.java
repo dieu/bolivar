@@ -39,9 +39,9 @@ public class ParserLogWorkOld implements Work {
             HashMap<String, Long> sum = new HashMap<String, Long>();
 
             InputStreamReader inputStreamReader = null;
-            if(pathToFile.startsWith("http")) {
+            if (pathToFile.startsWith("http")) {
                 inputStreamReader = new InputStreamReader(new URL(pathToFile).openStream());
-            }else{
+            } else {
                 inputStreamReader = new FileReader(pathToFile);
             }
             char[] newArray = new char[20000];
@@ -59,12 +59,12 @@ public class ParserLogWorkOld implements Work {
                         if (notSkip) {
                             if (newOffset > 0) {
                                 chunckCount++;
-                                if(chunckCount % 7 == 1){
-                                    ip = new String(Arrays.copyOfRange(newArray,newOffset,j));
+                                if (chunckCount % 7 == 1) {
+                                    ip = new String(Arrays.copyOfRange(newArray, newOffset, j));
                                 }
                                 if (chunckCount % 7 == 4) {
                                     long n = 0L;
-                                    for(int k = newOffset; k < j; k++ ){
+                                    for (int k = newOffset; k < j; k++) {
                                         n *= 10;
                                         n += newArray[k] - '0';
                                     }
@@ -72,17 +72,17 @@ public class ParserLogWorkOld implements Work {
                                 }
                             } else {
                                 chunckCount++;
-                                if(chunckCount % 7 == 1){
-                                    ip = new String(Arrays.copyOfRange(oldArray,oldOffset,oldI));
-                                    ip += new String(Arrays.copyOfRange(newArray,newOffset,j));
+                                if (chunckCount % 7 == 1) {
+                                    ip = new String(Arrays.copyOfRange(oldArray, oldOffset, oldI));
+                                    ip += new String(Arrays.copyOfRange(newArray, newOffset, j));
                                 }
                                 if (chunckCount % 7 == 4) {
                                     long n = 0L;
-                                     for(int k = oldOffset; k < oldI; k++ ){
+                                    for (int k = oldOffset; k < oldI; k++) {
                                         n *= 10;
                                         n += oldArray[k] - '0';
                                     }
-                                    for(int k = newOffset; k < j; k++ ){
+                                    for (int k = newOffset; k < j; k++) {
                                         n *= 10;
                                         n += newArray[k] - '0';
                                     }
@@ -107,8 +107,8 @@ public class ParserLogWorkOld implements Work {
             //if (chunckCount % 8 == 4) sum += Long.parseLong(new String(Arrays.copyOfRange(newArray, oldOffset, oldI)));
 
             //System.out.println("------------------" + sum + "-----------------");
-            for(String ip2:sum.keySet()){
-               aggregator.addStatitics(ip2,sum.get(ip2)); 
+            for (String ip2 : sum.keySet()) {
+                aggregator.addStatitics(ip2, sum.get(ip2));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -119,11 +119,11 @@ public class ParserLogWorkOld implements Work {
 
     private void addSum(HashMap<String, Long> sum, String ip, long n) {
         Long ipSum = sum.get(ip);
-        if (ipSum == null){
+        if (ipSum == null) {
             ipSum = n;
-        }else{
+        } else {
             ipSum += n;
         }
-        sum.put(ip,ipSum);
+        sum.put(ip, ipSum);
     }
 }

@@ -1,11 +1,13 @@
 set :user, 'guest'
 set :password, 'guest'
 
-role :workers, "192.168.21.4", "192.168.18.46", "192.168.18.45", "192.168.18.59"
+#role :workers, "192.168.21.4", "192.168.18.46", "192.168.18.45", "192.168.18.59"
+role :workers, "173.1.54.213"
 
 TARGET_DIR = "bolivar"
 WORKER_JARS = ["dso-boot.jar", "node.jar"]
-SERVER_ADDR = "192.168.18.59"
+#SERVER_ADDR = "192.168.18.59"
+SERVER_ADDR = "173.1.54.210"
 TC_DIR = "terracotta-2.7.2"
 CONFIG = "tc-config.xml"
 

@@ -27,8 +27,8 @@ public class Example {
         worker.start();
     }
 
-    public void lunchJob(String dir,String dirUrl) throws InterruptedException, IOException {
-        DynamicWorkManager workManager = new DynamicWorkManager(topologyName,null,new RoundRobinRouter());
+    public void lunchJob(String dir, String dirUrl) throws InterruptedException, IOException {
+        DynamicWorkManager workManager = new DynamicWorkManager(topologyName, null, new RoundRobinRouter());
         logger.info("Wait for workers");
         Thread.sleep(30000L);
         List<WorkItem> workItems = new ArrayList<WorkItem>();
@@ -39,14 +39,14 @@ public class Example {
         Long start = System.currentTimeMillis();
         Aggregator aggregator = new Aggregator();
         logger.info("Start work");
-        for(String fileName:file.list()){
+        for (String fileName : file.list()) {
             logger.info("Sheduler work for " + dirUrl + fileName);
-            ParserLogWork work = new ParserLogWork(dirUrl + fileName,aggregator);
+            ParserLogWork work = new ParserLogWork(dirUrl + fileName, aggregator);
             WorkItem workItem = workManager.schedule(work);
             workItems.add(workItem);
         }
 
-        workManager.waitForAll(workItems,Long.MAX_VALUE);
+        workManager.waitForAll(workItems, Long.MAX_VALUE);
         String ip = aggregator.getMaxIp();
         logger.info("Finished work in " + (System.currentTimeMillis() - start));
         logger.info("Ip " + ip + " has maximal traffic " + aggregator.getUserStat(ip));

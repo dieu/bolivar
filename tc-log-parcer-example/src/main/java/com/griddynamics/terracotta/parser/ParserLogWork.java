@@ -40,13 +40,13 @@ public class ParserLogWork implements Work {
             String s = bufferedReader.readLine();
             while (s != null) {
                 String[] strings = s.split("\t");
-                addSum(sum,strings[1], Long.parseLong(strings[4]));
-                s = bufferedReader.readLine();                
+                addSum(sum, strings[1], Long.parseLong(strings[4]));
+                s = bufferedReader.readLine();
             }
             bufferedReader.close();
 
-            for(String ip:sum.keySet()){
-               aggregator.addStatitics(ip,sum.get(ip)); 
+            for (String ip : sum.keySet()) {
+                aggregator.addStatitics(ip, sum.get(ip));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -57,11 +57,11 @@ public class ParserLogWork implements Work {
 
     private void addSum(HashMap<String, Long> sum, String ip, long n) {
         Long ipSum = sum.get(ip);
-        if (ipSum == null){
+        if (ipSum == null) {
             ipSum = n;
-        }else{
+        } else {
             ipSum += n;
         }
-        sum.put(ip,ipSum);
+        sum.put(ip, ipSum);
     }
 }
