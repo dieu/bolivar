@@ -16,7 +16,7 @@
         <profile>
             <id>Sheduler</id>
             <properties>
-                <jarName>sheduler</jarName>
+                <jarName>scheduler</jarName>
                 <mainClass>com.griddynamics.terracotta.StartSheduler</mainClass>
             </properties>
             <activation>
