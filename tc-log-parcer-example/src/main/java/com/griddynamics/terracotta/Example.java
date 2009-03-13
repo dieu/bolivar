@@ -29,12 +29,14 @@ public class Example {
 
     public void lunchJob(String dir,String dirUrl) throws InterruptedException, IOException {
         DynamicWorkManager workManager = new DynamicWorkManager(topologyName,null,new RoundRobinRouter());
-        logger.info("Wait for workers");
-        Thread.sleep(30000L);
         List<WorkItem> workItems = new ArrayList<WorkItem>();
+        
         File file = new File(dir);
         if (!file.exists()) throw new IOException("Directory not exists");
         if (!file.isDirectory()) throw new IOException("It is not directory");
+        logger.info("Wait for workers");
+        Thread.sleep(30000L);
+
 
         Long start = System.currentTimeMillis();
         Aggregator aggregator = new Aggregator();

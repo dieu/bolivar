@@ -17,6 +17,7 @@ public class AllInOneJvm {
             System.out.println("no property file found");
             System.exit(1);
         }
-        example.lunchJob(properties.getProperty("localDir"),properties.getProperty("httpUrl")); 
+
+        example.lunchJob(System.getProperty("localDir"),System.getProperty("httpUrl"));
     }
 }
