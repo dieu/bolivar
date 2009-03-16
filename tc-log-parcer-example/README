@@ -1,0 +1,11 @@
+To build the project and aquire all necessary jars do the following.
+Run:
+
+ mvn clean package
+
+and then
+
+ mvn package -P Worker
+
+First will produce "sheduler-unit.jar" and the second "node-unit.jar".
+
