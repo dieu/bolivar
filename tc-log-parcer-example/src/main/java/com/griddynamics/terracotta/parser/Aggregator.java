@@ -6,12 +6,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 public class Aggregator {
-    private ConcurrentMap<String, AtomicLong> statistics;
+    private ConcurrentMap<String, AtomicLong> statistics = new ConcurrentHashMap<String, AtomicLong>();
 
-    public Aggregator() {
-        statistics = new ConcurrentHashMap<String, AtomicLong>();
-    }
-
+    /**
+     * Adds or updates ip->traf pair.
+     *
+     * @param ip    - ip for which traffic is calculated.
+     * @param count - traffic for the ip.
+     */
     public void addStatitics(String ip, Long count) {
         AtomicLong oldSum = statistics.get(ip);
         if (oldSum == null) {
@@ -27,17 +29,28 @@ public class Aggregator {
         return statistics.toString();
     }
 
-
+    /**
+     * Returns traffic of given ip.
+     *
+     * @param ip - ip.
+     * @return traffic of given ip.
+     */
     public Long getUserStat(String ip) {
         return statistics.get(ip).longValue();
     }
 
-    public String getMaxIp() {
+    /**
+     * Finds ip with max traffic value.
+     *
+     * @return ip with max traffic value.
+     */
+    public String getIpWithMaxTraffic() {
         String maxIp = null;
         Long sum = Long.MIN_VALUE;
         for (String ip : statistics.keySet()) {
-            if (sum < statistics.get(ip).longValue()) {
-                sum = statistics.get(ip).longValue();
+            long traf = statistics.get(ip).longValue();
+            if (sum < traf) {
+                sum = traf;
                 maxIp = ip;
             }
         }

@@ -27,7 +27,7 @@
             <id>Worker</id>
             <properties>
                 <jarName>node</jarName>
-                <mainClass>com.griddynamics.terracotta.Node</mainClass>
+                <mainClass>com.griddynamics.terracotta.StartWorker</mainClass>
             </properties>
         </profile>
     </profiles>
@@ -108,9 +108,9 @@
                     <activeNodes>sheduler,node1,node2</activeNodes>
                     <processes>
                         <process nodeName="node1"
-                                 className="com.griddynamics.terracotta.Node" count="1"/>
+                                 className="com.griddynamics.terracotta.StartWorker" count="1"/>
                         <process nodeName="node2"
-                                 className="com.griddynamics.terracotta.Node" count="1"/>
+                                 className="com.griddynamics.terracotta.StartWorker" count="1"/>
                         <process nodeName="sheduler"
                                  className="com.griddynamics.terracotta.StartSheduler" count="1"/>
                     </processes>

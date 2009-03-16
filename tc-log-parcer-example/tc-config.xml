@@ -27,25 +27,9 @@
         <dso>
             <instrumented-classes>
                 <include>
-                    <class-expression>com.griddynamics.terracotta.parser.ParserLogWorkOld</class-expression>
-                </include>
-                <include>
                     <class-expression>com.griddynamics.terracotta.parser.Aggregator</class-expression>
                 </include>
             </instrumented-classes>
-            <locks>
-                <autolock>
-                    <method-expression>* com.griddynamics.terracotta.parser.ParserLogWorkOld.get*(..)
-                    </method-expression>
-                    <lock-level>read</lock-level>
-                </autolock>
-                <autolock>
-                    <method-expression>* com.griddynamics.terracotta.parser.ParserLogWorkOld.set*(..)
-                    </method-expression>
-                    <lock-level>write</lock-level>
-                </autolock>
-            </locks>
-
         </dso>
     </application>
 </tc:tc-config>
