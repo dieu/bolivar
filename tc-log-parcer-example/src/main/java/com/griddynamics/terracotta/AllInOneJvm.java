@@ -15,14 +15,6 @@ public class AllInOneJvm {
         jobService.startWorker();
         jobService.startWorker();
         jobService.startWorker();
-        Properties properties = new Properties();
-        try {
-            properties.load(ClassLoader.getSystemResourceAsStream("sheduler.properties"));
-        } catch (Exception e) {
-            System.out.println("no property file found");
-            System.exit(1);
-        }
-
         jobService.lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"));
     }
 }

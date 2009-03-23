@@ -15,13 +15,7 @@ public class StartSheduler {
      */
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Properties properties = new Properties();
-        try {
-            properties.load(ClassLoader.getSystemResourceAsStream("sheduler.properties"));
-        } catch (Exception e) {
-            System.exit(1);
-        }
-        (new JobService()).lunchJob(properties.getProperty("localDir"), properties.getProperty("httpUrl"));
+        (new JobService()).lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"));
     }
 
 
