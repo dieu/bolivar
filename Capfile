@@ -1,19 +1,19 @@
-SERVER_ADDR = "192.168.18.59"
-JAVA_HOME = "/usr/lib/jvm/java-6-sun"
+SERVER_ADDR = "apanasenko-test.carina.griddynamics.net"
+JAVA_HOME = "/usr/java/default"
 
-role :workers, "192.168.18.45", "192.168.18.46"
-role :scheduler, "192.168.18.59"
+role :workers, "apanasenko-test.carina.griddynamics.net"
+role :scheduler, "apanasenko-test.carina.griddynamics.net"
 role :server, SERVER_ADDR
 
-set :user, 'guest'
-set :password, 'guest'
+set :user, 'bolivar_scheduler'
+set :password, '123456'
 
 EXAMPLE_DIR = "tc-log-parser-example"
 TARGET_DIR = "bolivar"
 NODE = "node-unit.jar"
 SCHEDULER = "scheduler-unit.jar"
 JARS = [NODE, SCHEDULER]
-DSO_BOOT = "dso-boot.jar"
+DSO_BOOT = "dso-boot.linux.java-6.12.jar"
 TC_DIR = "terracotta-2.7.2"
 CONFIG = "tc-config.xml"
 MISC = "misc"
@@ -64,11 +64,11 @@ task :upload_all do
 end
 
 task :run_workers, :roles => :workers do
-  run "java -Xbootclasspath/p:#{TARGET_DIR}/dso-boot.jar -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} > /dev/null 2>&1 &"
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} > /dev/null 2>&1 &"
 end
 
 task :run_scheduler, :roles => :scheduler do
-  run "java -Xbootclasspath/p:#{TARGET_DIR}/dso-boot.jar -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/logs/ -jar #{TARGET_DIR}/#{SCHEDULER} &"
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/logs/ -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
 end
 
 task :run_server, :roles => :server do
