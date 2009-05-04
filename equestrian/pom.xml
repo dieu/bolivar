@@ -9,8 +9,9 @@
 	<url>http://maven.apache.org</url>
 
 	<modules>
-		<module>backend</module>
-		<module>frontend</module>
+        <module>equestrian-config</module>
+		<module>equestrian-ria</module>
+        <module>equestrian-web</module>		
 	</modules>
 
 

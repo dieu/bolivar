@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical">
+    <mx:creationComplete>
+		<![CDATA[
+            initApp();
+        ]]>
+    </mx:creationComplete>
+
+    <mx:RemoteObject id="srv" destination="Test"/>
+
+
+    <mx:Label text="Bolivar Demo" textAlign="center" fontWeight="bold" fontSize="16"/>
+    <mx:HRule width="100%" height="40"/>
+    <mx:HBox horizontalAlign="center" autoLayout="true">
+        <mx:NumericStepper id="nMachines" minimum="1" maximum="1000"/>
+        <mx:Button label="Start Environment" click="startEnvironmentClick()"/>
+    </mx:HBox>
+    <mx:HBox horizontalAlign="center" autoLayout="true">
+        <mx:Label id="statusCloud" height="50" horizontalCenter="true"
+                  text="Status Cloud" fontWeight="bold" fontSize="14"/>
+    </mx:HBox>
+    <mx:HBox horizontalAlign="center" autoLayout="true">
+        <mx:Label height="50" text="Status Application" fontWeight="bold" fontSize="14"/>
+    </mx:HBox>
+    <mx:HBox horizontalAlign="center" autoLayout="true">
+        <mx:Button label="Start Application" click="startApplicationClick()"/>
+        <mx:Button label="Stop Environment" click="stopEnvironmentClick()"/>
+    </mx:HBox>
+
+    <mx:RemoteObject id="testService" showBusyCursor="true"
+                     fault="onFault(event)" destination="TestService">
+        <mx:method name="getString" result="onResultSave(event)" fault="onFault(event)"/>
+    </mx:RemoteObject>
+
+
+    <mx:Script><![CDATA[
+        import mx.controls.Alert;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+
+
+        private function onResultSave(event:ResultEvent):void {
+            Alert.show(String(event.result), "qwe");
+        }
+
+        private function onFault(event:FaultEvent):void {
+            Alert.show(event.fault.faultString);
+        }
+
+        private function initApp():void {
+
+        }
+
+        private function startEnvironmentClick():void {
+            testService.getString("we");
+        }
+
+        private function startApplicationClick():void {
+
+        }
+
+        private function stopEnvironmentClick():void {
+
+        }
+        ]]></mx:Script>
+</mx:Application>
