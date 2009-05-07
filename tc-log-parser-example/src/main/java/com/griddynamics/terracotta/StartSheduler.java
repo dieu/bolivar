@@ -16,6 +16,7 @@ public class StartSheduler {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         (new JobService()).lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"));
+        System.exit(0);
     }
 
 
