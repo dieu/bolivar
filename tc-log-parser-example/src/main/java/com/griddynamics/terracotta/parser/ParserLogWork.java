@@ -6,8 +6,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 
-import com.griddynamics.terracotta.parser.Aggregator;
-
 
 public class ParserLogWork implements Work {
 

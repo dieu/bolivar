@@ -20,16 +20,18 @@
                   text="Status Cloud" fontWeight="bold" fontSize="14"/>
     </mx:HBox>
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:Label height="50" text="Status Application" fontWeight="bold" fontSize="14"/>
+        <mx:Label id="statusApplication" height="150"
+                  text="Status Application" fontWeight="bold" fontSize="14"/>
     </mx:HBox>
     <mx:HBox horizontalAlign="center" autoLayout="true">
         <mx:Button label="Start Application" click="startApplicationClick()"/>
         <mx:Button label="Stop Environment" click="stopEnvironmentClick()"/>
     </mx:HBox>
 
-    <mx:RemoteObject id="testService" showBusyCursor="true"
-                     fault="onFault(event)" destination="TestService">
-        <mx:method name="getString" result="onResultSave(event)" fault="onFault(event)"/>
+    <mx:RemoteObject id="equestrianService" showBusyCursor="true"
+                     fault="onFault(event)" destination="equestrianService">
+        <mx:method name="start" result="onResultStart(event)" fault="onFault(event)"/>
+        <mx:method name="verify" result="onResultVerify(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
 
@@ -37,11 +39,38 @@
         import mx.controls.Alert;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
+        import com.griddynamics.equestrian.entity.ApplicationEntity;
+
+        private var runApplication:Boolean = false;
 
 
-        private function onResultSave(event:ResultEvent):void {
-            Alert.show(String(event.result), "qwe");
+        private function onResultStart(event:ResultEvent):void {
+            //            Alert.show(String(event.result), "qwe");
         }
+
+        private function onResultVerify(event:ResultEvent):void {
+            var app:ApplicationEntity = event.result as ApplicationEntity;
+            runApplication = app.serverStatus;
+            statusApplication.height = 150;
+            statusApplication.text = "Status Application";
+            if (app.serverStatus) {
+                statusApplication.text += "\n Server Running \n";
+            } else {
+                statusApplication.text += "\n Server Stop \n";
+            }
+            if (app.workerStatus) {
+                statusApplication.text += "Worker Running \n";
+            } else {
+                statusApplication.text += "Worker Stop \n";
+            }
+            if (app.scheluderStatus) {
+                statusApplication.text += "Scheluder Running \n";
+            } else {
+                statusApplication.text += "Scheluder Stop \n";
+            }
+            statusApplication.text += app.applicationStatus;
+        }
+
 
         private function onFault(event:FaultEvent):void {
             Alert.show(event.fault.faultString);
@@ -52,11 +81,14 @@
         }
 
         private function startEnvironmentClick():void {
-            testService.getString("we");
+
         }
 
         private function startApplicationClick():void {
-
+            if(!runApplication) {
+                equestrianService.start();
+            }
+            equestrianService.verify();
         }
 
         private function stopEnvironmentClick():void {
