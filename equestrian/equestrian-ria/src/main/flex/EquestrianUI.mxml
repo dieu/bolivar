@@ -13,23 +13,28 @@
     <mx:HRule width="100%" height="40"/>
     <mx:HBox horizontalAlign="center" autoLayout="true">
         <mx:NumericStepper id="nMachines" minimum="1" maximum="1000"/>
-        <mx:Button label="Start Environment" click="startEnvironmentClick()"/>
+        <mx:Button label="Start Application" click="startApplicationClick()"/>
     </mx:HBox>
+    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
+    <!--<mx:Label id="statusCloud" height="50" horizontalCenter="true"-->
+    <!--text="Status Cloud" fontWeight="bold" fontSize="14"/>-->
+    <!--</mx:HBox>-->
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:Label id="statusCloud" height="50" horizontalCenter="true"
-                  text="Status Cloud" fontWeight="bold" fontSize="14"/>
-    </mx:HBox>
-    <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:Label id="statusApplication" height="150"
+        <mx:Label id="statusApplication" width="150"
                   text="Status Application" fontWeight="bold" fontSize="14"/>
     </mx:HBox>
+
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:Button label="Start Application" click="startApplicationClick()"/>
-        <mx:Button label="Stop Environment" click="stopEnvironmentClick()"/>
+        <mx:TextArea id="logApplication" height="250" width="500" fontSize="10"/>
     </mx:HBox>
+    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
+    <!--<mx:Button label="Start Environment" click="startEnvironmentClick()"/>-->
+    <!--<mx:Button label="Stop Environment" click="stopEnvironmentClick()"/>-->
+    <!--</mx:HBox>-->
 
     <mx:RemoteObject id="equestrianService" showBusyCursor="true"
                      fault="onFault(event)" destination="equestrianService">
+        <mx:method name="deploy" result="onResultDeploy(event)" fault="onFault(event)"/>
         <mx:method name="start" result="onResultStart(event)" fault="onFault(event)"/>
         <mx:method name="verify" result="onResultVerify(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
@@ -41,6 +46,9 @@
         import mx.rpc.events.ResultEvent;
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
+        private function onResultDeploy(event:ResultEvent):void {
+        }
+
         private var runApplication:Boolean = false;
 
 
@@ -51,24 +59,25 @@
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
             runApplication = app.serverStatus;
-            statusApplication.height = 150;
-            statusApplication.text = "Status Application";
+            //            logApplication.height = 150;
+//            logApplication.text = "Status Application \n";
+            logApplication.text = "";
             if (app.serverStatus) {
-                statusApplication.text += "\n Server Running \n";
+                logApplication.text += "Server Running \n";
             } else {
-                statusApplication.text += "\n Server Stop \n";
+                logApplication.text += "\n Server Stop \n";
             }
             if (app.workerStatus) {
-                statusApplication.text += "Worker Running \n";
+                logApplication.text += "Worker Running \n";
             } else {
-                statusApplication.text += "Worker Stop \n";
+                logApplication.text += "Worker Stop \n";
             }
             if (app.scheluderStatus) {
-                statusApplication.text += "Scheluder Running \n";
+                logApplication.text += "Scheluder Running \n";
             } else {
-                statusApplication.text += "Scheluder Stop \n";
+                logApplication.text += "Scheluder Stop \n";
             }
-            statusApplication.text += app.applicationStatus;
+            logApplication.text += app.applicationStatus;
         }
 
 

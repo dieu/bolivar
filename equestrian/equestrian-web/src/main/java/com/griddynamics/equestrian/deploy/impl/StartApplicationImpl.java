@@ -15,20 +15,30 @@ import java.util.regex.Pattern;
  * Time: 19:46:27
  */
 public class StartApplicationImpl implements StartApplication<Application> {
+    private String buildCaommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd build";
+    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
     private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
     private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
     private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
-    private String outServer = "";
-    private String outWorkers = "";
+    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+//    private String outServer = "";
+//    private String outWorkers = "";
     private String outScheduler = "";
     private boolean isRunServer = false;
     private boolean isRunWorkers = false;
     private boolean isRunScheduler = false;
+    private boolean isRunBuild = false;
+    private boolean isRunUpload = false;
     private Process server;
     private Process workers;
     private Process scheduler;
-    private Pattern pattern = Pattern.compile("[a-zA-Z]+");
-
+    private Process build;
+    private Process upload;
+    private String regAll = "[a-zA-Z\\d\\s\\S]*";
+    private String regTime = "\\s*<nodeTime>\\d+</nodeTime>\\s*";
+    private String regIp = "\\s*<ip>\\d\\.+</ip>\\s*";
+    private String regTraff = "\\s*<traf>\\d+</traf>\\s*";
+    private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
 
     public static void main(String[] arg) {
         StartApplicationImpl s = new StartApplicationImpl();
@@ -38,7 +48,26 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public void deploy() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            build = Runtime.getRuntime().exec(buildCaommand, null,
+                    new File(ApplicationPath.APPLICATION_PATH));
+            isRunBuild = true;
+            while(isRunBuild) {
+                getData(build, 4);
+                Thread.sleep(60000L);
+            }
+            upload = Runtime.getRuntime().exec(uploadCommand, null,
+                    new File(ApplicationPath.APPLICATION_PATH));
+            isRunUpload = true;
+            while(isRunUpload) {
+                getData(upload, 5);
+                Thread.sleep(60000L);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void start() {
@@ -51,10 +80,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     new File(ApplicationPath.APPLICATION_PATH));
             isRunWorkers = true;
             Thread.sleep(1000L);
-//            scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null,
-//                    new File(ApplicationPath.APPLICATION_PATH));
-//            isRunScheduler = true;
-//            Thread.sleep(1000L);
+            scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null,
+                    new File(ApplicationPath.APPLICATION_PATH));
+            isRunScheduler = true;
+            Thread.sleep(1000L);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -64,21 +93,44 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public Application verify() {
         Application application = new Application();
-        outServer += getData(server, 1);
-        outWorkers += getData(workers, 2);
         outScheduler += getData(scheduler, 3);
-        if(!isRunServer) {
-            application.setServerStatus(false);
-        }
-        if(!isRunWorkers) {
-            application.setWorkerStatus(false);
-        }
         if(!isRunScheduler) {
+            try {
+                Runtime.getRuntime().exec(runKillCommand, null,
+                        new File(ApplicationPath.APPLICATION_PATH));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            isRunServer = false;
+            isRunWorkers = false;
+            outScheduler = "";
+            application.setWorkerStatus(false);
+            application.setServerStatus(false);
             application.setScheluderStatus(false);
         }
-        Matcher m = pattern.matcher(outServer);
-        if(m.matches()) {
-            application.setApplicationStatus(m.toMatchResult().group());
+        if(patTime.matcher(outScheduler).matches()) {
+            String[] split = outScheduler.split(" ");
+            StringBuilder status = new StringBuilder("");
+            for(String word: split) {
+                if(word.startsWith("<nodeTime>")) {
+                    status.append(" Result time: ").append(word.replace("<nodeTime>","")
+                                                              .replace("</nodeTime>",""));
+                }
+                if(word.startsWith("<ip>")) {
+                    status.append(" Result ip: ").append(word.replace("<ip>","")
+                                                            .replace("</ip>",""));
+                }
+                if(word.startsWith("<traf>")) {
+                    status.append(" Result traffic: ").append(word.replace("<traf>","")
+                                                                 .replace("</traf>",""));
+                }
+            }
+            application.setApplicationStatus(status.toString().replace("\r","").replace("\n",""));
+        } else {
+            application.setApplicationStatus("Wait...");
+        }
+        if(application.getApplicationStatus().equals("")) {
+            application.setApplicationStatus("Wait...");
         }
         return application;
     }
@@ -105,12 +157,23 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 switch (id) {
                     case 1 :
                         isRunServer = false;
+                        server.destroy();
                         break;
                     case 2:
                         isRunWorkers = false;
+                        workers.destroy();
                         break;
                     case 3:
                         isRunScheduler = false;
+                        scheduler.destroy();
+                        break;
+                    case 4:
+                        isRunBuild = false;
+                        build.destroy();
+                        break;
+                    case 5:
+                        isRunUpload = false;
+                        upload.destroy();
                         break;
                     default:
                         break;
@@ -120,12 +183,23 @@ public class StartApplicationImpl implements StartApplication<Application> {
             switch (id) {
                 case 1 :
                     isRunServer = false;
+                    server.destroy();
                     break;
                 case 2:
                     isRunWorkers = false;
+                    workers.destroy();
                     break;
                 case 3:
                     isRunScheduler = false;
+                    scheduler.destroy();
+                    break;
+                case 4:
+                    isRunBuild = false;
+                    build.destroy();
+                    break;
+                case 5:
+                    isRunUpload = false;
+                    upload.destroy();
                     break;
                 default:
                     break;
