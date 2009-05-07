@@ -98,7 +98,7 @@ public class Scheduler {
 
     private void findIpWithMaxTraffic() {
         String ip = aggregator.getIpWithMaxTraffic();
-        logger.info("Work finished in " + (System.currentTimeMillis() - startTime));
-        logger.info("Ip " + ip + " has maximum traffic: " + aggregator.getUserStat(ip));
+        logger.info("Work finished in <nodeTime>" + (System.currentTimeMillis() - startTime) + "</nodeTime> ");
+        logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getUserStat(ip) + "</traf> ");
     }
 }
