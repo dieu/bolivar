@@ -5,8 +5,8 @@ package com.griddynamics.equestrian.deploy;
  * Date: 29.04.2009
  * Time: 19:42:06
  */
-public interface StartApplication {
+public interface StartApplication<T> {
 	void deploy();
 	void start();
-	boolean verify();
+	T verify();
 }
