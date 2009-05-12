@@ -2,6 +2,7 @@ package com.griddynamics.equestrian.deploy.impl;
 
 import com.griddynamics.equestrian.deploy.StartApplication;
 import com.griddynamics.equestrian.helpers.ApplicationPath;
+import com.griddynamics.equestrian.helpers.ParserHost;
 import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
     private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
 //    private String outServer = "";
-//    private String outWorkers = "";
+    //    private String outWorkers = "";
     private String outScheduler = "";
     private boolean isRunServer = false;
     private boolean isRunWorkers = false;
@@ -39,6 +40,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String regIp = "\\s*<ip>\\d\\.+</ip>\\s*";
     private String regTraff = "\\s*<traf>\\d+</traf>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
+    private ParserHost parserHost;
 
     public static void main(String[] arg) {
         StartApplicationImpl s = new StartApplicationImpl();
@@ -47,25 +49,25 @@ public class StartApplicationImpl implements StartApplication<Application> {
         s.verify();
     }
 
-    public void deploy() {
+    public void setParserHost(ParserHost parserHost) {
+        this.parserHost = parserHost;
+    }
+
+    public void deploy(int n) {
         try {
-            build = Runtime.getRuntime().exec(buildCaommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
-            isRunBuild = true;
-            while(isRunBuild) {
-                getData(build, 4);
-                Thread.sleep(60000L);
-            }
+            parserHost.parse(n);
             upload = Runtime.getRuntime().exec(uploadCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
             isRunUpload = true;
             while(isRunUpload) {
                 getData(upload, 5);
-                Thread.sleep(60000L);
+                Thread.sleep(1000L);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -114,15 +116,15 @@ public class StartApplicationImpl implements StartApplication<Application> {
             for(String word: split) {
                 if(word.startsWith("<nodeTime>")) {
                     status.append(" Result time: ").append(word.replace("<nodeTime>","")
-                                                              .replace("</nodeTime>",""));
+                            .replace("</nodeTime>",""));
                 }
                 if(word.startsWith("<ip>")) {
                     status.append(" Result ip: ").append(word.replace("<ip>","")
-                                                            .replace("</ip>",""));
+                            .replace("</ip>",""));
                 }
                 if(word.startsWith("<traf>")) {
                     status.append(" Result traffic: ").append(word.replace("<traf>","")
-                                                                 .replace("</traf>",""));
+                            .replace("</traf>",""));
                 }
             }
             application.setApplicationStatus(status.toString().replace("\r","").replace("\n",""));
@@ -183,23 +185,18 @@ public class StartApplicationImpl implements StartApplication<Application> {
             switch (id) {
                 case 1 :
                     isRunServer = false;
-                    server.destroy();
                     break;
                 case 2:
                     isRunWorkers = false;
-                    workers.destroy();
                     break;
                 case 3:
                     isRunScheduler = false;
-                    scheduler.destroy();
                     break;
                 case 4:
                     isRunBuild = false;
-                    build.destroy();
                     break;
                 case 5:
                     isRunUpload = false;
-                    upload.destroy();
                     break;
                 default:
                     break;

@@ -6,6 +6,10 @@ public class ApplicationEntity
     public var serverStatus:Boolean;
     public var workerStatus:Boolean;
     public var scheluderStatus:Boolean;
-    public var applicationStatus:String;    
+    public var applicationStatus:String;
+
+
+    public function ApplicationEntity() {
+    }
 }
 }

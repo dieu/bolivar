@@ -25,7 +25,10 @@
     </mx:HBox>
 
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:TextArea id="logApplication" height="250" width="500" fontSize="10"/>
+        <mx:TextArea id="logApplication" height="100" width="250" fontSize="10"/>
+    </mx:HBox>
+    <mx:HBox>
+        <mx:Grid id="table"/>
     </mx:HBox>
     <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
     <!--<mx:Button label="Start Environment" click="startEnvironmentClick()"/>-->
@@ -41,26 +44,32 @@
 
 
     <mx:Script><![CDATA[
-        import mx.controls.Alert;
-        import mx.rpc.events.FaultEvent;
+        import mx.containers.GridItem;
+import mx.containers.GridRow;
+import mx.controls.Alert;
+        import mx.controls.Label;
+import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
         import com.griddynamics.equestrian.entity.ApplicationEntity;
+
+        private var runApplication:Boolean = false;
+        private var n:int = 0;
+        private var myTimer:Timer = new Timer(10000);
+        private var row = new GridRow();
+
+        private function initApp():void {
+            myTimer.addEventListener("timer", timerHandler);
+        }
 
         private function onResultDeploy(event:ResultEvent):void {
         }
 
-        private var runApplication:Boolean = false;
-
-
         private function onResultStart(event:ResultEvent):void {
-            //            Alert.show(String(event.result), "qwe");
         }
 
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
             runApplication = app.serverStatus;
-            //            logApplication.height = 150;
-//            logApplication.text = "Status Application \n";
             logApplication.text = "";
             if (app.serverStatus) {
                 logApplication.text += "Server Running \n";
@@ -77,16 +86,16 @@
             } else {
                 logApplication.text += "Scheluder Stop \n";
             }
-            logApplication.text += app.applicationStatus;
+            if(!runApplication) {
+                myTimer.stop();
+            } else {
+                logApplication.text += app.applicationStatus;
+            }
         }
 
 
         private function onFault(event:FaultEvent):void {
             Alert.show(event.fault.faultString);
-        }
-
-        private function initApp():void {
-
         }
 
         private function startEnvironmentClick():void {
@@ -95,9 +104,20 @@
 
         private function startApplicationClick():void {
             if(!runApplication) {
+                if(n != nMachines.value as int) {
+                    equestrianService.deploy(nMachines.value as int);
+                }
                 equestrianService.start();
+                myTimer.start();
             }
-            equestrianService.verify();
+        }
+
+        public function timerHandler(event:TimerEvent):void {
+            if(runApplication) {
+                equestrianService.verify();
+            } else {
+                myTimer.stop();
+            }
         }
 
         private function stopEnvironmentClick():void {
