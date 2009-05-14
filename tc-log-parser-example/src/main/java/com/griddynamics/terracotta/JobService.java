@@ -30,7 +30,7 @@ public class JobService {
      * @throws InterruptedException - workManager.waitForAll()'s exception.
      * @throws IOException          - checkDirectory()'s exception. Thrown when directory doesn't exists or provided location is not a directory
      */
-    public void lunchJob(String dir, String dirUrl) throws InterruptedException, IOException {
-        new Scheduler(dir, dirUrl).launchJob();
+    public void lunchJob(String dir, String dirUrl, String localDir) throws InterruptedException, IOException {
+        new Scheduler(dir, dirUrl, localDir).findMaxTrafficWithSeveralWorkers();
     }
 }

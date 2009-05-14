@@ -2,58 +2,54 @@ package com.griddynamics.terracotta.parser;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
 
 
 public class Aggregator {
-    private ConcurrentMap<String, AtomicLong> statistics = new ConcurrentHashMap<String, AtomicLong>();
+    private static final AtomicBoolean TRUE = new AtomicBoolean(true);
+    private static final AtomicBoolean FALSE = new AtomicBoolean(false);
+    private final ConcurrentMap<String, Long> ipTraffic = new ConcurrentHashMap<String, Long>();
+    private final ConcurrentMap<String, AtomicBoolean> logIsParsed = new ConcurrentHashMap<String, AtomicBoolean>();
 
-    /**
-     * Adds or updates ip->traf pair.
-     *
-     * @param ip    - ip for which traffic is calculated.
-     * @param count - traffic for the ip.
-     */
-    public void addStatitics(String ip, Long count) {
-        AtomicLong oldSum = statistics.get(ip);
-        if (oldSum == null) {
-            oldSum = new AtomicLong(0L);
-            statistics.putIfAbsent(ip, oldSum);
-            oldSum = statistics.get(ip);
-        }
-        oldSum.addAndGet(count);
+    public synchronized void addStatistics(Map<String, Long> statistics) {
+        for (String ip : statistics.keySet())
+            addStatistics(ip, statistics.get(ip));
     }
 
-    @Override
-    public String toString() {
-        return statistics.toString();
+    private void addStatistics(String ip, Long traffic) {
+        ipTraffic.putIfAbsent(ip, 0L);
+        ipTraffic.put(ip, ipTraffic.get(ip) + traffic);
     }
 
-    /**
-     * Returns traffic of given ip.
-     *
-     * @param ip - ip.
-     * @return traffic of given ip.
-     */
     public Long getUserStat(String ip) {
-        return statistics.get(ip).longValue();
+        return ipTraffic.get(ip);
     }
 
-    /**
-     * Finds ip with max traffic value.
-     *
-     * @return ip with max traffic value.
-     */
     public String getIpWithMaxTraffic() {
         String maxIp = null;
         Long sum = Long.MIN_VALUE;
-        for (String ip : statistics.keySet()) {
-            long traf = statistics.get(ip).longValue();
+        for (String ip : ipTraffic.keySet()) {
+            long traf = ipTraffic.get(ip);
             if (sum < traf) {
                 sum = traf;
                 maxIp = ip;
             }
         }
         return maxIp;
+    }
+
+    public void markAsParsed(String log) {
+        logIsParsed.put(log, TRUE);
+    }
+
+    public Boolean isParsed(String log) {
+        AtomicBoolean isParsed = logIsParsed.putIfAbsent(log, FALSE);
+        return isParsed != null && isParsed.get();
+    }
+
+    @Override
+    public String toString() {
+        return ipTraffic.toString();
     }
 }

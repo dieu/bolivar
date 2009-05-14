@@ -29,7 +29,20 @@
                 <include>
                     <class-expression>com.griddynamics.terracotta.parser.Aggregator</class-expression>
                 </include>
+
+                <include>
+                    <class-expression>com.griddynamics.terracotta.parser.separate.Wget</class-expression>
+                    <honor-transient>true</honor-transient>
+                </include>
             </instrumented-classes>
+
+            <locks>
+                <autolock>
+                    <method-expression>
+                        * com.griddynamics.terracotta.parser.Aggregator.addStatistics(..)
+                    </method-expression>
+                </autolock>
+            </locks>
         </dso>
     </application>
 </tc:tc-config>

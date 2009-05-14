@@ -5,34 +5,30 @@ import commonj.work.Work;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 
-public class ParserLogWork implements Work {
-
-    private final String pathToFile;
-    private final Aggregator aggregator;
-
+public class ParseLog implements Work {
     private static final String PROTOCOL = "http";
     private static final String DATA_SEPARATOR = "\t";
     private static final int IP_INDEX = 1;
     private static final int TRAF_INDEX = 4;
+    private final String log;
+    private final Aggregator aggregator;
 
     /**
      * Just a parametrized constructor.
-     * @param pathToFile - path to log file.
+     * @param log - path to log file.
      * @param aggregator - Arrgegator istance.
      */
-    public ParserLogWork(String pathToFile, Aggregator aggregator) {
-        this.pathToFile = pathToFile;
+    public ParseLog(String log, Aggregator aggregator) {
+        this.log = log;
         this.aggregator = aggregator;
     }
 
-    public boolean isDaemon() {
-        return false;
-    }
-
-    public void release() {
-
+    public ParseLog(File log, Aggregator aggregator) {
+        this.log = log.getPath();
+        this.aggregator = aggregator;
     }
 
     /**
@@ -40,10 +36,10 @@ public class ParserLogWork implements Work {
      */
     public void run() {
         try {
-            HashMap<String, Long> sum = calculateSummForAllRecods();
-            for (String ip : sum.keySet()) {
-                aggregator.addStatitics(ip, sum.get(ip));
-            }
+            Map<String, Long> sum = calculateSummForAllRecods();
+            //for (String ip : sum.keySet())
+            //    aggregator.addStatistics(ip, sum.get(ip));
+            aggregator.addStatistics(sum);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -51,8 +47,8 @@ public class ParserLogWork implements Work {
         }
     }
 
-    private HashMap<String, Long> calculateSummForAllRecods() throws IOException {
-        HashMap<String, Long> sum = new HashMap<String, Long>();
+    private Map<String, Long> calculateSummForAllRecods() throws IOException {
+        Map<String, Long> sum = new HashMap<String, Long>();
         BufferedReader bufferedReader = getReader();
 
         String s = bufferedReader.readLine();
@@ -69,16 +65,16 @@ public class ParserLogWork implements Work {
 
     private BufferedReader getReader() throws IOException {
         InputStreamReader inputStreamReader;
-        if (pathToFile.startsWith(PROTOCOL)) {
-            inputStreamReader = new InputStreamReader(new URL(pathToFile).openStream());
+        if (log.startsWith(PROTOCOL)) {
+            inputStreamReader = new InputStreamReader(new URL(log).openStream());
         } else {
-            inputStreamReader = new FileReader(pathToFile);
+            inputStreamReader = new FileReader(log);
         }
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         return bufferedReader;
     }
 
-    private void putOrUpdateSumEntry(HashMap<String, Long> sum, String ip, long n) {
+    private void putOrUpdateSumEntry(Map<String, Long> sum, String ip, long n) {
         Long ipSum = sum.get(ip);
         if (ipSum == null) {
             ipSum = n;
@@ -86,5 +82,13 @@ public class ParserLogWork implements Work {
             ipSum += n;
         }
         sum.put(ip, ipSum);
+    }
+
+    public boolean isDaemon() {
+        return false;
+    }
+
+    public void release() {
+        // Do nothing.
     }
 }
