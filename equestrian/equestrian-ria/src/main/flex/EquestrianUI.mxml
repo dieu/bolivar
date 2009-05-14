@@ -139,16 +139,6 @@
             dataChart.addItem({Time:time, Workers:nWorkers});
         }
 
-        private function dtFunc(currDatatip:Object, dataFields:Array):String {
-            var tt:String = "Total: " + ' (' + currDatatip.total + ')';
-
-            for (var i:Number = 0; i<dataFields.length; i++)  {
-                tt += '\n' + dataFields[i] + ": " + currDatatip[dataFields[i]];
-            }
-
-            return  tt;
-        }
-
         private function onFault(event:FaultEvent):void {
             Alert.show(event.fault.faultString);
         }

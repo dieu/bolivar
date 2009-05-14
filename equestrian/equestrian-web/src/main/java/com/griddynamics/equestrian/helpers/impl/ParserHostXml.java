@@ -76,7 +76,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
         if(!serverIp.equals("") && !schedulerIp.equals("") && workersIp.size() != 0) {
             StringBuilder contentFile = new StringBuilder("");
             contentFile.append("SERVER_ADDR = \"" + serverIp + "\" \n");
-            contentFile.append("JAVA_HOME = \"/usr/java/default\" \n\n");
+            contentFile.append("JAVA_HOME = \"/usr/lib/jvm/java-6-sun\" \n\n");
             contentFile.append("role :workers, ");
             for(String ip: workersIp) {
                 contentFile.append("\"" + ip + "\",");
@@ -86,7 +86,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
             contentFile.append("role :scheduler, \"" + schedulerIp + "\" \n");
             contentFile.append("role :server, SERVER_ADDR\n" +
                     "\n" +
-                    "set :user, 'bolivar_scheduler'\n" +
+                    "set :user, 'agorbunov'\n" +
                     "set :password, '123456'\n" +
                     "\n" +
                     "EXAMPLE_DIR = \"tc-log-parser-example\"\n" +
