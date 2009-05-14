@@ -16,11 +16,11 @@ import java.util.regex.Pattern;
  * Time: 19:46:27
  */
 public class StartApplicationImpl implements StartApplication<Application> {
-    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
-    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
-    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
-    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
-    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap upload_all";
+    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_server";
+    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_workers";
+    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
+    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
     private String outScheduler = "";
     private boolean isRunServer = false;
     private boolean isRunWorkers = false;
@@ -35,13 +35,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
     private ParserHost parserHost;
     private Application application = new Application();
-
-    public static void main(String[] arg) {
-        StartApplicationImpl s = new StartApplicationImpl();
-        s.start();
-        s.verify();
-        s.verify();
-    }
 
     public void setParserHost(ParserHost parserHost) {
         this.parserHost = parserHost;
@@ -114,17 +107,14 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 if(word.startsWith("<nodeTime>")) {
                     application.setTime(word.replace("<nodeTime>","")
                             .replace("</nodeTime>",""));
-//                    status.append(" Result time: ").append(application.getTime());
                 }
                 if(word.startsWith("<ip>")) {
                     application.setIp(word.replace("<ip>","")
                             .replace("</ip>","").replace("\r","").replace("\n", ""));
-//                    status.append(" Result ip: ").append(application.getIp());
                 }
                 if(word.startsWith("<traf>")) {
                     application.setTraf(word.replace("<traf>","")
                             .replace("</traf>","").replace("\r","").replace("\n", ""));
-//                    status.append(" Result traffic: ").append(application.getTraf());
                 }
             }
             application.setApplicationStatus(status.toString());

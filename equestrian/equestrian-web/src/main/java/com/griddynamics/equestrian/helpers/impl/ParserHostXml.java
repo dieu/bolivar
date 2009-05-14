@@ -28,10 +28,6 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     private String schedulerIp = "";
     private int n;
 
-    public static void main(String[] arg) throws IOException, SAXException, ParserConfigurationException {
-        new ParserHostXml().parse(1);
-    }
-
     public ParserHostXml() {
     }
 
