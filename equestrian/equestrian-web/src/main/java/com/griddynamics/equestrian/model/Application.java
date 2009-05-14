@@ -10,6 +10,9 @@ public class Application {
     private boolean workerStatus = true;
     private boolean scheluderStatus = true;
     private String applicationStatus = "";
+    private String time = "";
+    private String ip = "";
+    private String traf = "";
 
     public Application() {
     }
@@ -44,5 +47,29 @@ public class Application {
 
     public void setApplicationStatus(String applicationStatus) {
         this.applicationStatus = applicationStatus;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getTraf() {
+        return traf;
+    }
+
+    public void setTraf(String traf) {
+        this.traf = traf;
     }
 }

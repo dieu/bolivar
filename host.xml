@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<project>
+    <server ip="apanasenko-test.carina.griddynamics.net"></server>
+    <scheduler ip="apanasenko-test.carina.griddynamics.net"></scheduler>
+    <worker ip="apanasenko-test.carina.griddynamics.net"></worker>
+</project>

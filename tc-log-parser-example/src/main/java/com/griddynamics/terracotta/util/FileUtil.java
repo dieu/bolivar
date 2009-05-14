@@ -13,7 +13,7 @@ public class FileUtil {
 
     public static void verifyDirExists(File dir) {
         vefiryExists(dir);
-        verifyIsDirectory(dir);
+        verifyIsDir(dir);
     }
 
     private static void vefiryExists(File f) {
@@ -21,24 +21,24 @@ public class FileUtil {
             throw new RuntimeException("File " + f.getPath() + " doesn't exist");
     }
 
-    private static void verifyIsDirectory(File f) {
+    private static void verifyIsDir(File f) {
         if (!f.isDirectory())
             throw new RuntimeException(f.getPath() + " is not directory");
     }
 
-    public static void createDirIfNotExists(String dir) {
-        createDirectoryIfNotExists(new File(dir));
+    public static void createDirIfNotExists(String d) {
+        createDirIfNotExists(new File(d));
     }
 
-    public static void createDirectoryIfNotExists(File dir) {
-        if (dir.exists())
+    public static void createDirIfNotExists(File d) {
+        if (d.exists())
             return;
-        boolean created = dir.mkdirs();
+        boolean created = d.mkdirs();
         if (!created)
-            throw new IllegalStateException("Could not create directory " + dir);
+            throw new IllegalStateException("Could not create directory " + d);
     }
 
-    public static void deleteDirectoryContent(File dir) {
+    public static void deleteDirContent(File dir) {
         if (!dir.exists())
             return;
         if (!dir.isDirectory())
@@ -46,7 +46,7 @@ public class FileUtil {
         File[] files = dir.listFiles();
         for (File f : files) {
             if (f.isDirectory())
-                deleteDirectoryContent(f);
+                deleteDirContent(f);
             else
                 deleteFile(f);
         }

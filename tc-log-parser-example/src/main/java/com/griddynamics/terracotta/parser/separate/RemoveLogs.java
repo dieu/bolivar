@@ -24,7 +24,7 @@ public class RemoveLogs implements Work {
     }
 
     public void run() {
-        FileUtil.deleteDirectoryContent(localDir);
+        FileUtil.deleteDirContent(localDir);
     }
 
     public boolean isDaemon() {

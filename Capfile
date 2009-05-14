@@ -1,8 +1,8 @@
-SERVER_ADDR = "apanasenko-test.carina.griddynamics.net"
-JAVA_HOME = "/usr/java/default"
+SERVER_ADDR = "apanasenko-test.carina.griddynamics.net" 
+JAVA_HOME = "/usr/java/default" 
 
-role :workers, "apanasenko-test.carina.griddynamics.net"
-role :scheduler, "apanasenko-test.carina.griddynamics.net"
+role :workers, "apanasenko-test.carina.griddynamics.net" 
+role :scheduler, "apanasenko-test.carina.griddynamics.net" 
 role :server, SERVER_ADDR
 
 set :user, 'bolivar_scheduler'

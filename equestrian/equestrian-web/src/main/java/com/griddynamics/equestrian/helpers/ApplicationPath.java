@@ -8,4 +8,5 @@ package com.griddynamics.equestrian.helpers;
 public class ApplicationPath {
     public static String APPLICATION_PATH = "C:\\Documents and Settings\\apanasenko\\bolivar\\";
     public static String CAPISTRANO_PATH = "C:\\ruby\\bin\\";
+    public static String HOST_LOG_PATH = "C:\\Documents and Settings\\apanasenko\\bolivar\\host.xml";
 }

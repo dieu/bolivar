@@ -6,7 +6,7 @@ package com.griddynamics.equestrian.deploy;
  * Time: 19:42:06
  */
 public interface StartApplication<T> {
-	void deploy();
+	void deploy(int n);
 	void start();
 	T verify();
 }

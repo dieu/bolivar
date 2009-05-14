@@ -2,6 +2,7 @@ package com.griddynamics.equestrian.deploy.impl;
 
 import com.griddynamics.equestrian.deploy.StartApplication;
 import com.griddynamics.equestrian.helpers.ApplicationPath;
+import com.griddynamics.equestrian.helpers.ParserHost;
 import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
@@ -15,30 +16,25 @@ import java.util.regex.Pattern;
  * Time: 19:46:27
  */
 public class StartApplicationImpl implements StartApplication<Application> {
-    private String buildCaommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd build";
     private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
     private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
     private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
     private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
     private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
-//    private String outServer = "";
-//    private String outWorkers = "";
     private String outScheduler = "";
     private boolean isRunServer = false;
     private boolean isRunWorkers = false;
     private boolean isRunScheduler = false;
-    private boolean isRunBuild = false;
     private boolean isRunUpload = false;
     private Process server;
     private Process workers;
     private Process scheduler;
-    private Process build;
     private Process upload;
     private String regAll = "[a-zA-Z\\d\\s\\S]*";
     private String regTime = "\\s*<nodeTime>\\d+</nodeTime>\\s*";
-    private String regIp = "\\s*<ip>\\d\\.+</ip>\\s*";
-    private String regTraff = "\\s*<traf>\\d+</traf>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
+    private ParserHost parserHost;
+    private Application application = new Application();
 
     public static void main(String[] arg) {
         StartApplicationImpl s = new StartApplicationImpl();
@@ -47,25 +43,26 @@ public class StartApplicationImpl implements StartApplication<Application> {
         s.verify();
     }
 
-    public void deploy() {
+    public void setParserHost(ParserHost parserHost) {
+        this.parserHost = parserHost;
+    }
+
+    public void deploy(int n) {
         try {
-            build = Runtime.getRuntime().exec(buildCaommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
-            isRunBuild = true;
-            while(isRunBuild) {
-                getData(build, 4);
-                Thread.sleep(60000L);
-            }
+            application = new Application();
+            parserHost.parse(n);
             upload = Runtime.getRuntime().exec(uploadCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
             isRunUpload = true;
             while(isRunUpload) {
-                getData(upload, 5);
-                Thread.sleep(60000L);
+                getData(upload, 4);
+                Thread.sleep(1000L);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -92,7 +89,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public Application verify() {
-        Application application = new Application();
+        application.setServerStatus(isRunServer);
+        application.setWorkerStatus(isRunWorkers);
+        application.setScheluderStatus(isRunScheduler);
         outScheduler += getData(scheduler, 3);
         if(!isRunScheduler) {
             try {
@@ -113,19 +112,22 @@ public class StartApplicationImpl implements StartApplication<Application> {
             StringBuilder status = new StringBuilder("");
             for(String word: split) {
                 if(word.startsWith("<nodeTime>")) {
-                    status.append(" Result time: ").append(word.replace("<nodeTime>","")
-                                                              .replace("</nodeTime>",""));
+                    application.setTime(word.replace("<nodeTime>","")
+                            .replace("</nodeTime>",""));
+//                    status.append(" Result time: ").append(application.getTime());
                 }
                 if(word.startsWith("<ip>")) {
-                    status.append(" Result ip: ").append(word.replace("<ip>","")
-                                                            .replace("</ip>",""));
+                    application.setIp(word.replace("<ip>","")
+                            .replace("</ip>","").replace("\r","").replace("\n", ""));
+//                    status.append(" Result ip: ").append(application.getIp());
                 }
                 if(word.startsWith("<traf>")) {
-                    status.append(" Result traffic: ").append(word.replace("<traf>","")
-                                                                 .replace("</traf>",""));
+                    application.setTraf(word.replace("<traf>","")
+                            .replace("</traf>","").replace("\r","").replace("\n", ""));
+//                    status.append(" Result traffic: ").append(application.getTraf());
                 }
             }
-            application.setApplicationStatus(status.toString().replace("\r","").replace("\n",""));
+            application.setApplicationStatus(status.toString());
         } else {
             application.setApplicationStatus("Wait...");
         }
@@ -168,10 +170,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
                         scheduler.destroy();
                         break;
                     case 4:
-                        isRunBuild = false;
-                        build.destroy();
-                        break;
-                    case 5:
                         isRunUpload = false;
                         upload.destroy();
                         break;
@@ -183,23 +181,15 @@ public class StartApplicationImpl implements StartApplication<Application> {
             switch (id) {
                 case 1 :
                     isRunServer = false;
-                    server.destroy();
                     break;
                 case 2:
                     isRunWorkers = false;
-                    workers.destroy();
                     break;
                 case 3:
                     isRunScheduler = false;
-                    scheduler.destroy();
                     break;
                 case 4:
-                    isRunBuild = false;
-                    build.destroy();
-                    break;
-                case 5:
                     isRunUpload = false;
-                    upload.destroy();
                     break;
                 default:
                     break;
