@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
     <mx:creationComplete>
-		<![CDATA[
+        <![CDATA[
             initApp();
         ]]>
     </mx:creationComplete>
@@ -12,7 +12,7 @@
     <mx:Label text="Bolivar Demo" textAlign="center" fontWeight="bold" fontSize="16"/>
     <mx:HRule width="100%" height="40"/>
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:NumericStepper id="nMachines" minimum="1" maximum="1000"/>
+        <mx:NumericStepper id="nMachines" minimum="1" maximum="15"/>
         <mx:Button label="Start Application" click="startApplicationClick()"/>
     </mx:HBox>
     <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
@@ -25,11 +25,44 @@
     </mx:HBox>
 
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:TextArea id="logApplication" height="100" width="250" fontSize="10"/>
+        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>
     </mx:HBox>
+
     <mx:HBox>
-        <mx:Grid id="table"/>
+        <mx:DataGrid id="table" dataProvider="{dataTable}" width="400">
+            <mx:columns>
+                <mx:DataGridColumn dataField="Workers"/>
+                <mx:DataGridColumn dataField="Time"/>
+                <mx:DataGridColumn dataField="IP"/>
+                <mx:DataGridColumn dataField="Traffic"/>
+            </mx:columns>
+        </mx:DataGrid>
     </mx:HBox>
+
+    <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
+
+    <mx:HBox>
+        <mx:Panel title="Bolivar Demo" width="422">
+             <mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">
+                <mx:horizontalAxis>
+                    <mx:CategoryAxis
+                            dataProvider="{dataChart}"
+                            categoryField="Workers"
+                            />
+                </mx:horizontalAxis>
+                <mx:series>
+                    <mx:ColumnSeries
+                            yField="Time"
+                            xField="Workers"
+                            displayName="Workers"
+                            fill="{colorChart}"
+                            />
+                </mx:series>
+            </mx:ColumnChart>
+            <mx:Legend dataProvider="{chart}"/>
+        </mx:Panel>
+    </mx:HBox>
+
     <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
     <!--<mx:Button label="Start Environment" click="startEnvironmentClick()"/>-->
     <!--<mx:Button label="Stop Environment" click="stopEnvironmentClick()"/>-->
@@ -44,21 +77,22 @@
 
 
     <mx:Script><![CDATA[
-        import mx.containers.GridItem;
-import mx.containers.GridRow;
-import mx.controls.Alert;
-        import mx.controls.Label;
-import mx.rpc.events.FaultEvent;
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
+
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
         private var runApplication:Boolean = false;
         private var n:int = 0;
-        private var myTimer:Timer = new Timer(10000);
-        private var row = new GridRow();
+        private var myTimer:Timer;
+        [Bindable]
+        public var dataChart:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        public var dataTable:ArrayCollection = new ArrayCollection();
 
         private function initApp():void {
-            myTimer.addEventListener("timer", timerHandler);
         }
 
         private function onResultDeploy(event:ResultEvent):void {
@@ -74,7 +108,8 @@ import mx.rpc.events.FaultEvent;
             if (app.serverStatus) {
                 logApplication.text += "Server Running \n";
             } else {
-                logApplication.text += "\n Server Stop \n";
+                logApplication.text += "Server Stop \n";
+                myTimer.stop();
             }
             if (app.workerStatus) {
                 logApplication.text += "Worker Running \n";
@@ -86,13 +121,33 @@ import mx.rpc.events.FaultEvent;
             } else {
                 logApplication.text += "Scheluder Stop \n";
             }
-            if(!runApplication) {
-                myTimer.stop();
+            if (!runApplication && app.applicationStatus == "Wait...") {
+                addDataTable(n.toString(), app.time, app.ip, app.traf);
             } else {
                 logApplication.text += app.applicationStatus;
             }
+
         }
 
+        private function addDataTable(nWorkers:String, time:String, ip:String, traf:String):void {
+            dataTable.addItem({Workers:nWorkers, Time:time,
+                IP:ip, Traffic:traf});
+            addDataChart(nWorkers, time);
+        }
+
+        private function addDataChart(nWorkers:String, time:String):void {
+            dataChart.addItem({Time:time, Workers:nWorkers});
+        }
+
+        private function dtFunc(currDatatip:Object, dataFields:Array):String {
+            var tt:String = "Total: " + ' (' + currDatatip.total + ')';
+
+            for (var i:Number = 0; i<dataFields.length; i++)  {
+                tt += '\n' + dataFields[i] + ": " + currDatatip[dataFields[i]];
+            }
+
+            return  tt;
+        }
 
         private function onFault(event:FaultEvent):void {
             Alert.show(event.fault.faultString);
@@ -103,21 +158,21 @@ import mx.rpc.events.FaultEvent;
         }
 
         private function startApplicationClick():void {
-            if(!runApplication) {
-                if(n != nMachines.value as int) {
+            if (!runApplication) {
+                if (n != nMachines.value as int) {
+                    n = nMachines.value as int;
                     equestrianService.deploy(nMachines.value as int);
                 }
                 equestrianService.start();
+                equestrianService.verify();
+                myTimer = new Timer(10000);
+                myTimer.addEventListener("timer", timerHandler);
                 myTimer.start();
             }
         }
 
         public function timerHandler(event:TimerEvent):void {
-            if(runApplication) {
-                equestrianService.verify();
-            } else {
-                myTimer.stop();
-            }
+            equestrianService.verify();
         }
 
         private function stopEnvironmentClick():void {
