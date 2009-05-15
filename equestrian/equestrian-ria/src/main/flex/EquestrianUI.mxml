@@ -119,7 +119,7 @@
                 logApplication.text += "Scheluder Stop \n";
                 runApplication = false;
                 myTimer.stop();
-                addDataTable(app.nWorkers, app.time, app.ip, app.traf);
+                addDataTable(app.workers, app.time, app.ip, app.traf);
             }
         }
 

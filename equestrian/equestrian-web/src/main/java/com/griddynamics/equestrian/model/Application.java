@@ -7,7 +7,7 @@ package com.griddynamics.equestrian.model;
  */
 public class Application {
     private boolean scheluderStatus = true;
-    private String nWorkers = "";
+    private String workers = "";
     private String applicationStatus = "";
     private String time = "";
     private String ip = "";
@@ -24,12 +24,12 @@ public class Application {
         this.scheluderStatus = scheluderStatus;
     }
 
-    public String getNWorkers() {
-        return nWorkers;
+    public String getWorkers() {
+        return workers;
     }
 
-    public void setNWorkers(String nWorkers) {
-        this.nWorkers = nWorkers;
+    public void setWorkers(String workers) {
+        this.workers = workers;
     }
 
     public String getApplicationStatus() {

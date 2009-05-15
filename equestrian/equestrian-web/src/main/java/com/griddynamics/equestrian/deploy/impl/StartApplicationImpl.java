@@ -3,6 +3,7 @@ package com.griddynamics.equestrian.deploy.impl;
 import com.griddynamics.equestrian.deploy.StartApplication;
 import com.griddynamics.equestrian.helpers.ApplicationPath;
 import com.griddynamics.equestrian.helpers.ParserHost;
+import com.griddynamics.equestrian.helpers.impl.ParserHostXml;
 import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
@@ -16,11 +17,16 @@ import java.util.regex.Pattern;
  * Time: 19:46:27
  */
 public class StartApplicationImpl implements StartApplication<Application> {
-    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
-    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
-    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
-    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
-    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap upload_all";
+    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_server";
+    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_workers";
+    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
+        private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
+//    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
+//    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
+//    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
+//    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
+//    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
     private String outScheduler = "";
     private int nWorkers = 0;
     private boolean isRunScheduler = false;
@@ -40,6 +46,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void deploy(int n) {
         try {
+            parserHost = new ParserHostXml();
             nWorkers = parserHost.parse(n);
             upload = Runtime.getRuntime().exec(uploadCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
@@ -78,7 +85,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public Application verify() {
         Application application = new Application();
-        application.setNWorkers(String.valueOf(nWorkers));
+        application.setWorkers(String.valueOf(nWorkers));
         application.setScheluderStatus(isRunScheduler);
         outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
@@ -89,7 +96,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 e.printStackTrace();
             }
             if(patTime.matcher(outScheduler).matches()) {
-                String[] split = outScheduler.split(" ");                
+                String[] split = outScheduler.split(" ");
                 for(String word: split) {
                     if(word.startsWith("<nodeTime>")) {
                         application.setTime(word.replace("<nodeTime>","")
