@@ -21,7 +21,7 @@
     </mx:HBox>
 
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>        
+        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>
     </mx:HBox>
 
     <mx:HBox>
@@ -77,8 +77,8 @@
         import mx.controls.Alert;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
-
         import com.griddynamics.equestrian.entity.ApplicationEntity;
+
 
         private var runApplication:Boolean = false;
         private var n:int = 0;
@@ -100,20 +100,26 @@
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
             runApplication = app.scheluderStatus;
-            n = app.nWorkers;
             logApplication.text = "";
             if (app.scheluderStatus) {
                 logApplication.text += "Server Running \n";
                 logApplication.text += "Worker Running \n";
                 logApplication.text += "Scheluder Running \n";
                 logApplication.text += app.applicationStatus;
+                myTimer.start();
+            } else if(app.time == "") {
+                logApplication.text += "Server Running \n";
+                logApplication.text += "Worker Running \n";
+                logApplication.text += "Scheluder Running \n";
+                logApplication.text += "Wait...";
+                startApplicationClick();
             } else {
                 logApplication.text += "Server Stop \n";
                 logApplication.text += "Worker Stop \n";
                 logApplication.text += "Scheluder Stop \n";
                 runApplication = false;
                 myTimer.stop();
-                addDataTable(n.toString(), app.time, app.ip, app.traf);
+                addDataTable(app.nWorkers, app.time, app.ip, app.traf);
             }
         }
 
@@ -137,12 +143,11 @@
 
         private function startApplicationClick():void {
             if (!runApplication) {
-                if (n != nMachines.value as int) {
-                    n = nMachines.value as int;
+                if (n != int(nMachines.value)) {
+                    n = int(nMachines.value);
                     equestrianService.deploy(nMachines.value as int);
                 }
                 equestrianService.start();
-                equestrianService.verify();
                 myTimer = new Timer(10000);
                 myTimer.addEventListener("timer", timerHandler);
                 myTimer.start();
@@ -150,7 +155,9 @@
         }
 
         public function timerHandler(event:TimerEvent):void {
+            myTimer.stop();
             equestrianService.verify();
+
         }
 
         private function stopEnvironmentClick():void {

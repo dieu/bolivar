@@ -4,7 +4,7 @@ package com.griddynamics.equestrian.entity {
 public class ApplicationEntity
 {
     public var scheluderStatus:Boolean;
-    public var nWorkers:int;
+    public var nWorkers:String;
     public var applicationStatus:String;
     public var time:String;
     public var ip:String;

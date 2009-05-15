@@ -26,7 +26,11 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     private List<String> workersIp = new ArrayList<String>();
     private String serverIp = "";
     private String schedulerIp = "";
-    private int n; 
+    private int n;
+
+    public static void main(String[] arg) throws IOException, SAXException, ParserConfigurationException {
+        new ParserHostXml().parse(2);
+    }
 
     public ParserHostXml() {
     }
@@ -97,7 +101,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "SCHEDULER = \"scheduler-unit.jar\"\n" +
                     "JARS = [NODE, SCHEDULER]\n" +
                     "DSO_BOOT = \"dso-boot.linux.java-6.10.jar\"\n" +
-                    "TC_DIR = \"terracotta-2.7.2\"\n" +
+                    "TC_DIR = \"terracotta-3.0.0\"\n" +
                     "CONFIG = \"tc-config.xml\"\n" +
                     "MISC = \"misc\"\n" +
                     "\n" +
