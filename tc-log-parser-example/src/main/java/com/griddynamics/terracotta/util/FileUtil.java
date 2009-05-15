@@ -7,56 +7,58 @@ import java.io.File;
  */
 public class FileUtil {
 
-    public static void verifyDirExists(String dir) {
-        verifyDirExists(new File(dir));
+    public static void verifyDirExists(String a) {
+        verifyDirExists(new File(a));
     }
 
-    public static void verifyDirExists(File dir) {
-        vefiryExists(dir);
-        verifyIsDir(dir);
+    public static void verifyDirExists(File a) {
+        vefiryExists(a);
+        verifyIsDir(a);
     }
 
-    private static void vefiryExists(File f) {
-        if (!f.exists())
-            throw new RuntimeException("File " + f.getPath() + " doesn't exist");
+    private static void vefiryExists(File a) {
+        if (!a.exists())
+            throw new RuntimeException("File " + a.getPath() + " doesn't exist");
     }
 
-    private static void verifyIsDir(File f) {
-        if (!f.isDirectory())
-            throw new RuntimeException(f.getPath() + " is not directory");
+    private static void verifyIsDir(File a) {
+        if (!a.isDirectory())
+            throw new RuntimeException(a.getPath() + " is not directory");
     }
 
-    public static void createDirIfNotExists(String d) {
-        createDirIfNotExists(new File(d));
+    public static void createDirIfNotExists(String a) {
+        createDirIfNotExists(new File(a));
     }
 
-    public static void createDirIfNotExists(File d) {
-        if (d.exists())
+    public static void createDirIfNotExists(File a) {
+        if (a.exists()) {
+            verifyIsDir(a);
             return;
-        boolean created = d.mkdirs();
+        }
+        boolean created = a.mkdirs();
         if (!created)
-            throw new IllegalStateException("Could not create directory " + d);
+            throw new IllegalStateException("Could not create directory " + a);
     }
 
-    public static void deleteDirContent(File dir) {
-        if (!dir.exists())
+    public static void deleteDirContent(File a) {
+        if (!a.exists())
             return;
-        if (!dir.isDirectory())
+        if (!a.isDirectory())
             return;
-        File[] files = dir.listFiles();
-        for (File f : files) {
-            if (f.isDirectory())
-                deleteDirContent(f);
+        File[] children = a.listFiles();
+        for (File c : children) {
+            if (c.isDirectory())
+                deleteDirContent(c);
             else
-                deleteFile(f);
+                deleteFile(c);
         }
     }
 
-    public static void deleteFile(File f) {
-        if (!f.exists())
+    public static void deleteFile(File a) {
+        if (!a.exists())
             return;
-        boolean deleted = f.delete();
+        boolean deleted = a.delete();
         if (!deleted)
-            throw new IllegalStateException("Could not delete file " + f);
+            throw new IllegalStateException("Could not delete file " + a);
     }
 }

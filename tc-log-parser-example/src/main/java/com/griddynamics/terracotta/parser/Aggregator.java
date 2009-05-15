@@ -3,7 +3,9 @@ package com.griddynamics.terracotta.parser;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.Map;
+import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 
 
 public class Aggregator {
