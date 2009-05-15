@@ -68,7 +68,7 @@ task :run_workers, :roles => :workers do
 end
 
 task :run_scheduler, :roles => :scheduler do
-  run "java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
 end
 
 task :run_server, :roles => :server do
