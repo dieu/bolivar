@@ -1,11 +1,11 @@
-SERVER_ADDR = "apanasenko-test.carina.griddynamics.net" 
-JAVA_HOME = "/usr/java/default" 
+SERVER_ADDR = "ec2-75-101-177-147.compute-1.amazonaws.com" 
+JAVA_HOME = "/usr/lib/jvm/java-6-sun" 
 
-role :workers, "apanasenko-test.carina.griddynamics.net" 
-role :scheduler, "apanasenko-test.carina.griddynamics.net" 
+role :workers, "ec2-75-101-251-62.compute-1.amazonaws.com","ec2-67-202-15-115.compute-1.amazonaws.com" 
+role :scheduler, "ec2-174-129-140-0.compute-1.amazonaws.com" 
 role :server, SERVER_ADDR
 
-set :user, 'bolivar_scheduler'
+set :user, 'agorbunov'
 set :password, '123456'
 
 EXAMPLE_DIR = "tc-log-parser-example"
@@ -13,7 +13,7 @@ TARGET_DIR = "bolivar"
 NODE = "node-unit.jar"
 SCHEDULER = "scheduler-unit.jar"
 JARS = [NODE, SCHEDULER]
-DSO_BOOT = "dso-boot.linux.java-6.12.jar"
+DSO_BOOT = "dso-boot.linux.java-6.10.jar"
 TC_DIR = "terracotta-2.7.2"
 CONFIG = "tc-config.xml"
 MISC = "misc"
@@ -68,7 +68,7 @@ task :run_workers, :roles => :workers do
 end
 
 task :run_scheduler, :roles => :scheduler do
-  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/logs/ -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
 end
 
 task :run_server, :roles => :server do

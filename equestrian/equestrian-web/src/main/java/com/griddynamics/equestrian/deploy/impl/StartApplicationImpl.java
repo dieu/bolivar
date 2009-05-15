@@ -22,8 +22,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
     private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
     private String outScheduler = "";
-    private boolean isRunServer = false;
-    private boolean isRunWorkers = false;
+    private int nWorkers = 0;
     private boolean isRunScheduler = false;
     private boolean isRunUpload = false;
     private Process server;
@@ -42,13 +41,12 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void deploy(int n) {
         try {
-            application = new Application();
-            parserHost.parse(n);
+            nWorkers = parserHost.parse(n);
             upload = Runtime.getRuntime().exec(uploadCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
             isRunUpload = true;
             while(isRunUpload) {
-                getData(upload, 4);
+                getData(upload, 2);
                 Thread.sleep(1000L);
             }
         } catch (IOException e) {
@@ -62,13 +60,13 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void start() {
         try {
+            application = new Application();
+            application.setNWorkers(nWorkers);
             server = Runtime.getRuntime().exec(runServerCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
-            isRunServer = true;
             Thread.sleep(1000L);
             workers = Runtime.getRuntime().exec(runWorkersCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
-            isRunWorkers = true;
             Thread.sleep(1000L);
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
@@ -82,10 +80,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public Application verify() {
-        application.setServerStatus(isRunServer);
-        application.setWorkerStatus(isRunWorkers);
         application.setScheluderStatus(isRunScheduler);
-        outScheduler += getData(scheduler, 3);
+        outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
                 Runtime.getRuntime().exec(runKillCommand, null,
@@ -93,11 +89,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            isRunServer = false;
-            isRunWorkers = false;
             outScheduler = "";
-            application.setWorkerStatus(false);
-            application.setServerStatus(false);
             application.setScheluderStatus(false);
         }
         if(patTime.matcher(outScheduler).matches()) {
@@ -119,9 +111,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
             application.setApplicationStatus(status.toString());
         } else {
-            application.setApplicationStatus("Wait...");
-        }
-        if(application.getApplicationStatus().equals("")) {
             application.setApplicationStatus("Wait...");
         }
         return application;
@@ -147,42 +136,28 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 out.append(new String(data)).append("\n");
             } else {
                 switch (id) {
-                    case 1 :
-                        isRunServer = false;
-                        server.destroy();
-                        break;
-                    case 2:
-                        isRunWorkers = false;
-                        workers.destroy();
-                        break;
-                    case 3:
+                    case 1:
                         isRunScheduler = false;
+                        server.destroy();
+                        workers.destroy();
                         scheduler.destroy();
                         break;
-                    case 4:
+                    case 2:
                         isRunUpload = false;
                         upload.destroy();
                         break;
-                    default:
-                        break;
+                    default: break;
                 }
             }
         } else {
             switch (id) {
-                case 1 :
-                    isRunServer = false;
-                    break;
-                case 2:
-                    isRunWorkers = false;
-                    break;
-                case 3:
+                case 1:
                     isRunScheduler = false;
                     break;
-                case 4:
+                case 2:
                     isRunUpload = false;
                     break;
-                default:
-                    break;
+                default: break;
             }
         }
         return out.toString();

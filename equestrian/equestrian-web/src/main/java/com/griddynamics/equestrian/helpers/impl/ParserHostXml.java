@@ -26,18 +26,20 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     private List<String> workersIp = new ArrayList<String>();
     private String serverIp = "";
     private String schedulerIp = "";
-    private int n;
+    private int n; 
 
     public ParserHostXml() {
     }
 
-    public void parse(int n) throws SAXException, ParserConfigurationException, IOException {
+    public int parse(int n) throws SAXException, ParserConfigurationException, IOException {
         this.n = n;
         File hostLog = new File(ApplicationPath.HOST_LOG_PATH);
         SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp = spf.newSAXParser();
         sp.parse(hostLog, this);
         writeCapFile();
+        this.n = workersIp.size();
+        return this.n;
     }
 
     public void startElement(String namespaceURI, String localName,
@@ -94,7 +96,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "NODE = \"node-unit.jar\"\n" +
                     "SCHEDULER = \"scheduler-unit.jar\"\n" +
                     "JARS = [NODE, SCHEDULER]\n" +
-                    "DSO_BOOT = \"dso-boot.linux.java-6.12.jar\"\n" +
+                    "DSO_BOOT = \"dso-boot.linux.java-6.10.jar\"\n" +
                     "TC_DIR = \"terracotta-2.7.2\"\n" +
                     "CONFIG = \"tc-config.xml\"\n" +
                     "MISC = \"misc\"\n" +
@@ -103,8 +105,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "  body = File.open(src, \"rb\") { |f| f.read }\n" +
                     "  run \"mkdir -p #{TARGET_DIR}\"\n" +
                     "  put(body, File.join(TARGET_DIR, dst))\n" +
-                    "end\n" +
-                    "\n" +
+                    "end\n" +                                   "\n" +
                     "def target(dir)\n" +
                     "  File.join(TARGET_DIR, dir)\n" +
                     "end\n" +
@@ -149,7 +150,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/logs/ -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_server, :roles => :server do\n" +

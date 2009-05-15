@@ -15,17 +15,13 @@
         <mx:NumericStepper id="nMachines" minimum="1" maximum="15"/>
         <mx:Button label="Start Application" click="startApplicationClick()"/>
     </mx:HBox>
-    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
-    <!--<mx:Label id="statusCloud" height="50" horizontalCenter="true"-->
-    <!--text="Status Cloud" fontWeight="bold" fontSize="14"/>-->
-    <!--</mx:HBox>-->
     <mx:HBox horizontalAlign="center" autoLayout="true">
         <mx:Label id="statusApplication" width="150"
                   text="Status Application" fontWeight="bold" fontSize="14"/>
     </mx:HBox>
 
     <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>
+        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>        
     </mx:HBox>
 
     <mx:HBox>
@@ -43,7 +39,7 @@
 
     <mx:HBox>
         <mx:Panel title="Bolivar Demo" width="422">
-             <mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">
+            <mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">
                 <mx:horizontalAxis>
                     <mx:CategoryAxis
                             dataProvider="{dataChart}"
@@ -103,30 +99,22 @@
 
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
-            runApplication = app.serverStatus;
+            runApplication = app.scheluderStatus;
+            n = app.nWorkers;
             logApplication.text = "";
-            if (app.serverStatus) {
+            if (app.scheluderStatus) {
                 logApplication.text += "Server Running \n";
+                logApplication.text += "Worker Running \n";
+                logApplication.text += "Scheluder Running \n";
+                logApplication.text += app.applicationStatus;
             } else {
                 logApplication.text += "Server Stop \n";
-                myTimer.stop();
-            }
-            if (app.workerStatus) {
-                logApplication.text += "Worker Running \n";
-            } else {
                 logApplication.text += "Worker Stop \n";
-            }
-            if (app.scheluderStatus) {
-                logApplication.text += "Scheluder Running \n";
-            } else {
                 logApplication.text += "Scheluder Stop \n";
-            }
-            if (!runApplication && app.applicationStatus == "Wait...") {
+                runApplication = false;
+                myTimer.stop();
                 addDataTable(n.toString(), app.time, app.ip, app.traf);
-            } else {
-                logApplication.text += app.applicationStatus;
             }
-
         }
 
         private function addDataTable(nWorkers:String, time:String, ip:String, traf:String):void {

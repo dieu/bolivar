@@ -10,5 +10,5 @@ import javax.xml.parsers.ParserConfigurationException;
  * Time: 14:09:21
  */
 public interface ParserHost {
-    void parse(int n) throws Exception;
+    int parse(int n) throws Exception;
 }

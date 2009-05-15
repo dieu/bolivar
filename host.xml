@@ -1,6 +1,7 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <project>
-    <server ip="apanasenko-test.carina.griddynamics.net"></server>
-    <scheduler ip="apanasenko-test.carina.griddynamics.net"></scheduler>
-    <worker ip="apanasenko-test.carina.griddynamics.net"></worker>
+    <server ip="ec2-75-101-177-147.compute-1.amazonaws.com"></server>
+    <scheduler ip="ec2-174-129-140-0.compute-1.amazonaws.com"></scheduler>
+    <worker ip="ec2-75-101-251-62.compute-1.amazonaws.com"></worker>
+    <worker ip="ec2-67-202-15-115.compute-1.amazonaws.com"></worker>
 </project>
