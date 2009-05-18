@@ -13,21 +13,15 @@ public class ParseLog implements Work {
     private static final String DATA_SEPARATOR = "\t";
     private static final int IP_INDEX = 1;
     private static final int TRAF_INDEX = 4;
-    private final String log;
-    private final Aggregator aggregator;
-
-    /**
-     * Just a parametrized constructor.
-     * @param log - path to log file.
-     * @param aggregator - Arrgegator istance.
-     */
-    public ParseLog(String log, Aggregator aggregator) {
-        this.log = log;
-        this.aggregator = aggregator;
-    }
+    private String log;
+    private Aggregator aggregator;
 
     public ParseLog(File log, Aggregator aggregator) {
-        this.log = log.getPath();
+        this(log.getPath(), aggregator);
+    }
+
+    public ParseLog(String log, Aggregator aggregator) {
+        this.log = log;
         this.aggregator = aggregator;
     }
 
@@ -35,15 +29,15 @@ public class ParseLog implements Work {
      * Fires up statistics calculations for one log file.
      */
     public void run() {
+        Map<String, Long> sum = parseLog();
+        reportToAggregator(sum);
+    }
+
+    private Map<String, Long> parseLog() {
         try {
-            Map<String, Long> sum = calculateSummForAllRecods();
-            //for (String ip : sum.keySet())
-            //    aggregator.addStatistics(ip, sum.get(ip));
-            aggregator.addStatistics(sum);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return calculateSummForAllRecods();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -82,6 +76,10 @@ public class ParseLog implements Work {
             ipSum += n;
         }
         sum.put(ip, ipSum);
+    }
+
+    private void reportToAggregator(Map<String, Long> sum) {
+        aggregator.addStatistics(sum);
     }
 
     public boolean isDaemon() {

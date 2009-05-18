@@ -5,9 +5,9 @@ import commonj.work.Work;
 import java.lang.reflect.Constructor;
 
 /**
- * Instantiates a work item not by the master, but when the worker
- * picks up the item off the queue. This is necessary to prevent
- * UnlockedSharedObjectException.
+ * Instantiates a work item not by the master, but by the worker
+ * when it picks up the item off the queue.
+ * This helps preventing UnlockedSharedObjectException.
  * http://www.shinetech.com/pages/viewpage.action?pageId=1276
  *
  * @author agorbunov @ 13.05.2009 13:31:33
@@ -43,6 +43,18 @@ public class LocalWork implements Work {
         for (int i = 0; i < arguments.length; i++)
             argumentTypes[i] = arguments[i].getClass();
         return work.getConstructor(argumentTypes);
+    }
+
+    public String toString() {
+        return work.toString();
+    }
+
+    public int hashCode() {
+        return work.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        return work.equals(o);
     }
 
     public boolean isDaemon() {

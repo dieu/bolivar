@@ -1,8 +1,9 @@
-SERVER_ADDR = "ec2-67-202-12-13.compute-1.amazonaws.com" 
+SERVER_ADDR = "ec2-75-101-196-243.compute-1.amazonaws.com" 
 JAVA_HOME = "/usr/lib/jvm/java-6-sun"
 
-role :workers, "ec2-67-202-12-33.compute-1.amazonaws.com", "ec2-75-101-242-184.compute-1.amazonaws.com"
-role :scheduler, "ec2-67-202-12-13.compute-1.amazonaws.com" 
+role :workers, "ec2-67-202-5-27.compute-1.amazonaws.com", "ec2-67-202-25-197.compute-1.amazonaws.com"
+#, "ec2-67-202-5-181.compute-1.amazonaws.com", "ec2-75-101-209-188.compute-1.amazonaws.com"
+role :scheduler, SERVER_ADDR
 role :server, SERVER_ADDR
 
 set :user, 'agorbunov'
@@ -64,11 +65,11 @@ task :upload_all do
 end
 
 task :run_workers, :roles => :workers do
-  run "java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} > /dev/null 2>&1 &"
+  run "java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} 2>&1"
 end
 
 task :run_scheduler, :roles => :scheduler do
-  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &"
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1"
 end
 
 task :run_server, :roles => :server do
