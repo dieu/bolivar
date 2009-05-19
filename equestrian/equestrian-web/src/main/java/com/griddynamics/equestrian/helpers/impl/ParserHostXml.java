@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author: apanasenko aka dieu
@@ -44,6 +46,16 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
         writeCapFile();
         this.n = workersIp.size();
         return this.n;
+    }
+
+    public Map<String, Boolean> getNodeIp() {
+        Map<String, Boolean> nodes = new HashMap<String, Boolean>();
+        for(String node: workersIp) {
+            nodes.put(node, true);
+        }
+        nodes.put(serverIp, true);
+        nodes.put(schedulerIp, true);
+        return nodes;
     }
 
     public void startElement(String namespaceURI, String localName,

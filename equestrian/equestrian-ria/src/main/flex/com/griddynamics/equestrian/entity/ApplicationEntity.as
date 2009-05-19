@@ -3,13 +3,14 @@ package com.griddynamics.equestrian.entity {
 [Bindable]
 public class ApplicationEntity
 {
-    public var scheluderStatus:Boolean;
+    public var schedulerStatus:Boolean;
+    public var date:Date;
     public var workers:String;
     public var applicationStatus:String;
     public var time:String;
     public var ip:String;
     public var traf:String;
-
+    public var nodeIp:Object;
 
     public function ApplicationEntity() {
     }

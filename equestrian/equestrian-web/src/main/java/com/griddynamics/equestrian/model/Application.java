@@ -1,27 +1,39 @@
 package com.griddynamics.equestrian.model;
 
+import java.util.*;
+
 /**
  * @author: apanasenko aka dieu
  * Date: 06.05.2009
  * Time: 15:55:03
  */
 public class Application {
-    private boolean scheluderStatus = true;
+    private boolean schedulerStatus = true;
+    private Date date = null;
     private String workers = "";
     private String applicationStatus = "";
     private String time = "";
     private String ip = "";
     private String traf = "";
+    private Map<String, Boolean> nodeIp = new HashMap<String, Boolean>();
 
     public Application() {
     }  
 
-    public boolean isScheluderStatus() {
-        return scheluderStatus;
+    public boolean isSchedulerStatus() {
+        return schedulerStatus;
     }
 
-    public void setScheluderStatus(boolean scheluderStatus) {
-        this.scheluderStatus = scheluderStatus;
+    public void setSchedulerStatus(boolean schedulerStatus) {
+        this.schedulerStatus = schedulerStatus;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public String getWorkers() {
@@ -62,5 +74,13 @@ public class Application {
 
     public void setTraf(String traf) {
         this.traf = traf;
+    }
+
+    public Map<String, Boolean> getNodeIp() {
+        return nodeIp;
+    }
+
+    public void setNodeIp(Map<String, Boolean> nodeIp) {
+        this.nodeIp = nodeIp;
     }
 }

@@ -8,8 +8,8 @@ import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * @author: apanasenko aka dieu
@@ -21,12 +21,12 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_server";
     private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_workers";
     private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
-        private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
+    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
 //    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
 //    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
-//    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
-//    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
-//    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+//        private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
+//        private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
+//        private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
     private String outScheduler = "";
     private int nWorkers = 0;
     private boolean isRunScheduler = false;
@@ -39,15 +39,26 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String regTime = "\\s*<nodeTime>\\d+</nodeTime>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
     private ParserHost parserHost;
+    private Application application;
+    private Date date;
+    private Map<String, Boolean> nodes;
 
     public void setParserHost(ParserHost parserHost) {
         this.parserHost = parserHost;
     }
 
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
     public void deploy(int n) {
         try {
+            Runtime.getRuntime().exec(runKillCommand, null,
+                    new File(ApplicationPath.APPLICATION_PATH));
+            Thread.sleep(1000L);
             parserHost = new ParserHostXml();
             nWorkers = parserHost.parse(n);
+            nodes =  parserHost.getNodeIp();
             upload = Runtime.getRuntime().exec(uploadCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
             isRunUpload = true;
@@ -66,6 +77,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void start() {
         try {
+            date = Calendar.getInstance().getTime();
+            Runtime.getRuntime().exec(runKillCommand, null,
+                    new File(ApplicationPath.APPLICATION_PATH));
+            Thread.sleep(1000L);
             server = Runtime.getRuntime().exec(runServerCommand, null,
                     new File(ApplicationPath.APPLICATION_PATH));
             Thread.sleep(1000L);
@@ -84,9 +99,11 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public Application verify() {
-        Application application = new Application();
+        application = new Application();
         application.setWorkers(String.valueOf(nWorkers));
-        application.setScheluderStatus(isRunScheduler);
+        application.setDate(date);
+        application.setNodeIp(nodes);
+        application.setSchedulerStatus(isRunScheduler);
         outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
@@ -113,7 +130,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 }
             }
             outScheduler = "";
-            application.setScheluderStatus(false);
+            application.setSchedulerStatus(false);
         } else {
             application.setApplicationStatus("Wait...");
         }

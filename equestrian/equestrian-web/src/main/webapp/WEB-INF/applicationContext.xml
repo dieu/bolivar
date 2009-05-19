@@ -7,9 +7,16 @@
                   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <bean name="parserHost" class="com.griddynamics.equestrian.helpers.impl.ParserHostXml"/>
+    <bean name="parserHost" class="com.griddynamics.equestrian.helpers.impl.ParserHostXml" scope="prototype"/>
+    <bean name="application" class="com.griddynamics.equestrian.model.Application" scope="prototype"/>
+    <bean name="historyEntity" class="com.griddynamics.equestrian.model.HistoryEntity" scope="singleton"/>
 
-    <bean name="startApplication" class="com.griddynamics.equestrian.deploy.impl.StartApplicationImpl">
+    <bean name="startApplication" class="com.griddynamics.equestrian.deploy.impl.StartApplicationImpl" scope="session">
         <property name="parserHost" ref="parserHost"/>
+        <property name="application" ref="application"/>
+    </bean>
+
+    <bean name="history" class="com.griddynamics.equestrian.helpers.History" scope="singleton">
+        <property name="historyEntity" ref="historyEntity"/>
     </bean>
 </beans>
