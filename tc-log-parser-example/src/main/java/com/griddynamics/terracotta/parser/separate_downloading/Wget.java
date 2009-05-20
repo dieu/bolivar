@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta.parser.separate;
+package com.griddynamics.terracotta.parser.separate_downloading;
 
 import org.apache.log4j.Logger;
 

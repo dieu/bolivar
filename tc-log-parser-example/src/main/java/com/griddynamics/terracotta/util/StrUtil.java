@@ -22,4 +22,12 @@ public class StrUtil {
             r.delete(r.length() - separator.length() - 1, r.length() - 1);
         return r.toString();
     }
+
+    public static String surroundWithTag(Long num, String tag) {
+        return surroundWithTag(num.toString(), tag);
+    }
+
+    public static String surroundWithTag(String s, String tag) {
+        return "<" + tag + ">" + s + "</" + tag + ">";
+    }
 }

@@ -43,13 +43,23 @@ public class RandomBasedLogFilesGenerator {
         long sTime = System.nanoTime();
 
         ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
-        for (long i = 0; i < fileNum; ++i) {
-            String filename = filenamePrefix + System.nanoTime() / 1000;
-            executorService.execute(new LogFileBuider(filename));
-        }
+        for (String file : getFilenames(fileNum))
+            executorService.execute(new LogFileBuilder(file));
         executorService.shutdown();
         executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         System.out.println("Generation finished in " + (System.nanoTime() - sTime) / 1000000 + " ms.");
+    }
+
+    private Set<String> getFilenames(long fileNum) {
+        Set<String> uniqueFilenames = new HashSet<String>();
+        for (long i = 0; i < fileNum; ++i) {
+            String filename;
+            do {
+                filename = filenamePrefix + System.nanoTime() / 1000;
+            } while (uniqueFilenames.contains(filename));
+            uniqueFilenames.add(filename);
+        }
+        return uniqueFilenames;
     }
 
     public void generateSync() throws InterruptedException, IOException {
@@ -59,7 +69,7 @@ public class RandomBasedLogFilesGenerator {
         System.out.println("Sync generation started.");
         long sTime = System.nanoTime();
         for (long i = 0; i < fileNum; ++i) {
-            (new LogFileBuider(filenamePrefix + System.currentTimeMillis())).createFile();
+            (new LogFileBuilder(filenamePrefix + System.currentTimeMillis())).createFile();
         }
 
         System.out.println("Sync Generation finished in " + (System.nanoTime() - sTime) / 1000000 + " ms.");
@@ -91,11 +101,11 @@ public class RandomBasedLogFilesGenerator {
         }
     }
 
-    private class LogFileBuider implements Runnable {
+    private class LogFileBuilder implements Runnable {
 
         private String filename;
 
-        private LogFileBuider(String filename) {
+        private LogFileBuilder(String filename) {
             this.filename = filename;
         }
 

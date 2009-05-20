@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta.parser.separate;
+package com.griddynamics.terracotta.parser.separate_downloading;
 
 import commonj.work.Work;
 import com.griddynamics.terracotta.util.FileUtil;
@@ -6,6 +6,8 @@ import com.griddynamics.terracotta.parser.Aggregator;
 import com.griddynamics.terracotta.parser.ParseLog;
 
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
@@ -14,37 +16,35 @@ import org.apache.log4j.Logger;
  */
 public class ParseLogs implements Work {
     private static Logger logger = Logger.getLogger(ParseLogs.class);
+    private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Aggregator aggregator;
-    private String localDir;
+    private String dir;
     private File[] logs;
 
-    public static Work inUsing(String localDir, Aggregator aggregator) {
-        return new LocalWork(ParseLogs.class, localDir, aggregator);
+    public static Work inUsing(String dir, Aggregator aggregator) {
+        return new LocalWork(ParseLogs.class, dir, aggregator);
     }
 
-    /* Instead of this constructor, call ParseLogs.inUsing(localDir, aggregator). 
+    /* Instead of this constructor, call ParseLogs.inUsing(dir, aggregator).
      * The constructor is private, but marked as public to suit Terracotta. */
     @Deprecated
-    public ParseLogs(String localDir, Aggregator aggregator) {
-        this.localDir = localDir;
+    public ParseLogs(String dir, Aggregator aggregator) {
+        this.dir = dir;
         this.aggregator = aggregator;
     }
 
     public void run() {
-        parseDownloadedLogs();
+        find();
+        parse();
+        report();
     }
 
-    private void parseDownloadedLogs() {
-        findLogs();
-        parseLogs();
+    private void find() {
+        FileUtil.verifyDirExists(dir);
+        logs = new File(dir).listFiles();
     }
 
-    private void findLogs() {
-        FileUtil.verifyDirExists(localDir);
-        logs = new File(localDir).listFiles();
-    }
-
-    private void parseLogs() {
+    private void parse() {
         for (File log : logs)
             parseIfNeeded(log);
     }
@@ -66,7 +66,19 @@ public class ParseLogs implements Work {
 
     private void parse(File log) {
         logger.info("Parsing log " + log.getPath());
-        new ParseLog(log, aggregator).run();
+        Long started = System.currentTimeMillis();
+        ParseLog work = new ParseLog(log, aggregator);
+        work.parseTo(trafficByIp);
+        logger.info("Parsed in " + (System.currentTimeMillis() - started));
+    }
+
+    private void report() {
+        if (!trafficByIp.isEmpty()) {
+            logger.info("Reporting traffuc ysage...");
+            Long started = System.currentTimeMillis();
+            aggregator.addStatistics(trafficByIp);
+            logger.info("Reported in " + (System.currentTimeMillis() - started));
+        }
     }
 
     public boolean isDaemon() {

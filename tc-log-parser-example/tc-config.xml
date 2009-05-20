@@ -32,7 +32,7 @@
                 </include>
 
                 <include>
-                    <class-expression>com.griddynamics.terracotta.parser.separate.Wget</class-expression>
+                    <class-expression>com.griddynamics.terracotta.parser.separate_downloading.Wget</class-expression>
                     <honor-transient>true</honor-transient>
                 </include>
             </instrumented-classes>

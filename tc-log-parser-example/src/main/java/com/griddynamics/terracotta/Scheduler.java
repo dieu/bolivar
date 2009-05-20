@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.griddynamics.terracotta.parser.Aggregator;
-import com.griddynamics.terracotta.parser.separate.RemoveLogs;
-import com.griddynamics.terracotta.parser.separate.DownloadLog;
-import com.griddynamics.terracotta.parser.separate.ParseLogs;
+import com.griddynamics.terracotta.parser.separate_downloading.RemoveLogs;
+import com.griddynamics.terracotta.parser.separate_downloading.DownloadLog;
+import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import com.griddynamics.terracotta.util.FileUtil;
 import commonj.work.WorkItem;
@@ -24,27 +24,27 @@ import commonj.work.Work;
 public class Scheduler {
     private static final Long SECOND = 1000L;
     private static Logger logger = Logger.getLogger(Scheduler.class);
-    private String dir;
-    private String dirUrl;
-    private String localDir;
+    private SchedulerMeter timeMeter = new SchedulerMeter();
+    private String masterDir;
+    private String masterUrl;
+    private String workerDir;
     private DynamicWorkManager workManager;
-    private List<WorkItem> workItems;
+    private List<WorkItem> workItems = new ArrayList<WorkItem>();
     private Long startedDownloading;
     private Long startedParsing;
     private Aggregator aggregator;
 
-    public Scheduler(String dir, String dirUrl, String localDir) {
-        this.dir = dir;
-        this.dirUrl = dirUrl;
-        this.localDir = localDir;
-        assertNotNull(dir);
-        assertNotNull(dirUrl);
-        assertNotNull(localDir);
+    public Scheduler(String masterDir, String masterUrl, String workerDir) {
+        this.masterDir = masterDir;
+        this.masterUrl = masterUrl;
+        this.workerDir = workerDir;
+        assertNotNull(masterDir);
+        assertNotNull(masterUrl);
+        assertNotNull(workerDir);
     }
 
     public void findMaxTrafficWithSeveralWorkers() {
         connectToWorkers();
-        findTrafficOfEachIp();
         findMaxTraffic();
     }
 
@@ -62,34 +62,52 @@ public class Scheduler {
         ThreadUtil.sleep(30 * SECOND);
     }
 
+    private void findMaxTraffic() {
+        findTrafficOfEachIp();
+        findMostConsumingIp();
+    }
+
     private void findTrafficOfEachIp() {
-        removeLogs();
-        downloadLogs();
+        fetchLogs();
         parseLogs();
     }
 
+    private void fetchLogs() {
+        removeLogs();
+        downloadLogs();
+    }
+
     private void removeLogs() {
+        timeMeter.removing();
         scheduleRemoving();
         waitForWorkers();
+        timeMeter.done();
     }
 
     private void scheduleRemoving() {
-        logger.info("Removing logs...");
-        workItems = new ArrayList<WorkItem>();
+        clearWorkItems();
         // TODO Schedule the task according to the number of workers, rather than the number of logs
-        for (String log : serverLogs())
-            workItems.add(scheduleRemovingOne());
+        for (String log : logs())
+            scheduleRemovingOne();
     }
 
-    private String[] serverLogs() {
-        File serverLogs = new File(dir);
-        FileUtil.verifyDirExists(serverLogs);
-        return serverLogs.list();
+    private void clearWorkItems() {
+        workItems.clear();
     }
 
-    private WorkItem scheduleRemovingOne() {
-        Work work = RemoveLogs.from(localDir);
-        return workManager.schedule(work);
+    private String[] logs() {
+        File logs = new File(masterDir);
+        FileUtil.verifyDirExists(logs);
+        return logs.list();
+    }
+
+    private void scheduleRemovingOne() {
+        schedule(RemoveLogs.from(workerDir));
+    }
+
+    private void schedule(Work work) {
+        WorkItem workItem = workManager.schedule(work);
+        workItems.add(workItem);
     }
 
     private void waitForWorkers() {
@@ -101,52 +119,46 @@ public class Scheduler {
     }
 
     private void downloadLogs() {
+        timeMeter.downloading();
         scheduleDownloading();
         waitForWorkers();
-        reportDownloadTime();
+        timeMeter.done();
     }
 
     private void scheduleDownloading() {
-        logger.info("Downloading logs...");
-        startedDownloading = System.currentTimeMillis();
-        workItems = new ArrayList<WorkItem>();
-        for (String log : serverLogs())
-            workItems.add(scheduleDownloadingOne(log));
+        clearWorkItems();
+        for (String log : logs())
+            scheduleDownloadingOne(log);
     }
 
-    private WorkItem scheduleDownloadingOne(String log) {
-        String url = dirUrl + log;
-        Work work = DownloadLog.fromTo(url, localDir);
-        return workManager.schedule(work);
-    }
-
-    private void reportDownloadTime() {
-        logger.info("Downloaded logs in " + (System.currentTimeMillis() - startedDownloading));
+    private void scheduleDownloadingOne(String log) {
+        String url = masterUrl + log;
+        schedule(DownloadLog.fromTo(url, workerDir));
     }
 
     private void parseLogs() {
+        timeMeter.parsing();
         scheduleParsing();
         waitForWorkers();
+        timeMeter.done();
     }
 
     private void scheduleParsing() {
-        logger.info("Parsing logs...");
-        startedParsing = System.currentTimeMillis();
         aggregator = new Aggregator();
-        workItems = new ArrayList<WorkItem>();
+        clearWorkItems();
         // TODO Schedule the task according to the number of workers, rather than the number of logs
-        for (String log : serverLogs())
-            workItems.add(scheduleParsingOne());
+        for (String log : logs())
+            scheduleParsingOne();
     }
 
-    private WorkItem scheduleParsingOne() {
-        Work work = ParseLogs.inUsing(localDir, aggregator);
-        return workManager.schedule(work);
+    private void scheduleParsingOne() {
+        schedule(ParseLogs.inUsing(workerDir, aggregator));
     }
 
-    private void findMaxTraffic() {
+    private void findMostConsumingIp() {
+        timeMeter.aggregating();
         String ip = aggregator.getIpWithMaxTraffic();
-        logger.info("Parsed logs in <nodeTime>" + (System.currentTimeMillis() - startedParsing) + "</nodeTime> ");
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getUserStat(ip) + "</traf> ");
+        timeMeter.done();
     }
 }

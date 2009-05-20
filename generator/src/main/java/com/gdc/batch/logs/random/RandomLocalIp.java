@@ -9,30 +9,30 @@ import com.gdc.batch.logs.config.Config;
  * Time: 17:44:43
  */
 public class RandomLocalIp extends RandomIp {
-    private int rooms;
-    private int usersPerRoom;
+    private int subnets;
+    private int usersPerSubnet;
 
     public RandomLocalIp() {
         LocalIpConfig config = new LocalIpConfig();
-        rooms = config.rooms();
-        usersPerRoom = config.usersPerRoom();
+        subnets = config.subnets();
+        usersPerSubnet = config.usersPerSubnet();
     }
     
     public String getRandomValue() {
-        return String.format(ipPattern, 192, 168, rnd.nextInt(rooms), rnd.nextInt(usersPerRoom));
+        return String.format(ipPattern, 192, 168, rnd.nextInt(subnets), rnd.nextInt(usersPerSubnet));
     }
 
     private class LocalIpConfig {
-        public int rooms() {
-            return readIntWithDefault("localIp.rooms", 32);
+        public int subnets() {
+            return readValueWithDefault("localIp.subnets", 32);
         }
 
-        public int usersPerRoom() {
-            return readIntWithDefault("localIp.usersPerRoom", 64);
+        public int usersPerSubnet() {
+            return readValueWithDefault("localIp.usersPerSubnet", 64);
         }
 
-        private int readIntWithDefault(String property, int defaultValue) {
-            String value = Config.getProperty(property);
+        private int readValueWithDefault(String key, int defaultValue) {
+            String value = Config.getProperty(key);
             if (value == null)
                 return defaultValue;
             return Integer.parseInt(value);

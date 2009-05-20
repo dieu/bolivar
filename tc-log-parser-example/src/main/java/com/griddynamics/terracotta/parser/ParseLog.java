@@ -25,36 +25,35 @@ public class ParseLog implements Work {
         this.aggregator = aggregator;
     }
 
-    /**
-     * Fires up statistics calculations for one log file.
-     */
     public void run() {
-        Map<String, Long> sum = parseLog();
-        reportToAggregator(sum);
+        parseAndReport();
     }
 
-    private Map<String, Long> parseLog() {
+    public void parseAndReport() {
+        Map<String, Long> trafficByIp = new HashMap<String, Long>();
+        parseTo(trafficByIp);
+        report(trafficByIp);
+    }
+
+    public void parseTo(Map<String, Long> ipTraffic) {
         try {
-            return calculateSummForAllRecods();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            analyzeLineByLineTo(ipTraffic);
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
     }
 
-    private Map<String, Long> calculateSummForAllRecods() throws IOException {
-        Map<String, Long> sum = new HashMap<String, Long>();
-        BufferedReader bufferedReader = getReader();
-
-        String s = bufferedReader.readLine();
-        while (s != null) {
-            String[] strings = s.split(DATA_SEPARATOR);
-            String ip = strings[IP_INDEX];
-            long traf = Long.parseLong(strings[TRAF_INDEX]);
-            putOrUpdateSumEntry(sum, ip, traf);
-            s = bufferedReader.readLine();
+    private void analyzeLineByLineTo(Map<String, Long> ipTraffic) throws IOException {
+        BufferedReader log = getReader();
+        String record = log.readLine();
+        while (record != null) {
+            String[] parsedRecord = record.split(DATA_SEPARATOR);
+            String ip = parsedRecord[IP_INDEX];
+            Long traffic = Long.parseLong(parsedRecord[TRAF_INDEX]);
+            putOrUpdateSumEntry(ipTraffic, ip, traffic);
+            record = log.readLine();
         }
-        bufferedReader.close();
-        return sum;
+        log.close();
     }
 
     private BufferedReader getReader() throws IOException {
@@ -78,7 +77,7 @@ public class ParseLog implements Work {
         sum.put(ip, ipSum);
     }
 
-    private void reportToAggregator(Map<String, Long> sum) {
+    private void report(Map<String, Long> sum) {
         aggregator.addStatistics(sum);
     }
 
