@@ -18,4 +18,11 @@
             <source>startApplication</source>
         </properties>
     </destination>
+
+    <destination id="historyService">
+        <properties>
+            <factory>spring</factory>
+            <source>history</source>
+        </properties>
+    </destination>
 </service>

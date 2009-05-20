@@ -6,40 +6,116 @@
         ]]>
     </mx:creationComplete>
 
-    <mx:RemoteObject id="srv" destination="Test"/>
-
-
-    <mx:Label text="Bolivar Demo" textAlign="center" fontWeight="bold" fontSize="16"/>
-    <mx:HRule width="100%" height="40"/>
-    <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:NumericStepper id="nMachines" minimum="1" maximum="15"/>
-        <mx:Button label="Start Application" click="startApplicationClick()"/>
-    </mx:HBox>
-    <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:Label id="statusApplication" width="150"
-                  text="Status Application" fontWeight="bold" fontSize="14"/>
-    </mx:HBox>
-
-    <mx:HBox horizontalAlign="center" autoLayout="true">
-        <mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>        
-    </mx:HBox>
-
-    <mx:HBox>
-        <mx:DataGrid id="table" dataProvider="{dataTable}" width="400">
-            <mx:columns>
-                <mx:DataGridColumn dataField="Workers"/>
-                <mx:DataGridColumn dataField="Time"/>
-                <mx:DataGridColumn dataField="IP"/>
-                <mx:DataGridColumn dataField="Traffic"/>
-            </mx:columns>
-        </mx:DataGrid>
-    </mx:HBox>
-
+    <!--<mx:Label text="Bolivar Demo" textAlign="center" fontWeight="bold" fontSize="16"/>-->
+    <!--<mx:HRule width="100%" height="40"/>-->
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
 
-    <mx:HBox>
-        <mx:Panel title="Bolivar Demo" width="422">
-            <mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">
+    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
+    <!--<mx:NumericStepper id="nMachines" minimum="1" maximum="15"/>-->
+    <!--<mx:Button label="Start Application" click="startApplicationClick()"/>-->
+    <!--</mx:HBox>-->
+    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
+    <!--<mx:Label id="statusApplication" width="150"-->
+    <!--text="Status Application" fontWeight="bold" fontSize="14"/>-->
+    <!--</mx:HBox>-->
+
+    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
+    <!--<mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>-->
+    <!--</mx:HBox>-->
+
+    <!--<mx:HBox>-->
+    <!--<mx:DataGrid id="table" dataProvider="{dataTable}" width="400">-->
+    <!--<mx:columns>-->
+    <!--<mx:DataGridColumn dataField="Date"/>-->
+    <!--<mx:DataGridColumn dataField="Workers"/>-->
+    <!--<mx:DataGridColumn dataField="Time" headerText="Time, ms"/>-->
+    <!--<mx:DataGridColumn dataField="IP"/>-->
+    <!--<mx:DataGridColumn dataField="Traffic"/>-->
+    <!--</mx:columns>-->
+    <!--</mx:DataGrid>-->
+    <!--</mx:HBox>-->
+
+    <!--<mx:HBox>-->
+    <!--<mx:Panel title="Bolivar Demo" width="422">-->
+    <!--<mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">-->
+    <!--<mx:horizontalAxis>-->
+    <!--<mx:CategoryAxis-->
+    <!--dataProvider="{dataChart}"-->
+    <!--categoryField="Workers"-->
+    <!--/>-->
+    <!--</mx:horizontalAxis>-->
+    <!--<mx:series>-->
+    <!--<mx:ColumnSeries-->
+    <!--yField="Time"-->
+    <!--xField="Workers"-->
+    <!--displayName="Workers"-->
+    <!--fill="{colorChart}"-->
+    <!--/>-->
+    <!--</mx:series>-->
+    <!--</mx:ColumnChart>-->
+    <!--<mx:Legend dataProvider="{chart}"/>-->
+    <!--</mx:Panel>-->
+    <!--</mx:HBox>-->
+
+    <!--<mx:VDividedBox horizontalAlign="center" verticalAlign="middle" height="100%" width="90%" backgroundColor="white">-->
+    <!--<mx:HDividedBox width="100%">-->
+    <!--<mx:VDividedBox height="100%" width="50%">-->
+    <!--<mx:Label id="statusApplication" width="150"-->
+    <!--text="Status Application" fontWeight="bold" fontSize="14"/>-->
+    <!--<mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>-->
+    <!--</mx:VDividedBox>-->
+    <!--<mx:DataGrid id="table" dataProvider="{dataTable}" width="50%" height="100%">-->
+    <!--<mx:columns>-->
+    <!--<mx:DataGridColumn dataField="Date"/>-->
+    <!--<mx:DataGridColumn dataField="Workers"/>-->
+    <!--<mx:DataGridColumn dataField="Time" headerText="Time, ms"/>-->
+    <!--<mx:DataGridColumn dataField="IP"/>-->
+    <!--<mx:DataGridColumn dataField="Traffic"/>-->
+    <!--</mx:columns>-->
+    <!--</mx:DataGrid>-->
+    <!--</mx:HDividedBox>-->
+    <!--<mx:ColumnChart width="100%"  height="100%" id="chart" dataProvider="{dataChart}" showDataTips="true">-->
+    <!--<mx:horizontalAxis>-->
+    <!--<mx:CategoryAxis-->
+    <!--dataProvider="{dataChart}"-->
+    <!--categoryField="Workers"-->
+    <!--/>-->
+    <!--</mx:horizontalAxis>-->
+    <!--<mx:series>-->
+    <!--<mx:ColumnSeries-->
+    <!--yField="Time"-->
+    <!--xField="Workers"-->
+    <!--displayName="Workers"-->
+    <!--fill="{colorChart}"-->
+    <!--/>-->
+    <!--</mx:series>-->
+    <!--</mx:ColumnChart>-->
+    <!--<mx:Legend dataProvider="{chart}"/>-->
+    <!--</mx:VDividedBox>-->
+
+    <mx:Panel  width="100%" height="100%" layout="absolute" title="Bolivar Demo">
+        <mx:HBox horizontalCenter="0" y="10">
+            <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
+            <mx:Button label="Start Application" click="startApplicationClick()"/>
+        </mx:HBox>
+        <mx:VDividedBox y="116" horizontalAlign="center" verticalAlign="middle" height="100%" width="100%" >
+            <mx:HDividedBox width="99%">
+                <mx:VDividedBox height="100%" width="50%">
+                    <mx:Label id="statusApplication" width="150"
+                              text="Status Application" fontWeight="bold" fontSize="14"/>
+                    <mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>
+                </mx:VDividedBox>
+                <mx:DataGrid id="table" dataProvider="{dataTable}" width="50%" height="100%">
+                    <mx:columns>
+                        <mx:DataGridColumn dataField="Date"/>
+                        <mx:DataGridColumn dataField="Workers"/>
+                        <mx:DataGridColumn dataField="Time" headerText="Time, ms"/>
+                        <mx:DataGridColumn dataField="IP"/>
+                        <mx:DataGridColumn dataField="Traffic"/>
+                    </mx:columns>
+                </mx:DataGrid>
+            </mx:HDividedBox>
+            <mx:ColumnChart width="99%"  height="100%" id="chart" dataProvider="{dataChart}" showDataTips="true">
                 <mx:horizontalAxis>
                     <mx:CategoryAxis
                             dataProvider="{dataChart}"
@@ -56,8 +132,8 @@
                 </mx:series>
             </mx:ColumnChart>
             <mx:Legend dataProvider="{chart}"/>
-        </mx:Panel>
-    </mx:HBox>
+        </mx:VDividedBox>
+    </mx:Panel>
 
     <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
     <!--<mx:Button label="Start Environment" click="startEnvironmentClick()"/>-->
@@ -71,13 +147,18 @@
         <mx:method name="verify" result="onResultVerify(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
+    <mx:RemoteObject id="historyService" showBusyCursor="true"
+                     fault="onFault(event)" destination="historyService">
+        <mx:method name="add" result="onResultAdd(event)" fault="onFault(event)"/>
+        <mx:method name="get" result="onResultGet(event)" fault="onFault(event)"/>
+    </mx:RemoteObject>
+
 
     <mx:Script><![CDATA[
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
-
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
         private var runApplication:Boolean = false;
@@ -89,6 +170,22 @@
         public var dataTable:ArrayCollection = new ArrayCollection();
 
         private function initApp():void {
+            historyService.get();
+        }
+
+        private function onResultGet(event:ResultEvent):void {
+            var result:String = event.result as String;
+            if(result != "") {
+                var array:Array = result.split(":");
+                for(var i:int = 0; i < array.length; i++) {
+                    var data:Array = array[i].split(";");
+                    addDataTable(String(data[0]), String(data[1]),
+                            String(data[2]), String(data[3]), String(data[4]));
+                }
+            }
+        }
+
+        private function onResultAdd(event:ResultEvent):void {
         }
 
         private function onResultDeploy(event:ResultEvent):void {
@@ -99,26 +196,33 @@
 
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
-            runApplication = app.scheluderStatus;
-            n = app.nWorkers;
+            runApplication = app.schedulerStatus;
             logApplication.text = "";
-            if (app.scheluderStatus) {
+            if (app.schedulerStatus) {
                 logApplication.text += "Server Running \n";
                 logApplication.text += "Worker Running \n";
                 logApplication.text += "Scheluder Running \n";
                 logApplication.text += app.applicationStatus;
+                myTimer.start();
+            } else if(app.time == "") {
+                logApplication.text += "Server Running \n";
+                logApplication.text += "Worker Running \n";
+                logApplication.text += "Scheluder Running \n";
+                logApplication.text += "Wait...";
+                startApplicationClick();
             } else {
                 logApplication.text += "Server Stop \n";
                 logApplication.text += "Worker Stop \n";
                 logApplication.text += "Scheluder Stop \n";
                 runApplication = false;
                 myTimer.stop();
-                addDataTable(n.toString(), app.time, app.ip, app.traf);
+                historyService.add(app.date.toDateString(), app.workers, app.time, app.ip, app.traf);
+                addDataTable(app.date.toDateString(), app.workers, app.time, app.ip, app.traf);
             }
         }
 
-        private function addDataTable(nWorkers:String, time:String, ip:String, traf:String):void {
-            dataTable.addItem({Workers:nWorkers, Time:time,
+        private function addDataTable(date:String, nWorkers:String, time:String, ip:String, traf:String):void {
+            dataTable.addItem({Date:date, Workers:nWorkers, Time:time,
                 IP:ip, Traffic:traf});
             addDataChart(nWorkers, time);
         }
@@ -137,12 +241,11 @@
 
         private function startApplicationClick():void {
             if (!runApplication) {
-                if (n != nMachines.value as int) {
-                    n = nMachines.value as int;
+                if (n != int(nMachines.value)) {
+                    n = int(nMachines.value);
                     equestrianService.deploy(nMachines.value as int);
                 }
                 equestrianService.start();
-                equestrianService.verify();
                 myTimer = new Timer(10000);
                 myTimer.addEventListener("timer", timerHandler);
                 myTimer.start();
@@ -150,7 +253,9 @@
         }
 
         public function timerHandler(event:TimerEvent):void {
+            myTimer.stop();
             equestrianService.verify();
+
         }
 
         private function stopEnvironmentClick():void {
