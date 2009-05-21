@@ -7,6 +7,7 @@ import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileWriter;
 import java.util.regex.Pattern;
 import java.util.*;
 
@@ -23,6 +24,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String runKillCommand;
     private String separator;
     private String outScheduler = "";
+    private String outWorkers = "";
+    private String files = "";
     private int nWorkers = 0;
     private int minute = 0;
     private boolean isRunScheduler = false;
@@ -101,13 +104,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
             init(nWorkers, minute);
             Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
-            init(nWorkers, minute);
             server = Runtime.getRuntime().exec(runServerCommand, null, dir);
             Thread.sleep(1000L);
-            init(nWorkers, minute);
             workers = Runtime.getRuntime().exec(runWorkersCommand, null, dir);
             Thread.sleep(1000L);
-            init(nWorkers, minute);
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
@@ -124,10 +124,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
         application.setDate(date);
         application.setNodeIp(nodes);
         application.setSchedulerStatus(isRunScheduler);
+        outWorkers += getData(workers, 3);
         outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
-                init(nWorkers, minute);
                 Runtime.getRuntime().exec(runKillCommand, null, dir);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -135,7 +135,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             if(patTime.matcher(outScheduler).matches()) {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
-                     if(word.startsWith("<re>")) {
+                    if(word.startsWith("<re>")) {
                         application.setRemoving(word.replace("<re>","")
                                 .replace("</re>","").replace("\r","").replace("\n", ""));
                     }
@@ -165,7 +165,18 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     }
                 }
             }
+            try {
+                FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
+                schedulerLogs.write(outScheduler);
+                schedulerLogs.close();
+                FileWriter workersLogs = new FileWriter(files + "workers.txt");
+                workersLogs.write(outWorkers);
+                workersLogs.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             outScheduler = "";
+            outWorkers = "";
             date = null;
             minute = 0;
             application.setSchedulerStatus(false);
@@ -182,6 +193,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public void stop() {
         isRunUpload = false;
         isRunScheduler = false;
+        outWorkers = "";
         outScheduler = "";
         date = null;
         minute = 0;
@@ -231,6 +243,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
                         isRunUpload = false;
                         upload.destroy();
                         break;
+                    case 3:
+                        workers.destroy();
+                        break;
                     default: break;
                 }
             }
@@ -242,6 +257,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 case 2:
                     isRunUpload = false;
                     break;
+                case 3:
+                    workers.destroy();
+                    break;
                 default: break;
             }
         }
@@ -250,25 +268,14 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     private void init(int n, int minute) {
         if(separator.equals("\\")) {
-            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd upload_all";
-            runServerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_server";
-            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_workers";
-            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_scheduler";
-            runKillCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd kill";
+
         } else {
             Calendar calendar = Calendar.getInstance();
-            String commandLine = " 2>&1 | /usr/bin/tee ";
-            String dir  = "remote-logs/"
+            String dir  = ApplicationPath.APPLICATION_PATH_NIX + "remote-logs/"
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
-            String files = calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
-            String createLogs = commandLine + dir + files;
-            new File(ApplicationPath.APPLICATION_PATH_NIX + dir).mkdirs();
-            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all" + createLogs + "upload.txt";
-            runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server" + createLogs + "run_server.txt";
-            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers" + createLogs + "run_workers.txt";
-            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_scheduler" + createLogs + "run_scheduler.txt";
-            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill" + createLogs + "kill.txt";
+            this.files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
+            new File(dir).mkdirs();
         }
 
     }
