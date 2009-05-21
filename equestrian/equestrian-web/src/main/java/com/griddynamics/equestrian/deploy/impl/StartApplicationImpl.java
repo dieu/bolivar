@@ -165,15 +165,17 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     }
                 }
             }
-            try {
-                FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
-                schedulerLogs.write(outScheduler);
-                schedulerLogs.close();
-                FileWriter workersLogs = new FileWriter(files + "workers.txt");
-                workersLogs.write(outWorkers);
-                workersLogs.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(!outScheduler.equals("") && !outWorkers.equals("")) {
+                try {
+                    FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
+                    schedulerLogs.write(outScheduler);
+                    schedulerLogs.close();
+                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
+                    workersLogs.write(outWorkers);
+                    workersLogs.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             outScheduler = "";
             outWorkers = "";
@@ -191,6 +193,16 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public void stop() {
+        try {
+            FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
+            schedulerLogs.write(outScheduler);
+            schedulerLogs.close();
+            FileWriter workersLogs = new FileWriter(files + "workers.txt");
+            workersLogs.write(outWorkers);
+            workersLogs.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         isRunUpload = false;
         isRunScheduler = false;
         outWorkers = "";
