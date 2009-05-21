@@ -259,7 +259,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
             String files = calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND);
             String createLogs = commandLine + dir + files;
-            new File(dir).mkdirs();
+            new File(ApplicationPath.APPLICATION_PATH_NIX + dir).mkdirs();
             uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all" + createLogs + "upload.txt";
             runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server" + createLogs + "run_server.txt";
             runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers" + createLogs + "run_workers.txt";

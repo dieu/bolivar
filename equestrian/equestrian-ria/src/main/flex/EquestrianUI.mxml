@@ -20,12 +20,12 @@
         </mx:HBox>
         <mx:VDividedBox y="116" horizontalAlign="center" verticalAlign="middle" height="100%" width="100%" >
             <mx:HDividedBox width="99%">
-                <mx:VDividedBox height="100%" width="50%">
+                <mx:VDividedBox height="100%" width="30%">
                     <mx:Label id="statusApplication" width="150"
                               text="Status Application" fontWeight="bold" fontSize="14"/>
                     <mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>
                 </mx:VDividedBox>
-                <mx:DataGrid id="table" dataProvider="{dataTable}" width="50%" height="100%">
+                <mx:DataGrid id="table" dataProvider="{dataTable}" width="70%" height="100%">
                     <mx:columns>
                         <mx:DataGridColumn dataField="Date"/>
                         <mx:DataGridColumn dataField="Workers"/>
@@ -194,8 +194,9 @@
 
         private function addDataTable(date:String, nWorkers:String, removing:String, dowloading:String,
                                         parsing:String, aggregating:String, time:String, ip:String, traf:String):void {
-            dataTable.addItem({Date:date, Workers:nWorkers, Time:time,
-                IP:ip, Traffic:traf});
+            
+            dataTable.addItem({Date:date, Workers:nWorkers, Removing:removing, Dowloading:dowloading,
+                            Parsing:parsing, Aggregation:aggregating, Time:time, IP:ip, Traffic:traf});
             addDataChart(date + " " + nWorkers, time);
         }
 
