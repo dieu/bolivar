@@ -269,8 +269,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 case 2:
                     isRunUpload = false;
                     break;
-                case 3:
-                    workers.destroy();
+                case 3:                    
                     break;
                 default: break;
             }
