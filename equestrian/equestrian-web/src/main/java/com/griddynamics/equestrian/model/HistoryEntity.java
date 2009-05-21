@@ -10,6 +10,10 @@ import java.util.ArrayList;
  */
 public class HistoryEntity {                                     
     private List date = new ArrayList();
+    private List removing = new ArrayList();
+    private List dowloading = new ArrayList();
+    private List parsing = new ArrayList();
+    private List aggregating = new ArrayList();
     private List time = new ArrayList();
     private List traf = new ArrayList();
     private List ip = new ArrayList();
@@ -24,6 +28,38 @@ public class HistoryEntity {
 
     public void setDate(String date) {
         this.date.add(date);
+    }
+
+    public List getRemoving() {
+        return removing;
+    }
+
+    public void setRemoving(String removing) {
+        this.removing.add(removing);
+    }
+
+    public List getDowloading() {
+        return dowloading;
+    }
+
+    public void setDowloading(String dowloading) {
+        this.dowloading.add(dowloading);
+    }
+
+    public List getParsing() {
+        return parsing;
+    }
+
+    public void setParsing(String parsing) {
+        this.parsing.add(parsing);
+    }
+
+    public List getAggregating() {
+        return aggregating;
+    }
+
+    public void setAggregating(String aggregating) {
+        this.aggregating.add(aggregating);
     }
 
     public List getTime() {

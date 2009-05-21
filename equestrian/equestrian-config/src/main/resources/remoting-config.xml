@@ -25,4 +25,11 @@
             <source>history</source>
         </properties>
     </destination>
+
+    <destination id="parseHostService">
+        <properties>
+            <factory>spring</factory>
+            <source>parserHost</source>
+        </properties>
+    </destination>
 </service>

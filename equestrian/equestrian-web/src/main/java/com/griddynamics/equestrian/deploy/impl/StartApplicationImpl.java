@@ -3,7 +3,6 @@ package com.griddynamics.equestrian.deploy.impl;
 import com.griddynamics.equestrian.deploy.StartApplication;
 import com.griddynamics.equestrian.helpers.ApplicationPath;
 import com.griddynamics.equestrian.helpers.ParserHost;
-import com.griddynamics.equestrian.helpers.impl.ParserHostXml;
 import com.griddynamics.equestrian.model.Application;
 
 import java.io.File;
@@ -17,18 +16,15 @@ import java.util.*;
  * Time: 19:46:27
  */
 public class StartApplicationImpl implements StartApplication<Application> {
-    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap upload_all";
-    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_server";
-    private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_workers";
-    private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
-    private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
-//    private String uploadCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
-//    private String runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
-//        private String runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
-//        private String runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
-//        private String runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+    private String uploadCommand;
+    private String runServerCommand;
+    private String runWorkersCommand;
+    private String runSchedulerCommand;
+    private String runKillCommand;
+    private String separator;
     private String outScheduler = "";
     private int nWorkers = 0;
+    private int minute = 0;
     private boolean isRunScheduler = false;
     private boolean isRunUpload = false;
     private Process server;
@@ -36,12 +32,32 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private Process scheduler;
     private Process upload;
     private String regAll = "[a-zA-Z\\d\\s\\S]*";
-    private String regTime = "\\s*<nodeTime>\\d+</nodeTime>\\s*";
+    private String regTime = "\\s*<to>\\d+</to>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
     private ParserHost parserHost;
     private Application application;
-    private Date date;
+    private Date date = null;
+    private File dir;
     private Map<String, Boolean> nodes;
+
+    public StartApplicationImpl() {
+        separator = System.getProperty("file.separator");
+        if(separator.equals("\\")) {
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd upload_all";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_server";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_workers";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_scheduler";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd kill";
+            dir = new File(ApplicationPath.APPLICATION_PATH_WIN);
+        } else {
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_scheduler";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill";
+            dir = new File(ApplicationPath.APPLICATION_PATH_NIX);
+        }
+    }
 
     public void setParserHost(ParserHost parserHost) {
         this.parserHost = parserHost;
@@ -53,14 +69,15 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void deploy(int n) {
         try {
-            Runtime.getRuntime().exec(runKillCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
-            parserHost = new ParserHostXml();
+            parserHost.clear();
             nWorkers = parserHost.parse(n);
             nodes =  parserHost.getNodeIp();
-            upload = Runtime.getRuntime().exec(uploadCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            date = Calendar.getInstance().getTime();
+            minute = Calendar.getInstance().get(Calendar.MINUTE);
+            init(nWorkers, minute);
+            upload = Runtime.getRuntime().exec(uploadCommand, null, dir);
             isRunUpload = true;
             while(isRunUpload) {
                 getData(upload, 2);
@@ -77,18 +94,21 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void start() {
         try {
-            date = Calendar.getInstance().getTime();
-            Runtime.getRuntime().exec(runKillCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            if(date == null) {
+                date = Calendar.getInstance().getTime();
+                minute = Calendar.getInstance().get(Calendar.MINUTE);
+            }
+            init(nWorkers, minute);
+            Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
-            server = Runtime.getRuntime().exec(runServerCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            init(nWorkers, minute);
+            server = Runtime.getRuntime().exec(runServerCommand, null, dir);
             Thread.sleep(1000L);
-            workers = Runtime.getRuntime().exec(runWorkersCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            init(nWorkers, minute);
+            workers = Runtime.getRuntime().exec(runWorkersCommand, null, dir);
             Thread.sleep(1000L);
-            scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null,
-                    new File(ApplicationPath.APPLICATION_PATH));
+            init(nWorkers, minute);
+            scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
         } catch (IOException e) {
@@ -107,17 +127,29 @@ public class StartApplicationImpl implements StartApplication<Application> {
         outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
-                Runtime.getRuntime().exec(runKillCommand, null,
-                        new File(ApplicationPath.APPLICATION_PATH));
+                init(nWorkers, minute);
+                Runtime.getRuntime().exec(runKillCommand, null, dir);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             if(patTime.matcher(outScheduler).matches()) {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
-                    if(word.startsWith("<nodeTime>")) {
-                        application.setTime(word.replace("<nodeTime>","")
-                                .replace("</nodeTime>","").replace("\r","").replace("\n", ""));
+                    if(word.startsWith("<do>")) {
+                        application.setDowloanding(word.replace("<do>","")
+                                .replace("</do>","").replace("\r","").replace("\n", ""));
+                    }
+                    if(word.startsWith("<pa>")) {
+                        application.setParsing(word.replace("<pa>","")
+                                .replace("</pa>","").replace("\r","").replace("\n", ""));
+                    }
+                    if(word.startsWith("<ag>")) {
+                        application.setAggregating(word.replace("<ag>","")
+                                .replace("</ag>","").replace("\r","").replace("\n", ""));
+                    }
+                    if(word.startsWith("<to>")) {
+                        application.setTime(word.replace("<to>","")
+                                .replace("</to>","").replace("\r","").replace("\n", ""));
                     }
                     if(word.startsWith("<ip>")) {
                         application.setIp(word.replace("<ip>","")
@@ -130,11 +162,39 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 }
             }
             outScheduler = "";
+            date = null;
+            minute = 0;
             application.setSchedulerStatus(false);
         } else {
             application.setApplicationStatus("Wait...");
         }
         return application;
+    }
+
+    public boolean isRun() {
+        return isRunScheduler;
+    }
+
+    public void stop() {
+        isRunUpload = false;
+        isRunScheduler = false;
+        outScheduler = "";
+        date = null;
+        minute = 0;
+        if(server != null) {
+            server.destroy();
+        }
+        if(workers != null) {
+            workers.destroy();
+        }
+        if(scheduler != null) {
+            scheduler.destroy();
+        }
+        try {
+            Runtime.getRuntime().exec(runKillCommand, null, dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getData(Process process, int id) {
@@ -182,5 +242,30 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
         }
         return out.toString();
+    }
+
+    private void init(int n, int minute) {
+        if(separator.equals("\\")) {
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd upload_all";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_server";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_workers";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_scheduler";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd kill";
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            String commandLine = " 2>&1 | tee ";
+            String dir  = "remote-logs/"
+                    + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
+                    + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
+            String files = calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND);
+            String createLogs = commandLine + dir + files;
+            new File(dir).mkdirs();
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all" + createLogs + "upload.txt";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server" + createLogs + "run_server.txt";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers" + createLogs + "run_workers.txt";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_scheduler" + createLogs + "run_scheduler.txt";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill" + createLogs + "cap kill.txt";
+        }
+
     }
 }
