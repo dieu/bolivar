@@ -257,7 +257,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             String dir  = "remote-logs/"
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
-            String files = calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND);
+            String files = calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
             String createLogs = commandLine + dir + files;
             new File(ApplicationPath.APPLICATION_PATH_NIX + dir).mkdirs();
             uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all" + createLogs + "upload.txt";
