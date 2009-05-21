@@ -135,10 +135,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             if(patTime.matcher(outScheduler).matches()) {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
-                    if(word.startsWith("<re>")) {
-                        application.setDowloanding(word.replace("<re>","")
-                                .replace("</re>","").replace("\r","").replace("\n", ""));
-                    }
                     if(word.startsWith("<do>")) {
                         application.setDowloanding(word.replace("<do>","")
                                 .replace("</do>","").replace("\r","").replace("\n", ""));
