@@ -136,7 +136,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
                      if(word.startsWith("<re>")) {
-                        application.setDowloanding(word.replace("<re>","")
+                        application.setRemoving(word.replace("<re>","")
                                 .replace("</re>","").replace("\r","").replace("\n", ""));
                     }
                     if(word.startsWith("<do>")) {
