@@ -257,7 +257,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             runKillCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd kill";
         } else {
             Calendar calendar = Calendar.getInstance();
-            String commandLine = " 2>&1 | tee ";
+            String commandLine = " 2>&1 | /usr/bin/tee ";
             String dir  = "remote-logs/"
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
@@ -268,7 +268,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server" + createLogs + "run_server.txt";
             runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers" + createLogs + "run_workers.txt";
             runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_scheduler" + createLogs + "run_scheduler.txt";
-            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill" + createLogs + "cap kill.txt";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill" + createLogs + "kill.txt";
         }
 
     }
