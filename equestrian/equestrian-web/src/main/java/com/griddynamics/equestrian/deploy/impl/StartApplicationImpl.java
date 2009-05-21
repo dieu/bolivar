@@ -124,7 +124,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
         application.setDate(date);
         application.setNodeIp(nodes);
         application.setSchedulerStatus(isRunScheduler);
-        outWorkers += getData(workers, 3);
+//        outWorkers += getData(workers, 3);
         outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
@@ -165,14 +165,14 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     }
                 }
             }
-            if(!outScheduler.equals("") && !outWorkers.equals("")) {
+            if(!outScheduler.equals("")) {
                 try {
                     FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
                     schedulerLogs.write(outScheduler);
                     schedulerLogs.close();
-                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
-                    workersLogs.write(outWorkers);
-                    workersLogs.close();
+//                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
+//                    workersLogs.write(outWorkers);
+//                    workersLogs.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -197,9 +197,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
             FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
             schedulerLogs.write(outScheduler);
             schedulerLogs.close();
-            FileWriter workersLogs = new FileWriter(files + "workers.txt");
-            workersLogs.write(outWorkers);
-            workersLogs.close();
+//            FileWriter workersLogs = new FileWriter(files + "workers.txt");
+//            workersLogs.write(outWorkers);
+//            workersLogs.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

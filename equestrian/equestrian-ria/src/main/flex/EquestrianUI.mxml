@@ -20,12 +20,12 @@
         </mx:HBox>
         <mx:VDividedBox y="116" horizontalAlign="center" verticalAlign="middle" height="100%" width="100%" >
             <mx:HDividedBox width="99%">
-                <mx:VDividedBox height="100%" width="30%">
+                <mx:VDividedBox height="100%" width="20%">
                     <mx:Label id="statusApplication" width="150"
                               text="Status Application" fontWeight="bold" fontSize="14"/>
                     <mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>
                 </mx:VDividedBox>
-                <mx:DataGrid id="table" dataProvider="{dataTable}" width="70%" height="100%">
+                <mx:DataGrid id="table" dataProvider="{dataTable}" width="80%" height="100%">
                     <mx:columns>
                         <mx:DataGridColumn dataField="Date"/>
                         <mx:DataGridColumn dataField="Workers"/>
