@@ -135,21 +135,13 @@ public class StartApplicationImpl implements StartApplication<Application> {
             if(patTime.matcher(outScheduler).matches()) {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
-                    if(word.startsWith("<re>")) {
-                        application.setRemoving(word.replace("<re>","")
-                                .replace("</re>","").replace("\r","").replace("\n", ""));
+                    if(word.startsWith("<op>")) {
+                        application.setParsing(word.replace("<op>","")
+                                .replace("</op>","").replace("\r","").replace("\n", ""));
                     }
-                    if(word.startsWith("<do>")) {
-                        application.setDowloanding(word.replace("<do>","")
-                                .replace("</do>","").replace("\r","").replace("\n", ""));
-                    }
-                    if(word.startsWith("<pa>")) {
-                        application.setParsing(word.replace("<pa>","")
-                                .replace("</pa>","").replace("\r","").replace("\n", ""));
-                    }
-                    if(word.startsWith("<ag>")) {
-                        application.setAggregating(word.replace("<ag>","")
-                                .replace("</ag>","").replace("\r","").replace("\n", ""));
+                    if(word.startsWith("<or>")) {
+                        application.setReturning(word.replace("<or>","")
+                                .replace("</or>","").replace("\r","").replace("\n", ""));
                     }
                     if(word.startsWith("<to>")) {
                         application.setTime(word.replace("<to>","")

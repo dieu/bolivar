@@ -17,14 +17,12 @@ public class History {
         this.historyEntity = historyEntity;
     }
 
-    public void add(String date, String workers, String removing, String dowloading,
-                    String parsing, String aggregating, String time, String ip, String traf) {
+    public void add(String date, String workers,
+                    String parsing, String returning, String time, String ip, String traf) {
         historyEntity.setDate(date);
         historyEntity.setWorkers(workers);
-        historyEntity.setRemoving(removing);
-        historyEntity.setDowloading(dowloading);
         historyEntity.setParsing(parsing);
-        historyEntity.setAggregating(aggregating);
+        historyEntity.setReturning(returning);
         historyEntity.setTime(time);
         historyEntity.setIp(ip);
         historyEntity.setTraf(traf);
@@ -35,10 +33,8 @@ public class History {
         for(int i = 0; i < historyEntity.getDate().size(); i++) {
             result.append(historyEntity.getDate().get(i) + ";")
                     .append(historyEntity.getWorkers().get(i) + ";")
-                    .append(historyEntity.getRemoving().get(i) + ";")
-                    .append(historyEntity.getDowloading().get(i) + ";")
                     .append(historyEntity.getParsing().get(i) + ";")
-                    .append(historyEntity.getAggregating().get(i) + ";")
+                    .append(historyEntity.getReturning().get(i) + ";")
                     .append(historyEntity.getTime().get(i) + ";")
                     .append(historyEntity.getIp().get(i) + ";")
                     .append(historyEntity.getTraf().get(i) + ";")

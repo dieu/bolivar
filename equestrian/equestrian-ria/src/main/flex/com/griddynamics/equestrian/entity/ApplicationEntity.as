@@ -7,10 +7,8 @@ public class ApplicationEntity
     public var date:Date;
     public var workers:String;
     public var applicationStatus:String;
-    public var removing:String;
-    public var dowloanding:String;
     public var parsing:String;
-    public var aggregating:String;
+    public var returning:String;
     public var time:String;
     public var ip:String;
     public var traf:String;

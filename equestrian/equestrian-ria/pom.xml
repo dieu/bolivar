@@ -59,7 +59,7 @@
             <version>3.2.0.3958</version>
             <type>swc</type>
         </dependency>
-        <!--Chart-->              
+        <!--Chart-->
         <dependency>
             <groupId>com.adobe.flex.sdk</groupId>
             <artifactId>datavisualization</artifactId>
@@ -179,8 +179,15 @@
                 <version>3.1.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <contextRoot>equestrian-web</contextRoot>
+                    <contextRoot>equestrian-web</contextRoot>                  
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.adobe.flex</groupId>
+                        <artifactId>license</artifactId>
+                        <version>3.2.0.3958</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

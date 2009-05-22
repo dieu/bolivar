@@ -12,10 +12,8 @@ public class Application {
     private Date date = null;
     private String workers = "";
     private String applicationStatus = "";
-    private String removing = "";
-    private String dowloanding = "";
     private String parsing = "";
-    private String aggregating = "";
+    private String returning = "";
     private String time = "";
     private String ip = "";
     private String traf = "";
@@ -56,22 +54,6 @@ public class Application {
         this.applicationStatus = applicationStatus;
     }
 
-    public String getRemoving() {
-        return removing;
-    }
-
-    public void setRemoving(String removing) {
-        this.removing = removing;
-    }
-
-    public String getDowloanding() {
-        return dowloanding;
-    }
-
-    public void setDowloanding(String dowloanding) {
-        this.dowloanding = dowloanding;
-    }
-
     public String getParsing() {
         return parsing;
     }
@@ -80,12 +62,12 @@ public class Application {
         this.parsing = parsing;
     }
 
-    public String getAggregating() {
-        return aggregating;
+    public String getReturning() {
+        return returning;
     }
 
-    public void setAggregating(String aggregating) {
-        this.aggregating = aggregating;
+    public void setReturning(String returning) {
+        this.returning = returning;
     }
 
     public String getTime() {
