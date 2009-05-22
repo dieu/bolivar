@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.util.Map;
 import java.util.HashMap;
 
-import static com.griddynamics.terracotta.util.StrUtil.surroundWithTag;
+import com.griddynamics.terracotta.util.StrUtil;
 
 /**
  * @author agorbunov @ 20.05.2009 14:15:22
@@ -71,7 +71,7 @@ public class SchedulerMeter {
 
     private String formatDuration() {
         String phaseTag = phase.toString().substring(0, 2);
-        return surroundWithTag(duration, phaseTag);
+        return StrUtil.encloseWithTag(duration, phaseTag);
     }
 
     private boolean isLastPhase() {
@@ -83,7 +83,7 @@ public class SchedulerMeter {
         Long totalDuration = 0L;
         for (Phase phase : phaseDuration.keySet())
             totalDuration += phaseDuration.get(phase);
-        String formattedTotalDuration = surroundWithTag(totalDuration, "to");
+        String formattedTotalDuration = StrUtil.encloseWithTag(totalDuration, "to");
         logger.info("Finished analysis in " + formattedTotalDuration);
     }
 }

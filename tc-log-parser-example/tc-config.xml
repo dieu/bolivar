@@ -28,11 +28,7 @@
         <dso>
             <instrumented-classes>
                 <include>
-                    <class-expression>com.griddynamics.terracotta.parser.Aggregator</class-expression>
-                </include>
-
-                <include>
-                    <class-expression>com.griddynamics.terracotta.parser.separate_downloading.Wget</class-expression>
+                    <class-expression>com.griddynamics.terracotta.parser..*</class-expression>
                     <honor-transient>true</honor-transient>
                 </include>
             </instrumented-classes>

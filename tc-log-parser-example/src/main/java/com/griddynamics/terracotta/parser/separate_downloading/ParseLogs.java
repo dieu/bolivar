@@ -8,6 +8,7 @@ import com.griddynamics.terracotta.parser.ParseLog;
 import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
@@ -15,11 +16,29 @@ import org.apache.log4j.Logger;
  * @author agorbunov @ 08.05.2009 15:11:36
  */
 public class ParseLogs implements Work {
+
+    public static class Performance {
+        public Long parsedIn = 0L;
+        public Long returnedIn = 0L;
+
+        public static Performance average(Collection<Performance> measurements) {
+            Performance average = new Performance();
+            for (Performance p : measurements) {
+                average.parsedIn += p.parsedIn;
+                average.returnedIn += p.returnedIn;
+            }
+            average.parsedIn /= measurements.size();
+            average.returnedIn /= measurements.size();
+            return average;
+        }
+    }
+
     private static Logger logger = Logger.getLogger(ParseLogs.class);
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Aggregator aggregator;
     private String dir;
     private File[] logs;
+    private Performance performance = new Performance();
 
     public static Work inUsing(String dir, Aggregator aggregator) {
         return new LocalWork(ParseLogs.class, dir, aggregator);
@@ -34,6 +53,10 @@ public class ParseLogs implements Work {
     }
 
     public void run() {
+        parseLogsInDir();
+    }
+
+    private void parseLogsInDir() {
         find();
         parse();
         report();
@@ -45,8 +68,10 @@ public class ParseLogs implements Work {
     }
 
     private void parse() {
+        Long startedParsing = System.currentTimeMillis();
         for (File log : logs)
             parseIfNeeded(log);
+        performance.parsedIn = System.currentTimeMillis() - startedParsing;
     }
 
     private void parseIfNeeded(File log) {
@@ -77,7 +102,9 @@ public class ParseLogs implements Work {
             logger.info("Reporting traffuc ysage...");
             Long started = System.currentTimeMillis();
             aggregator.addStatistics(trafficByIp);
-            logger.info("Reported in " + (System.currentTimeMillis() - started));
+            performance.returnedIn = System.currentTimeMillis() - started;
+            logger.info("Reported in " + performance.returnedIn);
+            aggregator.reportParsingPerformance(performance);
         }
     }
 

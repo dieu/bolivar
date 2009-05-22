@@ -3,15 +3,19 @@ package com.griddynamics.terracotta.parser;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.Map;
-import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Collections;
+
+import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
 
 
 public class Aggregator {
     private static final AtomicBoolean TRUE = new AtomicBoolean(true);
     private static final AtomicBoolean FALSE = new AtomicBoolean(false);
     private final ConcurrentMap<String, Long> ipTraffic = new ConcurrentHashMap<String, Long>();
+    private final List<ParseLogs.Performance> parsingPerformance = Collections.synchronizedList(new LinkedList<ParseLogs.Performance>());
     private final ConcurrentMap<String, AtomicBoolean> logIsParsed = new ConcurrentHashMap<String, AtomicBoolean>();
 
     public synchronized void addStatistics(Map<String, Long> statistics) {
@@ -46,8 +50,16 @@ public class Aggregator {
     }
 
     public Boolean isParsed(String log) {
-        AtomicBoolean isParsed = logIsParsed.putIfAbsent(log, FALSE);
-        return isParsed != null && isParsed.get();
+        AtomicBoolean yes = logIsParsed.putIfAbsent(log, FALSE);
+        return yes != null && yes.get();
+    }
+
+    public void reportParsingPerformance(ParseLogs.Performance p) {
+        parsingPerformance.add(p);
+    }
+
+    public ParseLogs.Performance averageParsingPerformance() {
+        return ParseLogs.Performance.average(parsingPerformance);
     }
 
     @Override

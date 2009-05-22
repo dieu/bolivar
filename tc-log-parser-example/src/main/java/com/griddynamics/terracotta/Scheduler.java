@@ -15,6 +15,7 @@ import com.griddynamics.terracotta.parser.separate_downloading.DownloadLog;
 import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import com.griddynamics.terracotta.util.FileUtil;
+import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
 import commonj.work.WorkItem;
 import commonj.work.Work;
 
@@ -30,8 +31,6 @@ public class Scheduler {
     private String workerDir;
     private DynamicWorkManager workManager;
     private List<WorkItem> workItems = new ArrayList<WorkItem>();
-    private Long startedDownloading;
-    private Long startedParsing;
     private Aggregator aggregator;
 
     public Scheduler(String masterDir, String masterUrl, String workerDir) {
@@ -46,6 +45,7 @@ public class Scheduler {
     public void findMaxTrafficWithSeveralWorkers() {
         connectToWorkers();
         findMaxTraffic();
+        reportParsingPerformance();
     }
 
     private void connectToWorkers() {
@@ -160,5 +160,11 @@ public class Scheduler {
         String ip = aggregator.getIpWithMaxTraffic();
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getUserStat(ip) + "</traf> ");
         timeMeter.done();
+    }
+
+    private void reportParsingPerformance() {
+        ParseLogs.Performance p = aggregator.averageParsingPerformance();
+        logger.info("One worker parsed in " + encloseWithTag(p.parsedIn, "op"));
+        logger.info("One worker returned in " + encloseWithTag(p.returnedIn, "or"));
     }
 }
