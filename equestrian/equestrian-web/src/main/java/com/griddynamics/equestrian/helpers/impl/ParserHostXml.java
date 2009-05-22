@@ -25,9 +25,11 @@ import java.util.HashMap;
  * Time: 14:10:04
  */
 public class ParserHostXml extends DefaultHandler implements ParserHost{
-    private List<String> workersIp = new ArrayList<String>();
-    private String serverIp = "";
-    private String schedulerIp = "";
+    private List<String> workersIp;
+    private String serverIp;
+    private String schedulerIp;
+    private String pathLog;
+    private String pathApp;
     private int n;
 
     public static void main(String[] arg) throws IOException, SAXException, ParserConfigurationException {
@@ -35,17 +37,47 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     }
 
     public ParserHostXml() {
+        if(System.getProperty("file.separator").equals("\\")) {
+            pathLog = ApplicationPath.HOST_LOG_PATH_WIN;
+            pathApp = ApplicationPath.APPLICATION_PATH_WIN;
+        } else {
+            pathLog = ApplicationPath.HOST_LOG_PATH_NIX;
+            pathApp = ApplicationPath.APPLICATION_PATH_NIX;
+        }
+        workersIp = new ArrayList<String>();
+        serverIp = "";
+        schedulerIp = "";
+        n = 0;
     }
 
     public int parse(int n) throws SAXException, ParserConfigurationException, IOException {
         this.n = n;
-        File hostLog = new File(ApplicationPath.HOST_LOG_PATH);
+        File hostLog = new File(this.pathLog);
         SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp = spf.newSAXParser();
         sp.parse(hostLog, this);
         writeCapFile();
         this.n = workersIp.size();
         return this.n;
+    }
+
+    public int getCountNode() throws IOException, SAXException, ParserConfigurationException {
+        clear();
+        this.n = Integer.MAX_VALUE;
+        File hostLog = new File(this.pathLog);
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+        sp.parse(hostLog, this);
+        int count = workersIp.size();
+        clear();
+        return count;
+    }
+
+    public void clear() {
+        workersIp = new ArrayList<String>();
+        serverIp = "";
+        schedulerIp = "";
+        n = 0;
     }
 
     public Map<String, Boolean> getNodeIp() {
@@ -162,15 +194,15 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_workers, :roles => :workers do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} > /dev/null 2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_server, :roles => :server do\n" +
-                    "  run \"export JAVA_HOME=#{JAVA_HOME} && #{File.join(TARGET_DIR, TC_DIR, \"bin\", \"start-tc-server.sh\")} > /dev/null 2>&1 &\"\n" +
+                    "  run \"export JAVA_HOME=#{JAVA_HOME} && #{File.join(TARGET_DIR, TC_DIR, \"bin\", \"start-tc-server.sh\")} \"\n" +//> /dev/null 2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :kill do\n" +
@@ -181,7 +213,7 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
                     "  run \"rm -rf #{TARGET_DIR}\"\n" +
                     "end");
 
-            FileWriter capFile = new FileWriter(ApplicationPath.APPLICATION_PATH + "Capfile");
+            FileWriter capFile = new FileWriter(this.pathApp + "Capfile");
             capFile.write(contentFile.toString());
             capFile.close();
         }

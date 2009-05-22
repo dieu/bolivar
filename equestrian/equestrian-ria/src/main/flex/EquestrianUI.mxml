@@ -6,109 +6,33 @@
         ]]>
     </mx:creationComplete>
 
-    <!--<mx:Label text="Bolivar Demo" textAlign="center" fontWeight="bold" fontSize="16"/>-->
-    <!--<mx:HRule width="100%" height="40"/>-->
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
-
-    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
-    <!--<mx:NumericStepper id="nMachines" minimum="1" maximum="15"/>-->
-    <!--<mx:Button label="Start Application" click="startApplicationClick()"/>-->
-    <!--</mx:HBox>-->
-    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
-    <!--<mx:Label id="statusApplication" width="150"-->
-    <!--text="Status Application" fontWeight="bold" fontSize="14"/>-->
-    <!--</mx:HBox>-->
-
-    <!--<mx:HBox horizontalAlign="center" autoLayout="true">-->
-    <!--<mx:TextArea id="logApplication" height="100" width="400" fontSize="10"/>-->
-    <!--</mx:HBox>-->
-
-    <!--<mx:HBox>-->
-    <!--<mx:DataGrid id="table" dataProvider="{dataTable}" width="400">-->
-    <!--<mx:columns>-->
-    <!--<mx:DataGridColumn dataField="Date"/>-->
-    <!--<mx:DataGridColumn dataField="Workers"/>-->
-    <!--<mx:DataGridColumn dataField="Time" headerText="Time, ms"/>-->
-    <!--<mx:DataGridColumn dataField="IP"/>-->
-    <!--<mx:DataGridColumn dataField="Traffic"/>-->
-    <!--</mx:columns>-->
-    <!--</mx:DataGrid>-->
-    <!--</mx:HBox>-->
-
-    <!--<mx:HBox>-->
-    <!--<mx:Panel title="Bolivar Demo" width="422">-->
-    <!--<mx:ColumnChart  id="chart" dataProvider="{dataChart}" showDataTips="true">-->
-    <!--<mx:horizontalAxis>-->
-    <!--<mx:CategoryAxis-->
-    <!--dataProvider="{dataChart}"-->
-    <!--categoryField="Workers"-->
-    <!--/>-->
-    <!--</mx:horizontalAxis>-->
-    <!--<mx:series>-->
-    <!--<mx:ColumnSeries-->
-    <!--yField="Time"-->
-    <!--xField="Workers"-->
-    <!--displayName="Workers"-->
-    <!--fill="{colorChart}"-->
-    <!--/>-->
-    <!--</mx:series>-->
-    <!--</mx:ColumnChart>-->
-    <!--<mx:Legend dataProvider="{chart}"/>-->
-    <!--</mx:Panel>-->
-    <!--</mx:HBox>-->
-
-    <!--<mx:VDividedBox horizontalAlign="center" verticalAlign="middle" height="100%" width="90%" backgroundColor="white">-->
-    <!--<mx:HDividedBox width="100%">-->
-    <!--<mx:VDividedBox height="100%" width="50%">-->
-    <!--<mx:Label id="statusApplication" width="150"-->
-    <!--text="Status Application" fontWeight="bold" fontSize="14"/>-->
-    <!--<mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>-->
-    <!--</mx:VDividedBox>-->
-    <!--<mx:DataGrid id="table" dataProvider="{dataTable}" width="50%" height="100%">-->
-    <!--<mx:columns>-->
-    <!--<mx:DataGridColumn dataField="Date"/>-->
-    <!--<mx:DataGridColumn dataField="Workers"/>-->
-    <!--<mx:DataGridColumn dataField="Time" headerText="Time, ms"/>-->
-    <!--<mx:DataGridColumn dataField="IP"/>-->
-    <!--<mx:DataGridColumn dataField="Traffic"/>-->
-    <!--</mx:columns>-->
-    <!--</mx:DataGrid>-->
-    <!--</mx:HDividedBox>-->
-    <!--<mx:ColumnChart width="100%"  height="100%" id="chart" dataProvider="{dataChart}" showDataTips="true">-->
-    <!--<mx:horizontalAxis>-->
-    <!--<mx:CategoryAxis-->
-    <!--dataProvider="{dataChart}"-->
-    <!--categoryField="Workers"-->
-    <!--/>-->
-    <!--</mx:horizontalAxis>-->
-    <!--<mx:series>-->
-    <!--<mx:ColumnSeries-->
-    <!--yField="Time"-->
-    <!--xField="Workers"-->
-    <!--displayName="Workers"-->
-    <!--fill="{colorChart}"-->
-    <!--/>-->
-    <!--</mx:series>-->
-    <!--</mx:ColumnChart>-->
-    <!--<mx:Legend dataProvider="{chart}"/>-->
-    <!--</mx:VDividedBox>-->
 
     <mx:Panel  width="100%" height="100%" layout="absolute" title="Bolivar Demo">
         <mx:HBox horizontalCenter="0" y="10">
+            <mx:Label id="countNode" text="Max Workers "/>
             <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
-            <mx:Button label="Start Application" click="startApplicationClick()"/>
+            <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
+        </mx:HBox>
+        <mx:HBox horizontalCenter="0" y="40">
+            <mx:Button id="clear" label="Clear table result" click="clearResult()"/>
+            <mx:Button id="stop" label="Stop Application" click="stopApp()"/>
         </mx:HBox>
         <mx:VDividedBox y="116" horizontalAlign="center" verticalAlign="middle" height="100%" width="100%" >
             <mx:HDividedBox width="99%">
-                <mx:VDividedBox height="100%" width="50%">
+                <mx:VDividedBox height="100%" width="20%">
                     <mx:Label id="statusApplication" width="150"
                               text="Status Application" fontWeight="bold" fontSize="14"/>
                     <mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>
                 </mx:VDividedBox>
-                <mx:DataGrid id="table" dataProvider="{dataTable}" width="50%" height="100%">
+                <mx:DataGrid id="table" dataProvider="{dataTable}" width="80%" height="100%">
                     <mx:columns>
                         <mx:DataGridColumn dataField="Date"/>
                         <mx:DataGridColumn dataField="Workers"/>
+                        <mx:DataGridColumn dataField="Removing" headerText="Removing, ms"/>
+                        <mx:DataGridColumn dataField="Dowloading" headerText="Dowloading, ms"/>
+                        <mx:DataGridColumn dataField="Parsing" headerText="Parsing, ms"/>
+                        <mx:DataGridColumn dataField="Aggregation" headerText="Aggregation, ms"/>
                         <mx:DataGridColumn dataField="Time" headerText="Time, ms"/>
                         <mx:DataGridColumn dataField="IP"/>
                         <mx:DataGridColumn dataField="Traffic"/>
@@ -126,7 +50,7 @@
                     <mx:ColumnSeries
                             yField="Time"
                             xField="Workers"
-                            displayName="Workers"
+                            displayName="Date and workers"
                             fill="{colorChart}"
                             />
                 </mx:series>
@@ -145,6 +69,8 @@
         <mx:method name="deploy" result="onResultDeploy(event)" fault="onFault(event)"/>
         <mx:method name="start" result="onResultStart(event)" fault="onFault(event)"/>
         <mx:method name="verify" result="onResultVerify(event)" fault="onFault(event)"/>
+        <mx:method name="isRun" result="OnResultIsRun(event)" fault="onFault(event)"/>
+        <mx:method name="stop" result="OnResultStop(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
     <mx:RemoteObject id="historyService" showBusyCursor="true"
@@ -153,17 +79,24 @@
         <mx:method name="get" result="onResultGet(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
+    <mx:RemoteObject id="parseHostService" showBusyCursor="true"
+                     fault="onFault(event)" destination="parseHostService">
+        <mx:method name="getCountNode" result="onResultGetCountNode(event)" fault="onFault(event)"/>
+    </mx:RemoteObject>
+
 
     <mx:Script><![CDATA[
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
+
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
         private var runApplication:Boolean = false;
         private var n:int = 0;
-        private var myTimer:Timer;
+        private var verifyAppTimer:Timer;
+        private var isRunAppTimer:Timer;
         [Bindable]
         public var dataChart:ArrayCollection = new ArrayCollection();
         [Bindable]
@@ -171,18 +104,54 @@
 
         private function initApp():void {
             historyService.get();
+            parseHostService.getCountNode();
+            isRunAppTimer = new Timer(10000);
+            isRunAppTimer.addEventListener("timer", isRunAppTimerHandler);
+            equestrianService.isRun();
         }
 
         private function onResultGet(event:ResultEvent):void {
             var result:String = event.result as String;
-            if(result != "") {
-                var array:Array = result.split(":");
-                for(var i:int = 0; i < array.length; i++) {
+            if (result != "") {
+                var array:Array = result.split("|");
+                for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
-                    addDataTable(String(data[0]), String(data[1]),
-                            String(data[2]), String(data[3]), String(data[4]));
+                    addDataTable(String(data[0]), String(data[1]), String(data[2]),
+                                String(data[3]), String(data[4]), String(data[5]),
+                                String(data[6]), String(data[7]), String(data[8]));
                 }
             }
+        }
+
+        private function onResultGetCountNode(event:ResultEvent):void {
+            nMachines.maximum = event.result as int;
+            countNode.text += String(event.result);
+        }
+
+        private function OnResultIsRun(event:ResultEvent):void {
+            if (Boolean(event.result)) {
+                if(startApp.enabled) {
+                    Alert.show("Please wait", "System busy");
+                    startApp.enabled = false;
+                }
+                isRunAppTimer.start();
+            } else {
+                if(!startApp.enabled) {
+                    Alert.show("The system is ready for use", "Welcome");
+                    startApp.enabled = true;
+                }
+                isRunAppTimer.stop();
+
+            }
+        }
+
+        private function OnResultStop(event:ResultEvent):void {
+            logApplication.text = "";
+            logApplication.text += "Server Stop \n";
+            logApplication.text += "Worker Stop \n";
+            logApplication.text += "Scheluder Stop \n";
+            runApplication = false;
+            verifyAppTimer.stop();
         }
 
         private function onResultAdd(event:ResultEvent):void {
@@ -203,8 +172,8 @@
                 logApplication.text += "Worker Running \n";
                 logApplication.text += "Scheluder Running \n";
                 logApplication.text += app.applicationStatus;
-                myTimer.start();
-            } else if(app.time == "") {
+                verifyAppTimer.start();
+            } else if (app.time == "") {
                 logApplication.text += "Server Running \n";
                 logApplication.text += "Worker Running \n";
                 logApplication.text += "Scheluder Running \n";
@@ -215,20 +184,33 @@
                 logApplication.text += "Worker Stop \n";
                 logApplication.text += "Scheluder Stop \n";
                 runApplication = false;
-                myTimer.stop();
-                historyService.add(app.date.toDateString(), app.workers, app.time, app.ip, app.traf);
-                addDataTable(app.date.toDateString(), app.workers, app.time, app.ip, app.traf);
+                verifyAppTimer.stop();
+                historyService.add(app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
+                              app.removing, app.dowloanding, app.parsing, app.aggregating, app.time, app.ip, app.traf);
+                addDataTable(app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
+                              app.removing, app.dowloanding, app.parsing, app.aggregating, app.time, app.ip, app.traf);
             }
         }
 
-        private function addDataTable(date:String, nWorkers:String, time:String, ip:String, traf:String):void {
-            dataTable.addItem({Date:date, Workers:nWorkers, Time:time,
-                IP:ip, Traffic:traf});
-            addDataChart(nWorkers, time);
+        private function addDataTable(date:String, nWorkers:String, removing:String, dowloading:String,
+                                        parsing:String, aggregating:String, time:String, ip:String, traf:String):void {
+            
+            dataTable.addItem({Date:date, Workers:nWorkers, Removing:removing, Dowloading:dowloading,
+                            Parsing:parsing, Aggregation:aggregating, Time:time, IP:ip, Traffic:traf});
+            addDataChart(date + " " + nWorkers, time);
         }
 
         private function addDataChart(nWorkers:String, time:String):void {
             dataChart.addItem({Time:time, Workers:nWorkers});
+        }
+
+        private function clearResult():void {
+            dataTable = new ArrayCollection();
+            dataChart = new ArrayCollection();
+        }
+
+        private function stopApp():void {
+            equestrianService.stop();
         }
 
         private function onFault(event:FaultEvent):void {
@@ -246,15 +228,21 @@
                     equestrianService.deploy(nMachines.value as int);
                 }
                 equestrianService.start();
-                myTimer = new Timer(10000);
-                myTimer.addEventListener("timer", timerHandler);
-                myTimer.start();
+                verifyAppTimer = new Timer(10000);
+                verifyAppTimer.addEventListener("timer", verifyAppTimerHandler);
+                verifyAppTimer.start();
             }
         }
 
-        public function timerHandler(event:TimerEvent):void {
-            myTimer.stop();
+        public function verifyAppTimerHandler(event:TimerEvent):void {
+            verifyAppTimer.stop();
             equestrianService.verify();
+
+        }
+
+        public function isRunAppTimerHandler(event:TimerEvent):void {
+            isRunAppTimer.stop();
+            equestrianService.isRun();
 
         }
 
