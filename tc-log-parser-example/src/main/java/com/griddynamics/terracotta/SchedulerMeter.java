@@ -80,10 +80,15 @@ public class SchedulerMeter {
 
     private void reportTotalDuration() {
         assertEquals(Phase.values().length, phaseDuration.size());
-        Long totalDuration = 0L;
-        for (Phase phase : phaseDuration.keySet())
-            totalDuration += phaseDuration.get(phase);
-        String formattedTotalDuration = StrUtil.encloseWithTag(totalDuration, "to");
-        logger.info("Finished analysis in " + formattedTotalDuration);
+        Long total = duration(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
+        String formattedTotal = StrUtil.encloseWithTag(total, "to");
+        logger.info("Finished analysis in " + formattedTotal);
+    }
+
+    private Long duration(Phase... phases) {
+        Long result = 0L;
+        for (Phase phase : phases)
+            result += phaseDuration.get(phase);
+        return result;
     }
 }
