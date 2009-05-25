@@ -36,7 +36,7 @@
             <locks>
                 <autolock>
                     <method-expression>
-                        * com.griddynamics.terracotta.parser.Aggregator.addStatistics(..)
+                        * com.griddynamics.terracotta.parser.Aggregator..*(..)
                     </method-expression>
                 </autolock>
             </locks>

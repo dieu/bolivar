@@ -78,7 +78,7 @@ public class ParseLog implements Work {
     }
 
     private void report(Map<String, Long> sum) {
-        aggregator.addStatistics(sum);
+        aggregator.add(sum);
     }
 
     public boolean isDaemon() {

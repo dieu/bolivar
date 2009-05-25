@@ -3,55 +3,92 @@ package com.griddynamics.terracotta.parser;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.Map;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collections;
+import java.util.*;
 
+import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs.Performance;
 import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
 
 
 public class Aggregator {
-    private static final AtomicBoolean TRUE = new AtomicBoolean(true);
-    private static final AtomicBoolean FALSE = new AtomicBoolean(false);
-    private final ConcurrentMap<String, Long> ipTraffic = new ConcurrentHashMap<String, Long>();
-    private final List<ParseLogs.Performance> parsingPerformance = Collections.synchronizedList(new LinkedList<ParseLogs.Performance>());
-    private final ConcurrentMap<String, AtomicBoolean> logIsParsed = new ConcurrentHashMap<String, AtomicBoolean>();
-
-    public synchronized void addStatistics(Map<String, Long> statistics) {
-        for (String ip : statistics.keySet())
-            addStatistics(ip, statistics.get(ip));
+    // These inner classes and interfaces are actually private,
+    // but marked as public to allow Terracotta to instrument them.
+    public static interface Statistics {
+        void add(Map<String, Long> part);
+        Map<String, Long> merge();
     }
 
-    private void addStatistics(String ip, Long traffic) {
-        ipTraffic.putIfAbsent(ip, 0L);
-        ipTraffic.put(ip, ipTraffic.get(ip) + traffic);
+    public static class Monolitical implements Statistics {
+        private final ConcurrentMap<String, Long> whole = new ConcurrentHashMap<String, Long>();
+
+        public synchronized void add(Map<String, Long> part) {
+            for (String ip : part.keySet())
+                increaseTrafficUsage(ip, part.get(ip));
+        }
+
+        private void increaseTrafficUsage(String ip, Long delta) {
+            whole.putIfAbsent(ip, 0L);
+            whole.put(ip, whole.get(ip) + delta);
+        }
+
+        public Map<String, Long> merge() {
+            return whole;
+        }
     }
 
-    public Long getUserStat(String ip) {
-        return ipTraffic.get(ip);
+    public static class Partial implements Statistics {
+        private List<Map<String, Long>> parts = Collections.synchronizedList(new ArrayList<Map<String, Long>>());
+
+        public void add(Map<String, Long> part) {
+            parts.add(part);
+        }
+
+        public Map<String, Long> merge() {
+            Statistics whole = new Monolitical();
+            for (Map<String, Long> part : parts)
+                whole.add(part);
+            return whole.merge();
+        }
     }
 
-    public String getIpWithMaxTraffic() {
+    private final List<Performance> parsingPerformance = Collections.synchronizedList(new LinkedList<Performance>());
+    //private final ConcurrentMap<String, AtomicBoolean> logIsParsed = new ConcurrentHashMap<String, AtomicBoolean>();
+    private final ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentHashMap<String, Boolean>();
+    private Statistics parts = new Partial();
+    private transient Map<String, Long> whole;
+
+    public void add(Map<String, Long> part) {
+        parts.add(part);
+    }
+
+    public synchronized String getIpWithMaxTraffic() {
+        whole = parts.merge();
+        Long maxTraf = Long.MIN_VALUE;
         String maxIp = null;
-        Long sum = Long.MIN_VALUE;
-        for (String ip : ipTraffic.keySet()) {
-            long traf = ipTraffic.get(ip);
-            if (sum < traf) {
-                sum = traf;
+        for (String ip : whole.keySet()) {
+            Long traf = whole.get(ip);
+            if (maxTraf < traf) {
+                maxTraf = traf;
                 maxIp = ip;
             }
         }
         return maxIp;
     }
 
-    public void markAsParsed(String log) {
-        logIsParsed.put(log, TRUE);
+    public Long getTraffic(String ip) {
+        return whole.get(ip);
     }
 
-    public Boolean isParsed(String log) {
-        AtomicBoolean yes = logIsParsed.putIfAbsent(log, FALSE);
-        return yes != null && yes.get();
+    public synchronized void markAsParsed(String log) {
+        //logIsParsed.put(log, TRUE);
+        logIsParsed.put(log, Boolean.TRUE);
+    }
+
+    public synchronized Boolean isParsed(String log) {
+        if (!logIsParsed.containsKey(log))
+            logIsParsed.put(log, Boolean.FALSE);
+        return logIsParsed.get(log);
+        //AtomicBoolean yes = logIsParsed.putIfAbsent(log, FALSE);
+        //return yes != null && yes.get();
     }
 
     public void reportParsingPerformance(ParseLogs.Performance p) {
@@ -60,10 +97,5 @@ public class Aggregator {
 
     public ParseLogs.Performance averageParsingPerformance() {
         return ParseLogs.Performance.average(parsingPerformance);
-    }
-
-    @Override
-    public String toString() {
-        return ipTraffic.toString();
     }
 }

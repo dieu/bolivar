@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
+import static java.lang.Math.max;
 
 import org.apache.log4j.Logger;
 
@@ -18,17 +19,27 @@ import org.apache.log4j.Logger;
 public class ParseLogs implements Work {
 
     public static class Performance {
-        public Long parsedIn = 0L;
-        public Long returnedIn = 0L;
+        public Long parsed = 0L;
+        public Long parsedOne = 0L;
+        public Long returned = 0L;
+        public Long logs = 0L;
 
-        public static Performance average(Collection<Performance> measurements) {
+        public static Performance average(Collection<Performance> workers) {
             Performance average = new Performance();
-            for (Performance p : measurements) {
-                average.parsedIn += p.parsedIn;
-                average.returnedIn += p.returnedIn;
+            Long parsedTotal = 0L;
+            Long returnedTotal = 0L;
+            Long logsTotal = 0L;
+            Long maxLogs = 0L;
+            for (Performance w : workers) {
+                parsedTotal += w.parsed;
+                returnedTotal += w.returned;
+                logsTotal += w.logs;
+                maxLogs = max(maxLogs, w.logs);
             }
-            average.parsedIn /= measurements.size();
-            average.returnedIn /= measurements.size();
+            average.parsed = parsedTotal / workers.size();
+            average.parsedOne = parsedTotal / logsTotal;
+            average.returned = returnedTotal / workers.size();
+            average.logs = maxLogs;
             return average;
         }
     }
@@ -65,13 +76,15 @@ public class ParseLogs implements Work {
     private void find() {
         FileUtil.verifyDirExists(dir);
         logs = new File(dir).listFiles();
+        performance.logs = (long) logs.length;
     }
 
     private void parse() {
-        Long startedParsing = System.currentTimeMillis();
+        Long startedAll = System.currentTimeMillis();
         for (File log : logs)
             parseIfNeeded(log);
-        performance.parsedIn = System.currentTimeMillis() - startedParsing;
+        performance.parsed = System.currentTimeMillis() - startedAll;
+        performance.parsedOne = performance.parsed / logs.length;
     }
 
     private void parseIfNeeded(File log) {
@@ -91,19 +104,19 @@ public class ParseLogs implements Work {
 
     private void parse(File log) {
         logger.info("Parsing log " + log.getPath());
-        Long started = System.currentTimeMillis();
-        ParseLog work = new ParseLog(log, aggregator);
-        work.parseTo(trafficByIp);
-        logger.info("Parsed in " + (System.currentTimeMillis() - started));
+        Long startedOne = System.currentTimeMillis();
+        ParseLog parser = new ParseLog(log, aggregator);
+        parser.parseTo(trafficByIp);
+        logger.info("Parsed log in " + (System.currentTimeMillis() - startedOne));
     }
 
     private void report() {
         if (!trafficByIp.isEmpty()) {
-            logger.info("Reporting traffuc ysage...");
+            logger.info("Returning traffic usage...");
             Long started = System.currentTimeMillis();
-            aggregator.addStatistics(trafficByIp);
-            performance.returnedIn = System.currentTimeMillis() - started;
-            logger.info("Reported in " + performance.returnedIn);
+            aggregator.add(trafficByIp);
+            performance.returned = System.currentTimeMillis() - started;
+            logger.info("Returned in " + performance.returned);
             aggregator.reportParsingPerformance(performance);
         }
     }

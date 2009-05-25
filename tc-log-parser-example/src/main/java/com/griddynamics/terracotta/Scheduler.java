@@ -158,13 +158,16 @@ public class Scheduler {
     private void findMostConsumingIp() {
         timeMeter.aggregating();
         String ip = aggregator.getIpWithMaxTraffic();
-        logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getUserStat(ip) + "</traf> ");
+        logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getTraffic(ip) + "</traf> ");
         timeMeter.done();
     }
 
     private void reportParsingPerformance() {
         ParseLogs.Performance p = aggregator.averageParsingPerformance();
-        logger.info("One worker parsed in " + encloseWithTag(p.parsedIn, "op"));
-        logger.info("One worker returned in " + encloseWithTag(p.returnedIn, "or"));
+        logger.info("Worker performance:");
+        logger.info("Parsed all logs in " + encloseWithTag(p.parsed, "op"));
+        logger.info("Parsed one log in " + p.parsedOne);
+        logger.info("Returned results in " + encloseWithTag(p.returned, "or"));
+        logger.info("Max logs per worker: " + p.logs);
     }
 }
