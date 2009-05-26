@@ -12,7 +12,7 @@ public class ApplicationEntity
     public var time:String;
     public var ip:String;
     public var traf:String;
-    public var nodeIp:Object;
+    public var nodeIp:String;
 
     public function ApplicationEntity() {
     }

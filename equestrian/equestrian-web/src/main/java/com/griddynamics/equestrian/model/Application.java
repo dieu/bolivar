@@ -17,7 +17,7 @@ public class Application {
     private String time = "";
     private String ip = "";
     private String traf = "";
-    private Map<String, Boolean> nodeIp = new HashMap<String, Boolean>();
+    private String nodeIp = "";
 
     public Application() {
     }  
@@ -94,11 +94,11 @@ public class Application {
         this.traf = traf;
     }
 
-    public Map<String, Boolean> getNodeIp() {
+    public String getNodeIp() {
         return nodeIp;
     }
 
-    public void setNodeIp(Map<String, Boolean> nodeIp) {
+    public void setNodeIp(String nodeIp) {
         this.nodeIp = nodeIp;
     }
 }

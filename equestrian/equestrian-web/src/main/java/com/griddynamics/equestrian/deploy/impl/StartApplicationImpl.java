@@ -25,6 +25,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String separator;
     private String outScheduler = "";
     private String outWorkers = "";
+    private String infoNodes = "";
     private String files = "";
     private int nWorkers = 0;
     private int minute = 0;
@@ -41,7 +42,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private Application application;
     private Date date = null;
     private File dir;
-    private Map<String, Boolean> nodes;
+    private Map<String, String> nodes;
 
     public StartApplicationImpl() {
         separator = System.getProperty("file.separator");
@@ -111,6 +112,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
+            ReadSchedulerOut readSchedulerOut = new ReadSchedulerOut();
+            readSchedulerOut.start();
+            ReadWorkersOut readWorkersOut = new ReadWorkersOut();
+            readWorkersOut.start();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -122,10 +127,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
         application = new Application();
         application.setWorkers(String.valueOf(nWorkers));
         application.setDate(date);
-        application.setNodeIp(nodes);
+        application.setNodeIp(infoNodes);
         application.setSchedulerStatus(isRunScheduler);
-//        outWorkers += getData(workers, 3);
-        outScheduler += getData(scheduler, 1);
         if(!isRunScheduler) {
             try {
                 Runtime.getRuntime().exec(runKillCommand, null, dir);
@@ -157,20 +160,21 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     }
                 }
             }
-            if(!outScheduler.equals("")) {
+            if(!outScheduler.equals("") && separator.equals("/")) {
                 try {
                     FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
                     schedulerLogs.write(outScheduler);
                     schedulerLogs.close();
-//                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
-//                    workersLogs.write(outWorkers);
-//                    workersLogs.close();
+                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
+                    workersLogs.write(outWorkers);
+                    workersLogs.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
             outScheduler = "";
             outWorkers = "";
+            infoNodes = "";
             date = null;
             minute = 0;
             application.setSchedulerStatus(false);
@@ -185,20 +189,23 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public void stop() {
-        try {
-            FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
-            schedulerLogs.write(outScheduler);
-            schedulerLogs.close();
-//            FileWriter workersLogs = new FileWriter(files + "workers.txt");
-//            workersLogs.write(outWorkers);
-//            workersLogs.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(separator.equals("/")) {
+            try {
+                FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
+                schedulerLogs.write(outScheduler);
+                schedulerLogs.close();
+                FileWriter workersLogs = new FileWriter(files + "workers.txt");
+                workersLogs.write(outWorkers);
+                workersLogs.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         isRunUpload = false;
         isRunScheduler = false;
         outWorkers = "";
         outScheduler = "";
+        infoNodes = "";
         date = null;
         minute = 0;
         if(server != null) {
@@ -261,7 +268,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 case 2:
                     isRunUpload = false;
                     break;
-                case 3:                    
+                case 3:
                     break;
                 default: break;
             }
@@ -281,5 +288,39 @@ public class StartApplicationImpl implements StartApplication<Application> {
             new File(dir).mkdirs();
         }
 
+    }
+
+    private class ReadSchedulerOut extends Thread {
+        public void run() {
+            while (isRunScheduler) {
+                outScheduler += getData(scheduler, 1);
+                try {
+                    sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private class ReadWorkersOut extends Thread {
+        public void run() {
+            while (isRunScheduler) {
+                outWorkers += getData(workers, 3);
+                String[] split = outWorkers.split(" ");
+                for(String word: split) {
+                    if(word.startsWith("<dow>")) {
+                        nodes.put(word.replace("<dow>","")
+                                .replace("</dow>","").replace("\r","").replace("\n", ""), "dowloading");
+                    }
+                }
+                infoNodes = nodes.toString().replace("{", "").replace("}", "");
+                try {
+                    sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
