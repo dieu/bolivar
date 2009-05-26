@@ -4,6 +4,8 @@ import commonj.work.Work;
 
 import java.lang.reflect.Constructor;
 
+import static com.griddynamics.terracotta.util.ErrUtil.runtimeException;
+
 /**
  * Instantiates a work item not by the master, but by the worker
  * when it picks up the item off the queue.
@@ -15,6 +17,10 @@ import java.lang.reflect.Constructor;
 public class LocalWork implements Work {
     private Class<? extends Work> work;
     private Object[] arguments;
+
+    public static Work createLocally(Class<? extends Work> work, Object... arguments) {
+        return new LocalWork(work, arguments);
+    }
 
     public LocalWork(Class<? extends Work> work, Object... arguments) {
         this.work = work;
@@ -30,8 +36,7 @@ public class LocalWork implements Work {
     }
 
     private void createAndRunWork() throws Exception {
-        Work work = createWork();
-        work.run();
+        run(createWork());
     }
 
     private Work createWork() throws Exception {
@@ -43,6 +48,33 @@ public class LocalWork implements Work {
         for (int i = 0; i < arguments.length; i++)
             argumentTypes[i] = arguments[i].getClass();
         return work.getConstructor(argumentTypes);
+    }
+
+    private void run(Work work) {
+        reportStarted();
+        try {
+            work.run();
+        } catch (Throwable e) {
+            reportFailed(e);
+            rethrow(e);
+        }
+        reportFinished();
+    }
+
+    protected void reportStarted() {
+        // Default implementation.
+    }
+
+    protected void reportFailed(Throwable e) {
+        // Default implementation.
+    }
+
+    private void rethrow(Throwable e) {
+        throw runtimeException(e);
+    }
+
+    protected void reportFinished() {
+        // Default implementation.
     }
 
     public String toString() {
@@ -63,5 +95,5 @@ public class LocalWork implements Work {
 
     public void release() {
         // Do nothing.
-    }
+    }        
 }

@@ -2,24 +2,26 @@ package com.griddynamics.terracotta.parser.separate_downloading;
 
 import commonj.work.Work;
 import com.griddynamics.terracotta.util.FileUtil;
+import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.DOWNLOADING;
 
 /**
  * @author agorbunov @ 08.05.2009 15:10:15
  */
 public class DownloadLog implements Work {
-    private String localDir;
+    private UiTracker tracker = new UiTracker();
     private Wget wget;
+    private String dir;
 
-    public static Work fromTo(String url, String localDir) {
-        return new LocalWork(DownloadLog.class, url, localDir);
+    public static Work fromTo(String url, String dir) {
+        return new LocalWork(DownloadLog.class, url, dir);
     }
 
-    /* Instead of this constructor, call DownloadLog.fromTo(url, localDir).
+    /* Instead of this constructor, call DownloadLog.fromTo(url, dest).
      * The constructor is private, but marked as public to suit Terracotta. */
     @Deprecated
-    public DownloadLog(String url, String localDir) {
-        this.localDir = localDir;
-        wget = new Wget(url, localDir);
+    public DownloadLog(String url, String dir) {
+        wget = new Wget(url, dir);
+        this.dir = dir;
     }
 
     public void run() {
@@ -33,10 +35,11 @@ public class DownloadLog implements Work {
     }
 
     private void createDestDir() {
-        FileUtil.createDirIfNotExists(localDir);
+        FileUtil.createDirIfNotExists(dir);
     }
 
     private void startDownloading() {
+        tracker.entered(DOWNLOADING);
         wget.startDownloading();
     }
 

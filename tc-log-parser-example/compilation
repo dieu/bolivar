@@ -1,0 +1,16 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Building tc-log-parcer-example
+[INFO]    task-segment: [compile]
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:compile]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1 second
+[INFO] Finished at: Wed May 20 13:57:41 MSD 2009
+[INFO] Final Memory: 6M/12M
+[INFO] ------------------------------------------------------------------------

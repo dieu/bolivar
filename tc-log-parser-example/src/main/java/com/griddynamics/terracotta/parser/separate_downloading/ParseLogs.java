@@ -13,6 +13,10 @@ import static java.lang.Math.max;
 
 import org.apache.log4j.Logger;
 
+import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.PARSING;
+import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.RETURNING;
+import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.DONE;
+
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
  */
@@ -29,26 +33,28 @@ public class ParseLogs implements Work {
             Long parsedTotal = 0L;
             Long returnedTotal = 0L;
             Long logsTotal = 0L;
-            Long maxLogs = 0L;
+            Long maxLogsPerWorker = 0L;
             for (Performance w : workers) {
                 parsedTotal += w.parsed;
                 returnedTotal += w.returned;
                 logsTotal += w.logs;
-                maxLogs = max(maxLogs, w.logs);
+                maxLogsPerWorker = max(maxLogsPerWorker, w.logs);
             }
             average.parsed = parsedTotal / workers.size();
             average.parsedOne = parsedTotal / logsTotal;
             average.returned = returnedTotal / workers.size();
-            average.logs = maxLogs;
+            average.logs = maxLogsPerWorker;
             return average;
         }
     }
 
     private static Logger logger = Logger.getLogger(ParseLogs.class);
+    private UiTracker tracker = new UiTracker();
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Aggregator aggregator;
     private String dir;
     private File[] logs;
+    private int logCount;
     private Performance performance = new Performance();
 
     public static Work inUsing(String dir, Aggregator aggregator) {
@@ -76,15 +82,22 @@ public class ParseLogs implements Work {
     private void find() {
         FileUtil.verifyDirExists(dir);
         logs = new File(dir).listFiles();
-        performance.logs = (long) logs.length;
+        logCount = logs.length;
+        performance.logs = (long) logCount;
     }
 
     private void parse() {
-        Long startedAll = System.currentTimeMillis();
+        // TODO Move measurements to tracker
+        Long started = System.currentTimeMillis();
+        tracker.entered(PARSING);
+        parseLogs();
+        performance.parsed = System.currentTimeMillis() - started;
+        performance.parsedOne = performance.parsed / logCount;
+    }
+
+    private void parseLogs() {
         for (File log : logs)
             parseIfNeeded(log);
-        performance.parsed = System.currentTimeMillis() - startedAll;
-        performance.parsedOne = performance.parsed / logs.length;
     }
 
     private void parseIfNeeded(File log) {
@@ -103,22 +116,34 @@ public class ParseLogs implements Work {
     }
 
     private void parse(File log) {
+        // TODO Move measurements to tracker
         logger.info("Parsing log " + log.getPath());
-        Long startedOne = System.currentTimeMillis();
-        ParseLog parser = new ParseLog(log, aggregator);
-        parser.parseTo(trafficByIp);
-        logger.info("Parsed log in " + (System.currentTimeMillis() - startedOne));
+        Long started = System.currentTimeMillis();
+        ParseLog p = new ParseLog(log, aggregator);
+        p.parseTo(trafficByIp);
+        logger.info("Parsed log in " + (System.currentTimeMillis() - started));
     }
 
     private void report() {
-        if (!trafficByIp.isEmpty()) {
+        if (parsedLogs()) {
+            // TODO Move measurements to tracker
             logger.info("Returning traffic usage...");
             Long started = System.currentTimeMillis();
-            aggregator.add(trafficByIp);
+            tracker.entered(RETURNING);
+            returnResult();
             performance.returned = System.currentTimeMillis() - started;
             logger.info("Returned in " + performance.returned);
             aggregator.reportParsingPerformance(performance);
+            tracker.entered(DONE);
         }
+    }
+
+    private boolean parsedLogs() {
+        return !trafficByIp.isEmpty();
+    }
+
+    private void returnResult() {
+        aggregator.add(trafficByIp);
     }
 
     public boolean isDaemon() {
