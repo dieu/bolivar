@@ -51,7 +51,6 @@ public class Aggregator {
     }
 
     private final List<Performance> parsingPerformance = Collections.synchronizedList(new LinkedList<Performance>());
-    //private final ConcurrentMap<String, AtomicBoolean> logIsParsed = new ConcurrentHashMap<String, AtomicBoolean>();
     private final ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentHashMap<String, Boolean>();
     private Statistics parts = new Partial();
     private transient Map<String, Long> whole;
@@ -79,7 +78,6 @@ public class Aggregator {
     }
 
     public synchronized void markAsParsed(String log) {
-        //logIsParsed.put(log, TRUE);
         logIsParsed.put(log, Boolean.TRUE);
     }
 
@@ -87,8 +85,6 @@ public class Aggregator {
         if (!logIsParsed.containsKey(log))
             logIsParsed.put(log, Boolean.FALSE);
         return logIsParsed.get(log);
-        //AtomicBoolean yes = logIsParsed.putIfAbsent(log, FALSE);
-        //return yes != null && yes.get();
     }
 
     public void reportParsingPerformance(ParseLogs.Performance p) {

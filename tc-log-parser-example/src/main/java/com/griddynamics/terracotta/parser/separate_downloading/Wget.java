@@ -21,7 +21,7 @@ public class Wget {
         }
 
         public void startCollecting() {
-            start();
+            super.start();
         }
 
         public void run() {
@@ -87,7 +87,7 @@ public class Wget {
 
     public void waitUntilDownloadCompletes() {
         verifyIsStarted();
-        waitUntilCompletes();
+        waitUntilCompletion();
         verifyCompletedSuccessfully();
     }
 
@@ -96,7 +96,7 @@ public class Wget {
             throw new IllegalStateException("Wget is not started");
     }
 
-    private void waitUntilCompletes() {
+    private void waitUntilCompletion() {
         try {
             wget.waitFor();
         } catch (InterruptedException e) {
