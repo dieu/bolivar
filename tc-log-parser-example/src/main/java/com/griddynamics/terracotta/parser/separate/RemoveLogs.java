@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta.parser.separate_downloading;
+package com.griddynamics.terracotta.parser.separate;
 
 import commonj.work.Work;
 
@@ -6,17 +6,19 @@ import java.io.File;
 
 import com.griddynamics.terracotta.util.FileUtil;
 
-import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.REMOVING;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.REMOVING;
+import com.griddynamics.terracotta.parser.separate.Trackable;
+import com.griddynamics.terracotta.parser.separate.Tracker;
 
 /**
  * @author agorbunov @ 08.05.2009 16:22:35
  */
 public class RemoveLogs implements Work {    
-    private UiTracker tracker = new UiTracker();
+    private Tracker tracker = new Tracker();
     private File dir;
 
     public static Work from(String dir) {
-        return new LocalWork(RemoveLogs.class, dir);
+        return new Trackable(RemoveLogs.class, dir);
     }
 
     /* Instead of this constructor, call RemoveLogs.from(dir).

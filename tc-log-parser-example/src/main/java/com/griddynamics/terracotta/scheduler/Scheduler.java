@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta;
+package com.griddynamics.terracotta.scheduler;
 
 import org.terracotta.workmanager.dynamic.DynamicWorkManager;
 import org.terracotta.message.routing.RoundRobinRouter;
@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.griddynamics.terracotta.parser.Aggregator;
-import com.griddynamics.terracotta.parser.separate_downloading.RemoveLogs;
-import com.griddynamics.terracotta.parser.separate_downloading.DownloadLog;
-import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
+import com.griddynamics.terracotta.parser.separate.RemoveLogs;
+import com.griddynamics.terracotta.parser.separate.DownloadLog;
+import com.griddynamics.terracotta.parser.separate.ParseLogs;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import com.griddynamics.terracotta.util.FileUtil;
 import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
+import com.griddynamics.terracotta.scheduler.SchedulerMeter;
+import com.griddynamics.terracotta.JobService;
 import commonj.work.WorkItem;
 import commonj.work.Work;
 

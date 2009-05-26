@@ -2,16 +2,18 @@ package com.griddynamics.terracotta.parser;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.*;
 
-import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs.Performance;
-import com.griddynamics.terracotta.parser.separate_downloading.ParseLogs;
+import com.griddynamics.terracotta.parser.separate.ParseLogs.Performance;
+import com.griddynamics.terracotta.parser.separate.ParseLogs;
 
-
+/**
+ * @author agorbunov @ 08.05.2009 15:10:15
+ */
 public class Aggregator {
-    // These inner classes and interfaces are actually private,
-    // but marked as public to allow Terracotta to instrument them.
+    // Here we come to another Terracotta issue.
+    // The classes below are actually private, but marked as public to allow Terracotta to instrument them.
+
     public static interface Statistics {
         void add(Map<String, Long> part);
         Map<String, Long> merge();
@@ -21,13 +23,15 @@ public class Aggregator {
         private final ConcurrentMap<String, Long> whole = new ConcurrentHashMap<String, Long>();
 
         public synchronized void add(Map<String, Long> part) {
-            for (String ip : part.keySet())
-                increaseTrafficUsage(ip, part.get(ip));
+            for (String ip : part.keySet()) {
+                Long traffic = part.get(ip);
+                increaseTrafficUsage(ip, traffic);
+            }
         }
 
-        private void increaseTrafficUsage(String ip, Long delta) {
+        private void increaseTrafficUsage(String ip, Long traffic) {
             whole.putIfAbsent(ip, 0L);
-            whole.put(ip, whole.get(ip) + delta);
+            whole.put(ip, whole.get(ip) + traffic);
         }
 
         public Map<String, Long> merge() {
@@ -61,12 +65,12 @@ public class Aggregator {
 
     public synchronized String getIpWithMaxTraffic() {
         whole = parts.merge();
-        Long maxTraf = Long.MIN_VALUE;
+        Long maxTraffic = Long.MIN_VALUE;
         String maxIp = null;
         for (String ip : whole.keySet()) {
-            Long traf = whole.get(ip);
-            if (maxTraf < traf) {
-                maxTraf = traf;
+            Long traffic = whole.get(ip);
+            if (maxTraffic < traffic) {
+                maxTraffic = traffic;
                 maxIp = ip;
             }
         }

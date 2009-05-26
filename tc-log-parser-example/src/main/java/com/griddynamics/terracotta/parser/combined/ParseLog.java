@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta.parser;
+package com.griddynamics.terracotta.parser.combined;
 
 import commonj.work.Work;
 
@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.griddynamics.terracotta.parser.Aggregator;
 
 
 public class ParseLog implements Work {

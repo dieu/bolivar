@@ -7,6 +7,8 @@ import org.terracotta.workmanager.dynamic.DynamicWorkerFactory;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 
+import com.griddynamics.terracotta.scheduler.Scheduler;
+
 public class JobService {
     public static final String topologyName = "parserTopology";
     private static final Logger logger = Logger.getLogger(JobService.class);

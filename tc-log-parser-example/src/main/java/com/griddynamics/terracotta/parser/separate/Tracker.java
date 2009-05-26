@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta.parser.separate_downloading;
+package com.griddynamics.terracotta.parser.separate;
 
 import org.apache.log4j.Logger;
 import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
@@ -10,7 +10,7 @@ import java.net.InetAddress;
  */
 // TODO Measure the duration of each phase
 // TODO Merge with SchedulerMeter, and extract common steps to a superclass
-public class UiTracker {
+public class Tracker {
     public static enum Phase {
         REMOVING,
         DOWNLOADING,
@@ -20,7 +20,7 @@ public class UiTracker {
         ERROR
     }
 
-    private static Logger logger = Logger.getLogger(UiTracker.class);
+    private static Logger logger = Logger.getLogger(Tracker.class);
     private String phase;
 
     public void entered(Phase phase) {

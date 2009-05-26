@@ -1,4 +1,4 @@
-package com.griddynamics.terracotta;
+package com.griddynamics.terracotta.scheduler;
 
 import org.apache.log4j.Logger;
 import static org.junit.Assert.*;

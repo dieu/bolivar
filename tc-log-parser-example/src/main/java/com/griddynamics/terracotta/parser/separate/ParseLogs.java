@@ -1,9 +1,11 @@
-package com.griddynamics.terracotta.parser.separate_downloading;
+package com.griddynamics.terracotta.parser.separate;
 
 import commonj.work.Work;
 import com.griddynamics.terracotta.util.FileUtil;
 import com.griddynamics.terracotta.parser.Aggregator;
-import com.griddynamics.terracotta.parser.ParseLog;
+import com.griddynamics.terracotta.parser.combined.ParseLog;
+import com.griddynamics.terracotta.parser.separate.Tracker;
+import com.griddynamics.terracotta.parser.separate.Trackable;
 
 import java.io.File;
 import java.util.Map;
@@ -13,9 +15,9 @@ import static java.lang.Math.max;
 
 import org.apache.log4j.Logger;
 
-import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.PARSING;
-import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.RETURNING;
-import static com.griddynamics.terracotta.parser.separate_downloading.UiTracker.Phase.DONE;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.PARSING;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.RETURNING;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.DONE;
 
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
@@ -49,7 +51,7 @@ public class ParseLogs implements Work {
     }
 
     private static Logger logger = Logger.getLogger(ParseLogs.class);
-    private UiTracker tracker = new UiTracker();
+    private Tracker tracker = new Tracker();
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Aggregator aggregator;
     private String dir;
@@ -58,7 +60,7 @@ public class ParseLogs implements Work {
     private Performance performance = new Performance();
 
     public static Work inUsing(String dir, Aggregator aggregator) {
-        return new LocalWork(ParseLogs.class, dir, aggregator);
+        return new Trackable(ParseLogs.class, dir, aggregator);
     }
 
     /* Instead of this constructor, call ParseLogs.inUsing(dir, aggregator).
@@ -125,7 +127,7 @@ public class ParseLogs implements Work {
     }
 
     private void report() {
-        if (parsedLogs()) {
+        if (parsedSomeLogs()) {
             // TODO Move measurements to tracker
             logger.info("Returning traffic usage...");
             Long started = System.currentTimeMillis();
@@ -138,7 +140,7 @@ public class ParseLogs implements Work {
         }
     }
 
-    private boolean parsedLogs() {
+    private boolean parsedSomeLogs() {
         return !trafficByIp.isEmpty();
     }
 
