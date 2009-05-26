@@ -1,108 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
-    <mx:creationComplete>
-        <![CDATA[
-            initApp();
-        ]]>
-    </mx:creationComplete>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="initApp()"
+                backgroundGradientColors="[#8080c0, #ffffff]">
 
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
-
-    <mx:Panel  width="100%" height="100%" layout="absolute" title="Bolivar Demo">
-        <mx:HBox horizontalCenter="0" y="10">
-            <mx:Label id="countNode" text="Max Workers "/>
-            <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
-            <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
+    <mx:VBox left="10" right="10" top="10" bottom="10" height="100%" width="100%">
+        <mx:HBox>
+            <mx:Canvas width="300" height="100%"><mx:TextArea width="100%" height="100%" text="This application demonstrates
+			calculating some OLAP analytics on historical data. In this concrete example,
+			we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
+            </mx:Canvas>
+            <!--mx:Canvas width="200" height="100%"-->
+            <mx:Canvas>
+                <mx:HBox horizontalCenter="0">
+                    <mx:Label id="countNode" text="Max Workers "/>
+                    <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
+                    <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
+                </mx:HBox>
+                <mx:HBox horizontalCenter="0" y="40">
+                    <mx:Button id="clear" label="Clear table result" click="clearResult()"/>
+                    <mx:Button id="stop" label="Stop Application" click="stopApp()"/>
+                </mx:HBox>
+            </mx:Canvas>
+            <!--/mx:Canvas-->
+            <mx:Canvas width="200" height="100%" color="white" backgroundColor="black">
+                <mx:Form>
+                    <mx:FormItem label="Offender:"><mx:Label id="ip" text=""/></mx:FormItem>
+                    <mx:FormItem label="Traffic used:"><mx:Label id="traffic" text=""/></mx:FormItem>
+                </mx:Form>
+            </mx:Canvas>
         </mx:HBox>
-        <mx:HBox horizontalCenter="0" y="40">
-            <mx:Button id="clear" label="Clear table result" click="clearResult()"/>
-            <mx:Button id="stop" label="Stop Application" click="stopApp()"/>
-        </mx:HBox>
-        <mx:VDividedBox y="116" horizontalAlign="center" verticalAlign="middle" height="100%" width="100%" >
-            <mx:HDividedBox width="99%">
-                <mx:VDividedBox height="100%" width="20%">
-                    <mx:Label id="statusApplication" width="150"
-                              text="Status Application" fontWeight="bold" fontSize="14"/>
-                    <mx:TextArea id="logApplication" height="100%" width="100%" fontSize="10"/>
-                </mx:VDividedBox>
-                <mx:DataGrid id="table" dataProvider="{dataTable}" width="80%" height="100%">
+        <mx:HBox height="100%" width="100%">
+            <mx:Panel width="300" height="100%" id="clusterStatus" title="Cluster Status: ">
+                <mx:DataGrid id="tableNodeInfo" dataProvider="{dataNodeInfoTable}" width="100%" height="100%">
                     <mx:columns>
-                        <mx:DataGridColumn dataField="N" headerText="#"/>
-                        <mx:DataGridColumn dataField="Date"/>
-                        <mx:DataGridColumn dataField="Workers"/>
-                        <mx:DataGridColumn dataField="Parsing" headerText="Parsing Ave., ms"/>
-                        <mx:DataGridColumn dataField="Returning" headerText="Returning Ave., ms"/>
-                        <mx:DataGridColumn dataField="Total" headerText="Total time, ms"/>
-                        <mx:DataGridColumn dataField="IP"/>
-                        <mx:DataGridColumn dataField="Traffic"/>
+                        <mx:DataGridColumn dataField="Node"/>
+                        <mx:DataGridColumn dataField="Status"/>
                     </mx:columns>
                 </mx:DataGrid>
-            </mx:HDividedBox>
-            <mx:TabNavigator width="100%" height="100%">
-                <mx:Canvas label="Column Chart" width="100%" height="100%">
-                    <mx:VDividedBox width="100%" height="100%">
-                        <mx:ColumnChart width="99%"  height="95%" id="columnChart" dataProvider="{dataColumnChart}" showDataTips="true">
-                            <mx:horizontalAxis>
-                                <mx:CategoryAxis
-                                        dataProvider="{dataColumnChart}"
-                                        categoryField="Workers"
-                                        />
-                            </mx:horizontalAxis>
-                            <mx:series>
-                                <mx:ColumnSeries
-                                        yField="Time"
-                                        xField="Workers"
-                                        displayName="Workers"
-                                        fill="{colorChart}"
-                                        />
-                            </mx:series>
-                        </mx:ColumnChart>
-                        <mx:Legend horizontalCenter="0" dataProvider="{columnChart}"/>
-                    </mx:VDividedBox>
-                </mx:Canvas>
-                <mx:Canvas label="Line Chart" width="100%" height="100%">
-                    <mx:VDividedBox width="100%" height="100%">
-                        <mx:LineChart id="lineChart" width="99%" height="95%" dataProvider="{dataLineChart}">
-                            <mx:seriesFilters>
-                                <mx:Array/>
-                            </mx:seriesFilters>
-                            <mx:horizontalAxis>
-                                <mx:CategoryAxis
-                                        dataProvider="{dataLineChart}"
-                                        categoryField="Workers"
-                                        />
-                            </mx:horizontalAxis>
-                            <mx:series>
-                                <mx:LineSeries
-                                        yField="Ideal"
-                                        displayName="Ideal"
-                                        >
-                                    <mx:lineStroke>
-                                        <mx:Stroke
-                                                color="black"
-                                                weight="3"
+            </mx:Panel>
+            <mx:Panel width="100%" height="100%" id="infoTestPanel" title="Last total time: ">
+                <mx:VDividedBox width="100%" height="100%">
+                    <mx:DataGrid id="tableTestInfo" dataProvider="{dataTestInfoTable}" width="100%" height="100%">
+                        <mx:columns>
+                            <mx:DataGridColumn dataField="N" headerText="#" width="40"/>
+                            <mx:DataGridColumn dataField="Date" minWidth="100"/>
+                            <mx:DataGridColumn dataField="Workers"/>
+                            <mx:DataGridColumn dataField="Parsing" headerText="Parsing Ave., ms"/>
+                            <mx:DataGridColumn dataField="Returning" headerText="Returning Ave., ms"/>
+                            <mx:DataGridColumn dataField="Total" headerText="Total time, ms"/>
+                            <mx:DataGridColumn dataField="IP"/>
+                            <mx:DataGridColumn dataField="Traffic"/>
+                        </mx:columns>
+                    </mx:DataGrid>
+                    <mx:TabNavigator width="100%" height="100%">
+                        <mx:Canvas label="Column Chart" width="100%" height="100%">
+                            <mx:VDividedBox width="100%" height="100%">
+                                <mx:ColumnChart width="99%"  height="95%" id="columnChart" dataProvider="{dataColumnChart}" showDataTips="true">
+                                    <mx:horizontalAxis>
+                                        <mx:CategoryAxis
+                                                dataProvider="{dataColumnChart}"
+                                                categoryField="Workers"
                                                 />
-                                    </mx:lineStroke>
-                                </mx:LineSeries>
-                                <mx:LineSeries
-                                        yField="Total"
-                                        displayName="Total"
-                                        >
-                                    <mx:lineStroke>
-                                        <mx:Stroke
-                                                color="red"
-                                                weight="3"
+                                    </mx:horizontalAxis>
+                                    <mx:series>
+                                        <mx:ColumnSeries
+                                                yField="Time"
+                                                xField="Workers"
+                                                displayName="Workers"
+                                                fill="{colorChart}"
                                                 />
-                                    </mx:lineStroke>
-                                </mx:LineSeries>
-                            </mx:series>
-                        </mx:LineChart>
-                        <mx:Legend horizontalCenter="0" dataProvider="{lineChart}"/>
-                    </mx:VDividedBox>
-                </mx:Canvas>
-            </mx:TabNavigator>
-        </mx:VDividedBox>
-    </mx:Panel>
+                                    </mx:series>
+                                </mx:ColumnChart>
+                                <mx:Legend horizontalCenter="0" dataProvider="{columnChart}"/>
+                            </mx:VDividedBox>
+                        </mx:Canvas>
+                        <mx:Canvas label="Line Chart" width="100%" height="100%">
+                            <mx:VDividedBox width="100%" height="100%">
+                                <mx:LineChart id="lineChart" width="99%" height="95%" dataProvider="{dataLineChart}" showDataTips="true">
+                                    <mx:seriesFilters>
+                                        <mx:Array/>
+                                    </mx:seriesFilters>
+                                    <mx:horizontalAxis>
+                                        <mx:CategoryAxis
+                                                dataProvider="{dataLineChart}"
+                                                categoryField="Workers"
+                                                />
+                                    </mx:horizontalAxis>
+                                    <mx:series>
+                                        <mx:LineSeries
+                                                yField="Ideal"
+                                                displayName="Ideal"
+                                                >
+                                            <mx:lineStroke>
+                                                <mx:Stroke
+                                                        color="black"
+                                                        weight="3"
+                                                        />
+                                            </mx:lineStroke>
+                                        </mx:LineSeries>
+                                        <mx:LineSeries
+                                                yField="Total"
+                                                displayName="Total"
+                                                >
+                                            <mx:lineStroke>
+                                                <mx:Stroke
+                                                        color="red"
+                                                        weight="3"
+                                                        />
+                                            </mx:lineStroke>
+                                        </mx:LineSeries>
+                                    </mx:series>
+                                </mx:LineChart>
+                                <mx:Legend horizontalCenter="0" dataProvider="{lineChart}"/>
+                            </mx:VDividedBox>
+                        </mx:Canvas>
+                    </mx:TabNavigator>
+                </mx:VDividedBox>
+            </mx:Panel>
+        </mx:HBox>
+    </mx:VBox>
 
     <mx:RemoteObject id="equestrianService" showBusyCursor="true"
                      fault="onFault(event)" destination="equestrianService">
@@ -115,15 +131,15 @@
 
     <mx:RemoteObject id="historyService" showBusyCursor="true"
                      fault="onFault(event)" destination="historyService">
-        <mx:method name="add" result="onResultAdd(event)" fault="onFault(event)"/>
-        <mx:method name="get" result="onResultGet(event)" fault="onFault(event)"/>
+        <mx:method name="add" fault="onFault(event)"/>
+        <mx:method name="getHistory" result="onResultGetHistory(event)" fault="onFault(event)"/>
+        <mx:method name="getLineData" result="onResultGetLineData(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
     <mx:RemoteObject id="parseHostService" showBusyCursor="true"
                      fault="onFault(event)" destination="parseHostService">
         <mx:method name="getCountNode" result="onResultGetCountNode(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
-
 
     <mx:Script><![CDATA[
         import mx.collections.ArrayCollection;
@@ -143,26 +159,42 @@
         [Bindable]
         public var dataLineChart:ArrayCollection = new ArrayCollection();
         [Bindable]
-        public var dataTable:ArrayCollection = new ArrayCollection();
+        public var dataTestInfoTable:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        public var dataNodeInfoTable:ArrayCollection = new ArrayCollection();
 
         private function initApp():void {
-            historyService.get();
+            historyService.getHistory();
+            historyService.getLineData();
             parseHostService.getCountNode();
             isRunAppTimer = new Timer(10000);
             isRunAppTimer.addEventListener("timer", isRunAppTimerHandler);
             equestrianService.isRun();
         }
 
-        private function onResultGet(event:ResultEvent):void {
+        private function onResultGetHistory(event:ResultEvent):void {
+            dataColumnChart = new ArrayCollection();
             var result:String = event.result as String;
             if (result != "") {
                 var array:Array = result.split("|");
                 nRun += array.length;
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
-                    addDataTable(String(i+1), String(data[0]), String(data[1]), String(data[2]),
+                    addDataTable(String(i + 1), String(data[0]), String(data[1]), String(data[2]),
                             String(data[3]), String(data[4]), String(data[5]),
                             String(data[6]));
+                }
+            }
+        }
+
+        private function onResultGetLineData(event:ResultEvent):void {
+            dataLineChart = new ArrayCollection();
+            var result:String = event.result as String;
+            if (result != "") {
+                var array:Array = result.split("|");
+                for (var i:int = 0; i < array.length; i++) {
+                    var data:Array = array[i].split(";");
+                    dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
                 }
             }
         }
@@ -174,31 +206,27 @@
 
         private function OnResultIsRun(event:ResultEvent):void {
             if (Boolean(event.result)) {
-                if (startApp.enabled) {
+                if (startApp.enabled && !runApplication) {
                     Alert.show("Please wait", "System busy");
                     startApp.enabled = false;
                 }
-                isRunAppTimer.start();
+                clusterStatus.label = "Cluster Status: Busy";
             } else {
                 if (!startApp.enabled) {
                     Alert.show("The system is ready for use", "Welcome");
                     startApp.enabled = true;
+                    historyService.getHistory();
+                    historyService.getLineData();
                 }
-                isRunAppTimer.stop();
-
+                clusterStatus.label = "Cluster Status: ";
             }
+            isRunAppTimer.start();
         }
 
         private function OnResultStop(event:ResultEvent):void {
-            logApplication.text = "";
-            logApplication.text += "Server Stop \n";
-            logApplication.text += "Worker Stop \n";
-            logApplication.text += "Scheluder Stop \n";
+            dataTestInfoTable = new ArrayCollection();
             runApplication = false;
             verifyAppTimer.stop();
-        }
-
-        private function onResultAdd(event:ResultEvent):void {
         }
 
         private function onResultDeploy(event:ResultEvent):void {
@@ -207,37 +235,28 @@
         private function onResultStart(event:ResultEvent):void {
             verifyAppTimer = new Timer(10000);
             verifyAppTimer.addEventListener("timer", verifyAppTimerHandler);
-            equestrianService.verify();            
+            equestrianService.verify();
         }
 
         private function onResultVerify(event:ResultEvent):void {
             var app:ApplicationEntity = event.result as ApplicationEntity;
             runApplication = app.schedulerStatus;
-            logApplication.text = "";
             if (app.schedulerStatus) {
-                logApplication.text += "Server Running \n";
-                logApplication.text += "Worker Running \n";
-                logApplication.text += "Scheluder Running \n";
-                logApplication.text += app.applicationStatus;
+                addDataNodeInfo(app.nodeIp);
                 verifyAppTimer.start();
-                //            } else if (app.time == "") {
-                //                logApplication.text += "Server Running \n";
-                //                logApplication.text += "Worker Running \n";
-                //                logApplication.text += "Scheluder Running \n";
-                //                logApplication.text += "Wait...";
-                //                startApplicationClick();
             } else {
-                logApplication.text += "Server Stop \n";
-                logApplication.text += "Worker Stop \n";
-                logApplication.text += "Scheluder Stop \n";
+                dataNodeInfoTable = new ArrayCollection();
                 runApplication = false;
                 verifyAppTimer.stop();
-                if(app.time != "") {
+                if (app.time != "") {
                     nRun += 1;
+                    infoTestPanel.label = "Last total time: " + app.time + "ms";
+                    ip.text = app.ip;
+                    traffic.text = app.traf;
                     historyService.add(app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
                             app.parsing, app.returning, app.time, app.ip, app.traf);
                     addDataTable(String(nRun), app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
-                           app.parsing, app.returning, app.time, app.ip, app.traf);
+                            app.parsing, app.returning, app.time, app.ip, app.traf);
                 }
             }
         }
@@ -245,59 +264,31 @@
         private function addDataTable(n:String, date:String, nWorkers:String,
                                       parsing:String, returning:String, time:String, ip:String, traf:String):void {
 
-            dataTable.addItem({N:n, Date:date, Workers:nWorkers,
+            dataTestInfoTable.addItem({N:n, Date:date, Workers:nWorkers,
                 Parsing:parsing, Returning:returning, Total:time, IP:ip, Traffic:traf});
-            addDataColumnChart("№ " + n + " \n" + nWorkers + "Workers", time);
-            addDataLineChart(nWorkers, time);
+            addDataColumnChart("# " + n + " \n" + nWorkers + "Workers", time);
+            historyService.getLineData();
         }
 
         private function addDataColumnChart(nWorkers:String, time:String):void {
             dataColumnChart.addItem({Time:time, Workers:nWorkers});
         }
 
-            private function addDataLineChart(nWorkers:String, time:String):void {
-                var newTime:String = "";
-                for(var i:int = 0; i < dataLineChart.length; i++) {
-                    var obj:Object = dataLineChart.getItemAt(i);
-                    var n:String = obj["Workers"];
-                    if(nWorkers == n) {
-                        var timeOld:String = obj["Total"];
-                        newTime = String((int(time) + int(timeOld))/2);
-                        var objPrev:Object = dataLineChart.getItemAt(i-1);
-                        var idealTime:String = String(int(objPrev["Ideal"]) / 2);
-                        dataLineChart.removeItemAt(i);
-                        dataLineChart.addItem({Workers:nWorkers, Ideal:idealTime, Total:newTime});
-                        if(i + 1 < dataLineChart.length) {
-                            var objTo:Object = dataLineChart.getItemAt(i+1);
-                            var newIdealTime:String = String(int(newTime) / 2);
-                            dataLineChart.removeItemAt(i+1);
-                            dataLineChart.addItem({Workers:objTo["Workers"], Ideal:newIdealTime, Total:objTo["Total"]});
-                        }
-                        break;
-                    }
-                }
-                if(newTime == "") {
-                    var newIdeal:String = time;
-                    for(var j:int = 0; j+1 < dataLineChart.length; j++) {
-                        obj = dataLineChart.getItemAt(j);
-                        objTo = dataLineChart.getItemAt(j+1);
-                        var nPre:int = int(obj["Workers"]);
-                        var nTo:int = int(objTo["Workers"]);
-                        if(nPre < int(nWorkers) && int(nWorkers) > nTo) {
-                            newIdeal = String(int(obj["Total"]) / 2);
-                            break;
-                        } else if(int(nWorkers) > nTo && i+2 == dataLineChart.length) {
-                            newIdeal = String(int(objTo["Total"]) / 2);
-                            break;
-                        }
-                    }
-                    dataLineChart.addItem({Workers:nWorkers, Ideal:newIdeal, Total:time});
+        private function addDataNodeInfo(info:String):void {
+            dataNodeInfoTable = new ArrayCollection();
+            if (info != "") {
+                var nodes:Array = info.split(", ");
+                for(var i:int = 0; i < nodes.length; i++) {
+                    var data:Array = String(nodes[i]).split("=");
+                    dataNodeInfoTable.addItem({Node:data[0], Status:data[1]});
                 }
             }
+        }
 
         private function clearResult():void {
-            dataTable = new ArrayCollection();
+            dataTestInfoTable = new ArrayCollection();
             dataColumnChart = new ArrayCollection();
+            dataLineChart = new ArrayCollection();
         }
 
         private function stopApp():void {
@@ -308,11 +299,11 @@
             Alert.show(event.fault.faultString);
         }
 
-        private function startEnvironmentClick():void {
-
-        }
-
         private function startApplicationClick():void {
+            clusterStatus.label = "Cluster Status: Busy";
+            infoTestPanel.label = "Last total time: ";
+            ip.text = "";
+            traffic.text = "";
             if (!runApplication) {
                 if (n != int(nMachines.value)) {
                     n = int(nMachines.value);
@@ -325,17 +316,11 @@
         public function verifyAppTimerHandler(event:TimerEvent):void {
             verifyAppTimer.stop();
             equestrianService.verify();
-
         }
 
         public function isRunAppTimerHandler(event:TimerEvent):void {
             isRunAppTimer.stop();
             equestrianService.isRun();
-
-        }
-
-        private function stopEnvironmentClick():void {
-
         }
         ]]></mx:Script>
 </mx:Application>
