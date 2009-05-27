@@ -55,14 +55,16 @@ public class Tracker {
 
     private String worker() {
         try {
-            return host();
+            return machine();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String host() throws Exception {
-        return InetAddress.getLocalHost().toString();
+    private String machine() throws Exception {
+        String hostAndIp = InetAddress.getLocalHost().toString();
+        String ip = hostAndIp.split("\\/")[1];
+        return ip;
     }
 
     private String phaseTag() {
