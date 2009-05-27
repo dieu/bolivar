@@ -50,24 +50,27 @@ public class Tracker {
     }
 
     private String message() {
-        return encloseWithTag(worker(), phaseTag());
+        return encloseWithTag(worker(), phase());
     }
 
     private String worker() {
         try {
-            return machine();
+            return host();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String machine() throws Exception {
+    private String host() throws Exception {
         String hostAndIp = InetAddress.getLocalHost().toString();
-        String ip = hostAndIp.split("\\/")[0];
-        return ip;
+        return first(hostAndIp);
     }
 
-    private String phaseTag() {
+    private String first(String s) {
+        return s.split("\\/")[0];
+    }
+
+    private String phase() {
         return phase.tag;
     }
 
