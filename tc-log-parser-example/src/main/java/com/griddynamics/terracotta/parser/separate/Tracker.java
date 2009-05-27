@@ -11,21 +11,38 @@ import java.net.InetAddress;
 // TODO Measure the duration of each phase
 // TODO Merge with SchedulerMeter, and extract common steps to a superclass
 public class Tracker {
+
     public static enum Phase {
-        REMOVING,
-        DOWNLOADING,
-        PARSING,
-        RETURNING,
-        DONE,
-        ERROR
+        REMOVING("rem"),
+        DOWNLOADING("dow"),
+        PARSING("par"),
+        RETURNING("ret"),
+        DONE("fin"),
+        ERROR("err");
+
+        public final String tag;
+
+        Phase(String tag) {
+            this.tag = tag;
+        }
     }
 
     private static Logger logger = Logger.getLogger(Tracker.class);
-    private String phase;
+    private Phase phase;
 
     public void entered(Phase phase) {
-        this.phase = phase.toString();
+        if (!isNew(phase))
+            return;
+        set(phase);
         printWorkerIdEnclosedWithPhase();
+    }
+
+    private boolean isNew(Phase phase) {
+        return phase != this.phase;
+    }
+
+    private void set(Phase phase) {
+        this.phase = phase;
     }
 
     private void printWorkerIdEnclosedWithPhase() {
@@ -33,10 +50,10 @@ public class Tracker {
     }
 
     private String message() {
-        return encloseWithTag(workerId(), phase());
+        return encloseWithTag(worker(), phaseTag());
     }
 
-    private String workerId() {
+    private String worker() {
         try {
             return host();
         } catch (Exception e) {
@@ -48,17 +65,8 @@ public class Tracker {
         return InetAddress.getLocalHost().toString();
     }
 
-    private String phase() {
-        return status() + phaseId();
-    }
-
-    private String status() {
-        return "s";
-    }
-
-    private String phaseId() {
-        String lowercasedPhase = phase.toLowerCase();
-        return "" + lowercasedPhase.charAt(0) + lowercasedPhase.charAt(2);
+    private String phaseTag() {
+        return phase.tag;
     }
 
     private void print(String s) {

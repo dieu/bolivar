@@ -15,9 +15,7 @@ import static java.lang.Math.max;
 
 import org.apache.log4j.Logger;
 
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.PARSING;
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.RETURNING;
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.DONE;
+import com.griddynamics.terracotta.parser.separate.Tracker.Phase;
 
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
@@ -91,7 +89,6 @@ public class ParseLogs implements Work {
     private void parse() {
         // TODO Move measurements to tracker
         Long started = System.currentTimeMillis();
-        tracker.entered(PARSING);
         parseLogs();
         performance.parsed = System.currentTimeMillis() - started;
         performance.parsedOne = performance.parsed / logCount;
@@ -121,8 +118,9 @@ public class ParseLogs implements Work {
         // TODO Move measurements to tracker
         logger.info("Parsing log " + log.getPath());
         Long started = System.currentTimeMillis();
-        ParseLog p = new ParseLog(log, aggregator);
-        p.parseTo(trafficByIp);
+        tracker.entered(Phase.PARSING);
+        ParseLog work = new ParseLog(log, aggregator);
+        work.parseTo(trafficByIp);
         logger.info("Parsed log in " + (System.currentTimeMillis() - started));
     }
 
@@ -131,12 +129,12 @@ public class ParseLogs implements Work {
             // TODO Move measurements to tracker
             logger.info("Returning traffic usage...");
             Long started = System.currentTimeMillis();
-            tracker.entered(RETURNING);
+            tracker.entered(Phase.RETURNING);
             returnResult();
             performance.returned = System.currentTimeMillis() - started;
             logger.info("Returned in " + performance.returned);
             aggregator.reportParsingPerformance(performance);
-            tracker.entered(DONE);
+            tracker.entered(Phase.DONE);
         }
     }
 
