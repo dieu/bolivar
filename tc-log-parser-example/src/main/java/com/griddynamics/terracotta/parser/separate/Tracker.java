@@ -63,7 +63,7 @@ public class Tracker {
 
     private String machine() throws Exception {
         String hostAndIp = InetAddress.getLocalHost().toString();
-        String ip = hostAndIp.split("\\/")[1];
+        String ip = hostAndIp.split("\\/")[0];
         return ip;
     }
 
