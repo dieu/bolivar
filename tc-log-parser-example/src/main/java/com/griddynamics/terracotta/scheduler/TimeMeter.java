@@ -11,19 +11,18 @@ import com.griddynamics.terracotta.util.StrUtil;
 /**
  * @author agorbunov @ 20.05.2009 14:15:22
  */
-public class SchedulerMeter {
+public class TimeMeter {
     private enum Phase {
         REMOVING,
         DOWNLOADING,
         PARSING,
         AGGREGATING;
-
         public String toString() {
             return name().toLowerCase();
         }
     }
 
-    private static final Logger logger = Logger.getLogger(SchedulerMeter.class);
+    private static final Logger logger = Logger.getLogger(TimeMeter.class);
     private Map<Phase, Long> phaseDuration = new HashMap<Phase, Long>();
     private boolean isMeasuring;
     private Phase phase;
@@ -63,13 +62,13 @@ public class SchedulerMeter {
         isMeasuring = false;
         duration = System.currentTimeMillis() - started;
         phaseDuration.put(phase, duration);
-        logger.info("Finished " + phase + " in " + formatDuration());
+        logger.info("Finished " + phase + " in " + formattedDuration());
         if (isLastPhase()) {
-            reportTotalDuration();
+            reportTotal();
         }
     }
 
-    private String formatDuration() {
+    private String formattedDuration() {
         String phaseTag = phase.toString().substring(0, 2);
         return StrUtil.encloseWithTag(duration, phaseTag);
     }
@@ -78,17 +77,17 @@ public class SchedulerMeter {
         return phase == Phase.AGGREGATING;
     }
 
-    private void reportTotalDuration() {
+    private void reportTotal() {
         assertEquals(Phase.values().length, phaseDuration.size());
-        Long total = duration(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
-        String formattedTotal = StrUtil.encloseWithTag(total, "to");
-        logger.info("Finished analysis in " + formattedTotal);
+        Long totalDuration = sum(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
+        String taggedTotalDuration = StrUtil.encloseWithTag(totalDuration, "to");
+        logger.info("Finished analysis in " + taggedTotalDuration);
     }
 
-    private Long duration(Phase... phases) {
-        Long result = 0L;
+    private Long sum(Phase... phases) {
+        Long s = 0L;
         for (Phase phase : phases)
-            result += phaseDuration.get(phase);
-        return result;
+            s += phaseDuration.get(phase);
+        return s;
     }
 }

@@ -12,50 +12,99 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 import org.apache.log4j.Logger;
 
-import com.griddynamics.terracotta.parser.separate.Tracker.Phase;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.*;
 
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
  */
 public class ParseLogs implements Work {
-
     public static class Performance {
         public Long parsed = 0L;
         public Long parsedOne = 0L;
         public Long returned = 0L;
         public Long logs = 0L;
+    }
 
-        public static Performance average(Collection<Performance> workers) {
-            Performance average = new Performance();
+    public static class AveragePerformance {
+        private Collection<Performance> workers;
+        private Long parsed;
+        private Long parsedMin = Long.MAX_VALUE;
+        private Long parsedMax = Long.MIN_VALUE;
+        private Long parsedOne;
+        private Long returned;
+        private Long returnedMin = Long.MAX_VALUE;
+        private Long returnedMax = Long.MIN_VALUE;
+        private Long maxLogs = Long.MIN_VALUE;
+
+        public AveragePerformance(Collection<Performance> workers) {
+            this.workers = workers;
+            findAverage();
+        }
+
+        private void findAverage() {
             Long parsedTotal = 0L;
             Long returnedTotal = 0L;
             Long logsTotal = 0L;
-            Long maxLogsPerWorker = 0L;
             for (Performance w : workers) {
                 parsedTotal += w.parsed;
+                parsedMin = min(parsedMin, w.parsed);
+                parsedMax = max(parsedMax, w.parsed);
                 returnedTotal += w.returned;
+                returnedMin = min(returnedMin, w.returned);
+                returnedMax = max(returnedMax, w.returned);
                 logsTotal += w.logs;
-                maxLogsPerWorker = max(maxLogsPerWorker, w.logs);
+                maxLogs = max(maxLogs, w.logs);
             }
-            average.parsed = parsedTotal / workers.size();
-            average.parsedOne = parsedTotal / logsTotal;
-            average.returned = returnedTotal / workers.size();
-            average.logs = maxLogsPerWorker;
-            return average;
+            parsed = parsedTotal / workers.size();
+            parsedOne = parsedTotal / logsTotal;
+            returned = returnedTotal / workers.size();
+        }
+
+        public Long parsed() {
+            return parsed;
+        }
+
+        public Long parsedMin() {
+            return parsedMin;
+        }
+
+        public Long parsedMax() {
+            return parsedMax;
+        }
+
+        public Long parsedOne() {
+            return parsedOne;
+        }
+
+        public Long returned() {
+            return returned;
+        }
+
+        public Long returnedMin() {
+            return returnedMin;
+        }
+
+        public Long returnedMax() {
+            return returnedMax;
+        }
+
+        public Long logs() {
+            return maxLogs;
         }
     }
 
     private static Logger logger = Logger.getLogger(ParseLogs.class);
-    private Tracker tracker = new Tracker();
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
+    private Performance performance = new Performance();
     private Aggregator aggregator;
+    private Tracker tracker = new Tracker();
     private String dir;
     private File[] logs;
-    private int logCount;
-    private Performance performance = new Performance();
+    private int numLogs;
 
     public static Work inUsing(String dir, Aggregator aggregator) {
         return new Trackable(ParseLogs.class, dir, aggregator);
@@ -82,8 +131,8 @@ public class ParseLogs implements Work {
     private void find() {
         FileUtil.verifyDirExists(dir);
         logs = new File(dir).listFiles();
-        logCount = logs.length;
-        performance.logs = (long) logCount;
+        numLogs = logs.length;
+        performance.logs = (long) numLogs;
     }
 
     private void parse() {
@@ -91,7 +140,7 @@ public class ParseLogs implements Work {
         Long started = System.currentTimeMillis();
         parseLogs();
         performance.parsed = System.currentTimeMillis() - started;
-        performance.parsedOne = performance.parsed / logCount;
+        performance.parsedOne = performance.parsed / numLogs;
     }
 
     private void parseLogs() {
@@ -115,30 +164,30 @@ public class ParseLogs implements Work {
     }
 
     private void parse(File log) {
-        // TODO Move measurements to tracker
+        // TODO Move measurements to phase
         logger.info("Parsing log " + log.getPath());
         Long started = System.currentTimeMillis();
-        tracker.entered(Phase.PARSING);
+        tracker.phase(PARSING);
         ParseLog work = new ParseLog(log, aggregator);
         work.parseTo(trafficByIp);
         logger.info("Parsed log in " + (System.currentTimeMillis() - started));
     }
 
     private void report() {
-        if (parsedSomeLogs()) {
-            // TODO Move measurements to tracker
+        if (parsedNewLogs()) {
+            // TODO Move measurements to phase
             logger.info("Returning traffic usage...");
             Long started = System.currentTimeMillis();
-            tracker.entered(Phase.RETURNING);
+            tracker.phase(RETURNING);
             returnResult();
             performance.returned = System.currentTimeMillis() - started;
             logger.info("Returned in " + performance.returned);
             aggregator.reportParsingPerformance(performance);
-            tracker.entered(Phase.DONE);
+            tracker.phase(DONE);
         }
     }
 
-    private boolean parsedSomeLogs() {
+    private boolean parsedNewLogs() {
         return !trafficByIp.isEmpty();
     }
 

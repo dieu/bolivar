@@ -5,13 +5,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
 import com.griddynamics.terracotta.parser.separate.ParseLogs.Performance;
-import com.griddynamics.terracotta.parser.separate.ParseLogs;
+import com.griddynamics.terracotta.parser.separate.ParseLogs.AveragePerformance;
+import com.griddynamics.terracotta.util.NetUtil;
+import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 
 /**
  * @author agorbunov @ 08.05.2009 15:10:15
  */
 public class Aggregator {
-    // Here we come to another Terracotta issue.
+    // Here we can see another Terracotta issue.
     // The classes below are actually private, but marked as public to allow Terracotta to instrument them.
 
     public static interface Statistics {
@@ -40,22 +42,26 @@ public class Aggregator {
     }
 
     public static class Partial implements Statistics {
-        private List<Map<String, Long>> parts = Collections.synchronizedList(new ArrayList<Map<String, Long>>());
+        private ConcurrentMap<String, Map<String, Long>> parts = new ConcurrentStringMap<Map<String, Long>>();
 
         public void add(Map<String, Long> part) {
-            parts.add(part);
+            parts.put(worker(), part);
+        }
+
+        private String worker() {
+            return NetUtil.host();
         }
 
         public Map<String, Long> merge() {
             Statistics whole = new Monolitical();
-            for (Map<String, Long> part : parts)
+            for (Map<String, Long> part : parts.values())
                 whole.add(part);
             return whole.merge();
         }
     }
 
-    private final List<Performance> parsingPerformance = Collections.synchronizedList(new LinkedList<Performance>());
-    private final ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentHashMap<String, Boolean>();
+    private ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentStringMap<Boolean>();
+    private List<Performance> performance = Collections.synchronizedList(new LinkedList<Performance>());
     private Statistics parts = new Partial();
     private transient Map<String, Long> whole;
 
@@ -81,21 +87,19 @@ public class Aggregator {
         return whole.get(ip);
     }
 
-    public synchronized void markAsParsed(String log) {
+    public void markAsParsed(String log) {
         logIsParsed.put(log, Boolean.TRUE);
     }
 
-    public synchronized Boolean isParsed(String log) {
-        if (!logIsParsed.containsKey(log))
-            logIsParsed.put(log, Boolean.FALSE);
-        return logIsParsed.get(log);
+    public Boolean isParsed(String log) {
+        return logIsParsed.containsKey(log);
     }
 
-    public void reportParsingPerformance(ParseLogs.Performance p) {
-        parsingPerformance.add(p);
+    public void reportParsingPerformance(Performance p) {
+        performance.add(p);
     }
 
-    public ParseLogs.Performance averageParsingPerformance() {
-        return ParseLogs.Performance.average(parsingPerformance);
+    public AveragePerformance averageParsingPerformance() {
+        return new AveragePerformance(performance);
     }
 }

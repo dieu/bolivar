@@ -1,17 +1,17 @@
 package com.griddynamics.terracotta.parser.separate;
 
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase;
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.ERROR;
 import com.griddynamics.terracotta.parser.wrapper.Wrapper;
 import static com.griddynamics.terracotta.util.ErrUtil.runtimeException;
 import commonj.work.Work;
 
 /**
- * In case of an error, notifies the user that the work has failed.
+ * Allows the user to track whether a work has failed or not.
  *
  * @author agorbunov @ 26.05.2009 20:49:59
  */
 public class Trackable extends Wrapper {
-    private Tracker tracker = new Tracker();
+    private Tracker phase = new Tracker();
 
     public Trackable(Class<? extends Work> work, Object... arguments) {
         super(work, arguments);
@@ -28,7 +28,7 @@ public class Trackable extends Wrapper {
     }
 
     protected void reportFailure(Throwable e) {
-        tracker.entered(Phase.ERROR);
+        phase.phase(ERROR);
     }
 
     private void rethrow(Throwable e) {

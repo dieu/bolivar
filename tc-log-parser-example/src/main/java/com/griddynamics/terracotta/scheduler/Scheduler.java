@@ -13,10 +13,11 @@ import com.griddynamics.terracotta.parser.Aggregator;
 import com.griddynamics.terracotta.parser.separate.RemoveLogs;
 import com.griddynamics.terracotta.parser.separate.DownloadLog;
 import com.griddynamics.terracotta.parser.separate.ParseLogs;
+import com.griddynamics.terracotta.parser.separate.ParseLogs.AveragePerformance;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import com.griddynamics.terracotta.util.FileUtil;
 import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
-import com.griddynamics.terracotta.scheduler.SchedulerMeter;
+import com.griddynamics.terracotta.scheduler.TimeMeter;
 import com.griddynamics.terracotta.JobService;
 import commonj.work.WorkItem;
 import commonj.work.Work;
@@ -27,7 +28,7 @@ import commonj.work.Work;
 public class Scheduler {
     private static final Long SECOND = 1000L;
     private static Logger logger = Logger.getLogger(Scheduler.class);
-    private SchedulerMeter timeMeter = new SchedulerMeter();
+    private TimeMeter timeMeter = new TimeMeter();
     private String masterDir;
     private String masterUrl;
     private String workerDir;
@@ -108,8 +109,7 @@ public class Scheduler {
     }
 
     private void schedule(Work work) {
-        WorkItem workItem = workManager.schedule(work);
-        workItems.add(workItem);
+        workItems.add(workManager.schedule(work));
     }
 
     private void waitForWorkers() {
@@ -165,11 +165,13 @@ public class Scheduler {
     }
 
     private void reportParsingPerformance() {
-        ParseLogs.Performance p = aggregator.averageParsingPerformance();
-        logger.info("Worker performance:");
-        logger.info("Parsed all logs in " + encloseWithTag(p.parsed, "op"));
-        logger.info("Parsed one log in " + p.parsedOne);
-        logger.info("Returned results in " + encloseWithTag(p.returned, "or"));
-        logger.info("Max logs per worker: " + p.logs);
+        AveragePerformance ap = aggregator.averageParsingPerformance();
+        logger.info("Parsing performance:");
+        logger.info("Parsed all logs: " + encloseWithTag(ap.parsed(), "op"));
+        logger.info("Parsed one log: " + ap.parsedOne());
+        logger.info("Returned: " + encloseWithTag(ap.returned(), "or"));
+        logger.info("Returned min: " + ap.returnedMin());
+        logger.info("Returned max:" + ap.returnedMax());
+        logger.info("Logs per worker: " + ap.logs());
     }
 }

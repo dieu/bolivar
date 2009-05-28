@@ -2,8 +2,7 @@ package com.griddynamics.terracotta.parser.separate;
 
 import org.apache.log4j.Logger;
 import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
-
-import java.net.InetAddress;
+import com.griddynamics.terracotta.util.NetUtil;
 
 /**
  * @author agorbunov @ 26.05.2009 18:40:30
@@ -11,7 +10,6 @@ import java.net.InetAddress;
 // TODO Measure the duration of each phase
 // TODO Merge with SchedulerMeter, and extract common steps to a superclass
 public class Tracker {
-
     public static enum Phase {
         REMOVING("rem"),
         DOWNLOADING("dow"),
@@ -19,9 +17,7 @@ public class Tracker {
         RETURNING("ret"),
         DONE("fin"),
         ERROR("err");
-
         public final String tag;
-
         Phase(String tag) {
             this.tag = tag;
         }
@@ -30,7 +26,7 @@ public class Tracker {
     private static Logger logger = Logger.getLogger(Tracker.class);
     private Phase phase;
 
-    public void entered(Phase phase) {
+    public void phase(Phase phase) {
         if (!isNew(phase))
             return;
         set(phase);
@@ -50,24 +46,15 @@ public class Tracker {
     }
 
     private String message() {
-        return encloseWithTag(worker(), phase());
+        return encloseWithTag(workerId(), phase());
     }
 
-    private String worker() {
+    private String workerId() {
         try {
-            return host();
+            return NetUtil.host();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String host() throws Exception {
-        String hostAndIp = InetAddress.getLocalHost().toString();
-        return first(hostAndIp);
-    }
-
-    private String first(String s) {
-        return s.split("\\/")[0];
     }
 
     private String phase() {

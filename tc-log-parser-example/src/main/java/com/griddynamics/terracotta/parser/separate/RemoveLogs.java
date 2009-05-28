@@ -14,7 +14,7 @@ import com.griddynamics.terracotta.parser.separate.Tracker;
  * @author agorbunov @ 08.05.2009 16:22:35
  */
 public class RemoveLogs implements Work {    
-    private Tracker tracker = new Tracker();
+    private Tracker phase = new Tracker();
     private File dir;
 
     public static Work from(String dir) {
@@ -29,7 +29,7 @@ public class RemoveLogs implements Work {
     }
 
     public void run() {
-        tracker.entered(REMOVING);
+        phase.phase(REMOVING);
         FileUtil.deleteDirContent(dir);
     }
 
