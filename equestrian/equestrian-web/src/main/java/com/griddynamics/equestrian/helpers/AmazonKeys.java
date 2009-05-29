@@ -15,9 +15,12 @@ import java.io.*;
  * Time: 13:38:33
  */
 public class AmazonKeys {
-    public String AWSAccessKeyId = "";
-    public String SecretAccessKey = "";
-    public String UserId = "";
+    private String AWSAccessKeyId = "";
+    private String SecretAccessKey = "";
+    private String UserId = "";
+    private String workerImageId = "";
+    private String serverImageId = "";
+    private String schedulerImageId = "";
 
     public static void main(String[] ars) {
            new AmazonKeys();
@@ -63,6 +66,33 @@ public class AmazonKeys {
                                 }
                             }
                         }
+                    } else if(rawName.equals("wid")) {
+                        if (attrs != null && workerImageId.equals("")) {
+                            int len = attrs.getLength();
+                            for (int i = 0; i < len; i++) {
+                                if(attrs.getQName(i).equals("id")) {
+                                    workerImageId = attrs.getValue(i);
+                                }
+                            }
+                        }
+                    } else if(rawName.equals("sid")) {
+                        if (attrs != null && serverImageId.equals("")) {
+                            int len = attrs.getLength();
+                            for (int i = 0; i < len; i++) {
+                                if(attrs.getQName(i).equals("id")) {
+                                    serverImageId = attrs.getValue(i);
+                                }
+                            }
+                        }
+                    } else if(rawName.equals("schid")) {
+                        if (attrs != null && schedulerImageId.equals("")) {
+                            int len = attrs.getLength();
+                            for (int i = 0; i < len; i++) {
+                                if(attrs.getQName(i).equals("id")) {
+                                    schedulerImageId = attrs.getValue(i);
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -85,5 +115,17 @@ public class AmazonKeys {
 
     public String getUserId() {
         return UserId;
+    }
+
+    public String getWorkerImageId() {
+        return workerImageId;
+    }
+
+    public String getServerImageId() {
+        return serverImageId;
+    }
+
+    public String getSchedulerImageId() {
+        return schedulerImageId;
     }
 }

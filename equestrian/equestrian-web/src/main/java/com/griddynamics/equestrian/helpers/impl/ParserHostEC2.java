@@ -31,9 +31,6 @@ public class ParserHostEC2 implements ParserHost{
     private String pathApp;
     private int n;
     private AmazonKeys aws;
-    private final String workerImageId = "ami-6df81e04";
-    private final String serverImageId = "ami-cff117a6";
-    private final String schedulerImageId = "ami-cff117a6";
 
     public ParserHostEC2() {
         if(System.getProperty("file.separator").equals("\\")) {
@@ -68,13 +65,13 @@ public class ParserHostEC2 implements ParserHost{
             if (res.getInstances() != null) {
                 for (ReservationDescription.Instance inst : res.getInstances()) {
                     if(inst.isRunning() && inst.getKeyName().equals(aws.getUserId())) {
-                        if(inst.getImageId().equals(workerImageId) && workersIp.size() < n) {
+                        if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
                         }
-                        if(inst.getImageId().equals(serverImageId)) {
+                        if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getPrivateDnsName();
                         }
-                        if(inst.getImageId().equals(schedulerImageId)) {
+                        if(inst.getImageId().equals(aws.getSchedulerImageId())) {
                             schedulerIp = inst.getPrivateDnsName();
                         }
                     }
@@ -96,13 +93,13 @@ public class ParserHostEC2 implements ParserHost{
             if (res.getInstances() != null) {
                 for (ReservationDescription.Instance inst : res.getInstances()) {
                     if(inst.isRunning()) {
-                        if(inst.getImageId().equals(workerImageId) && workersIp.size() < n) {
+                        if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
                         }
-                        if(inst.getImageId().equals(serverImageId)) {
+                        if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getPrivateDnsName();
                         }
-                        if(inst.getImageId().equals(schedulerImageId)) {
+                        if(inst.getImageId().equals(aws.getSchedulerImageId())) {
                             schedulerIp = inst.getPrivateDnsName();
                         }
                     }
