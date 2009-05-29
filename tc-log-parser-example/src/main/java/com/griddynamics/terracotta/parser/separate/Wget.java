@@ -41,6 +41,10 @@ public class Wget {
             }
         }
 
+        public boolean isEmpty() {
+            return output.length() == 0;
+        }
+
         public String toString() {
             return output.toString();
         }
@@ -123,13 +127,18 @@ public class Wget {
 
     private void printErrorSummary() {
         System.err.println(errorSummary());
+        System.err.println(exitCode());
     }
 
     private String errorSummary() {
         return String.format(
-                "Could not download %s to directory %s.\n" +
-                "Wget finished with exit code %d",
-                url, localDir,
+                "Could not download %s to directory %s.",
+                url, localDir);
+    }
+
+    private String exitCode() {
+        return String.format(
+                "Wget finished with exit code %d.",
                 wget.exitValue());
     }
 

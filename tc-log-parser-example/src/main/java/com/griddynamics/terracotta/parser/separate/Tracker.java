@@ -46,15 +46,7 @@ public class Tracker {
     }
 
     private String message() {
-        return encloseWithTag(workerId(), phase());
-    }
-
-    private String workerId() {
-        try {
-            return NetUtil.host();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return encloseWithTag(NetUtil.worker(), phase());
     }
 
     private String phase() {

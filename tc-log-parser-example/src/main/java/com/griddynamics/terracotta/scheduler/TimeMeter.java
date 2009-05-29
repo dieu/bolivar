@@ -17,8 +17,8 @@ public class TimeMeter {
         DOWNLOADING,
         PARSING,
         AGGREGATING;
-        public String toString() {
-            return name().toLowerCase();
+        public String shortName() {
+            return name().toLowerCase().substring(0, 3);
         }
     }
 
@@ -62,32 +62,49 @@ public class TimeMeter {
         isMeasuring = false;
         duration = System.currentTimeMillis() - started;
         phaseDuration.put(phase, duration);
-        logger.info("Finished " + phase + " in " + formattedDuration());
+        logger.info("Finished " + phase + " in " + formatDuration());
         if (isLastPhase()) {
             reportTotal();
         }
     }
 
-    private String formattedDuration() {
-        String phaseTag = phase.toString().substring(0, 2);
-        return StrUtil.encloseWithTag(duration, phaseTag);
+    private String formatDuration() {
+        return StrUtil.encloseWithTag(duration, phase.shortName());
     }
 
     private boolean isLastPhase() {
-        return phase == Phase.AGGREGATING;
+        return phase == lastPhase();
     }
 
     private void reportTotal() {
-        assertEquals(Phase.values().length, phaseDuration.size());
-        Long totalDuration = sum(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
-        String taggedTotalDuration = StrUtil.encloseWithTag(totalDuration, "to");
-        logger.info("Finished analysis in " + taggedTotalDuration);
+        verifyPassedAllPhases();
+        logger.info("Finished analysis in " + formatTotal());
+    }
+
+    private void verifyPassedAllPhases() {
+        assertEquals(allPhases().length, phaseDuration.size());
+    }
+
+    private String formatTotal() {
+        return StrUtil.encloseWithTag(total(), "to");
+    }
+
+    private Long total() {
+        return sum(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
     }
 
     private Long sum(Phase... phases) {
-        Long s = 0L;
+        Long sum = 0L;
         for (Phase phase : phases)
-            s += phaseDuration.get(phase);
-        return s;
+            sum += phaseDuration.get(phase);
+        return sum;
+    }
+
+    private Phase lastPhase() {
+        return allPhases()[(allPhases().length - 1)];
+    }
+
+    private Phase[] allPhases() {
+        return Phase.values();
     }
 }

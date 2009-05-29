@@ -159,19 +159,21 @@ public class Scheduler {
 
     private void findMostConsumingIp() {
         timeMeter.aggregating();
-        String ip = aggregator.getIpWithMaxTraffic();
-        logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getTraffic(ip) + "</traf> ");
+        String ip = aggregator.ipWithMaxTraffic();
+        logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.traffic(ip) + "</traf> ");
         timeMeter.done();
     }
 
     private void reportParsingPerformance() {
-        AveragePerformance ap = aggregator.averageParsingPerformance();
+        AveragePerformance ap = aggregator.averagePerformance();
         logger.info("Parsing performance:");
-        logger.info("Parsed all logs: " + encloseWithTag(ap.parsed(), "op"));
-        logger.info("Parsed one log: " + ap.parsedOne());
+        logger.info("Parsed: " + encloseWithTag(ap.parsed(), "op"));
+        logger.info("Parsed min: " + ap.parsedMin());
+        logger.info("Parsed max: " + ap.parsedMax());
+        logger.info("Parsed one: " + ap.parsedOne());
         logger.info("Returned: " + encloseWithTag(ap.returned(), "or"));
         logger.info("Returned min: " + ap.returnedMin());
-        logger.info("Returned max:" + ap.returnedMax());
-        logger.info("Logs per worker: " + ap.logs());
+        logger.info("Returned max: " + ap.returnedMax());
+        logger.info("Logs: " + ap.logs());
     }
 }

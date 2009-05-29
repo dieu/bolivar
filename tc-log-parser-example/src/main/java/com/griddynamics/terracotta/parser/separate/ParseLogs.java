@@ -1,27 +1,24 @@
 package com.griddynamics.terracotta.parser.separate;
 
-import commonj.work.Work;
-import com.griddynamics.terracotta.util.FileUtil;
 import com.griddynamics.terracotta.parser.Aggregator;
 import com.griddynamics.terracotta.parser.combined.ParseLog;
-import com.griddynamics.terracotta.parser.separate.Tracker;
-import com.griddynamics.terracotta.parser.separate.Trackable;
-
-import java.io.File;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collection;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
+import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.*;
+import com.griddynamics.terracotta.util.FileUtil;
+import commonj.work.Work;
 import org.apache.log4j.Logger;
 
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.*;
+import java.io.File;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
  */
 public class ParseLogs implements Work {
+
     public static class Performance {
         public Long parsed = 0L;
         public Long parsedOne = 0L;
@@ -32,9 +29,9 @@ public class ParseLogs implements Work {
     public static class AveragePerformance {
         private Collection<Performance> workers;
         private Long parsed;
+        private Long parsedOne;
         private Long parsedMin = Long.MAX_VALUE;
         private Long parsedMax = Long.MIN_VALUE;
-        private Long parsedOne;
         private Long returned;
         private Long returnedMin = Long.MAX_VALUE;
         private Long returnedMax = Long.MIN_VALUE;
@@ -100,11 +97,10 @@ public class ParseLogs implements Work {
     private static Logger logger = Logger.getLogger(ParseLogs.class);
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Performance performance = new Performance();
-    private Aggregator aggregator;
     private Tracker tracker = new Tracker();
+    private Aggregator aggregator;
     private String dir;
     private File[] logs;
-    private int numLogs;
 
     public static Work inUsing(String dir, Aggregator aggregator) {
         return new Trackable(ParseLogs.class, dir, aggregator);
@@ -129,18 +125,19 @@ public class ParseLogs implements Work {
     }
 
     private void find() {
+        Long started = System.currentTimeMillis();
         FileUtil.verifyDirExists(dir);
         logs = new File(dir).listFiles();
-        numLogs = logs.length;
-        performance.logs = (long) numLogs;
+        logger.info("Found logs in " + (System.currentTimeMillis() - started));
+        performance.logs = (long) logs.length;
     }
 
     private void parse() {
-        // TODO Move measurements to tracker
+        // TODO Move measurements to the tracker
         Long started = System.currentTimeMillis();
         parseLogs();
         performance.parsed = System.currentTimeMillis() - started;
-        performance.parsedOne = performance.parsed / numLogs;
+        performance.parsedOne = performance.parsed / logs.length;
     }
 
     private void parseLogs() {
@@ -164,26 +161,18 @@ public class ParseLogs implements Work {
     }
 
     private void parse(File log) {
-        // TODO Move measurements to phase
+        // TODO Move measurements to the tracker
         logger.info("Parsing log " + log.getPath());
         Long started = System.currentTimeMillis();
         tracker.phase(PARSING);
-        ParseLog work = new ParseLog(log, aggregator);
-        work.parseTo(trafficByIp);
+        new ParseLog(log, aggregator).parseTo(trafficByIp);
         logger.info("Parsed log in " + (System.currentTimeMillis() - started));
     }
 
     private void report() {
         if (parsedNewLogs()) {
-            // TODO Move measurements to phase
-            logger.info("Returning traffic usage...");
-            Long started = System.currentTimeMillis();
-            tracker.phase(RETURNING);
-            returnResult();
-            performance.returned = System.currentTimeMillis() - started;
-            logger.info("Returned in " + performance.returned);
-            aggregator.reportParsingPerformance(performance);
-            tracker.phase(DONE);
+            reportTraffic();
+            reportPerformance();
         }
     }
 
@@ -191,8 +180,21 @@ public class ParseLogs implements Work {
         return !trafficByIp.isEmpty();
     }
 
-    private void returnResult() {
+    private void reportTraffic() {
+        // TODO Move measurements to the tracker
+        logger.info("Returning parsing result...");
+        Long started = System.currentTimeMillis();
+        tracker.phase(RETURNING);
         aggregator.add(trafficByIp);
+        performance.returned = System.currentTimeMillis() - started;
+        logger.info("Returned in " + performance.returned);
+    }
+
+    private void reportPerformance() {
+        Long started = System.currentTimeMillis();
+        aggregator.reportPerformance(performance);
+        logger.info("Reported performance in " + (System.currentTimeMillis() - started));
+        tracker.phase(DONE);
     }
 
     public boolean isDaemon() {

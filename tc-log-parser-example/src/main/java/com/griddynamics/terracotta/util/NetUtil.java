@@ -7,6 +7,10 @@ import java.net.InetAddress;
  */
 public class NetUtil {
 
+    public static String worker() {
+        return host();
+    }
+
     public static String host() {
         return first(hostAndIp());
     }

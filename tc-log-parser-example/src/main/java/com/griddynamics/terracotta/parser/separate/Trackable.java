@@ -11,8 +11,6 @@ import commonj.work.Work;
  * @author agorbunov @ 26.05.2009 20:49:59
  */
 public class Trackable extends Wrapper {
-    private Tracker phase = new Tracker();
-
     public Trackable(Class<? extends Work> work, Object... arguments) {
         super(work, arguments);
     }
@@ -22,13 +20,15 @@ public class Trackable extends Wrapper {
         try {
             work.run();
         } catch (Throwable e) {
-            reportFailure(e);
+            reportFailure();
             rethrow(e);
         }
     }
 
-    protected void reportFailure(Throwable e) {
-        phase.phase(ERROR);
+    protected void reportFailure() {
+        // A local variable instead of a field to prevent UnlockedSharedObjectException.
+        Tracker tracker = new Tracker();
+        tracker.phase(ERROR);
     }
 
     private void rethrow(Throwable e) {

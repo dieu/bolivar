@@ -1,7 +1,6 @@
 package com.griddynamics.terracotta.parser;
 
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
 import com.griddynamics.terracotta.parser.separate.ParseLogs.Performance;
@@ -22,18 +21,18 @@ public class Aggregator {
     }
 
     public static class Monolitical implements Statistics {
-        private final ConcurrentMap<String, Long> whole = new ConcurrentHashMap<String, Long>();
+        private ConcurrentMap<String, Long> whole = new ConcurrentStringMap<Long>();
 
         public synchronized void add(Map<String, Long> part) {
             for (String ip : part.keySet()) {
-                Long traffic = part.get(ip);
-                increaseTrafficUsage(ip, traffic);
+                Long usage = part.get(ip);
+                increaseTraffic(ip, usage);
             }
         }
 
-        private void increaseTrafficUsage(String ip, Long traffic) {
+        private void increaseTraffic(String ip, Long usage) {
             whole.putIfAbsent(ip, 0L);
-            whole.put(ip, whole.get(ip) + traffic);
+            whole.put(ip, whole.get(ip) + usage);
         }
 
         public Map<String, Long> merge() {
@@ -45,11 +44,7 @@ public class Aggregator {
         private ConcurrentMap<String, Map<String, Long>> parts = new ConcurrentStringMap<Map<String, Long>>();
 
         public void add(Map<String, Long> part) {
-            parts.put(worker(), part);
-        }
-
-        private String worker() {
-            return NetUtil.host();
+            parts.put(NetUtil.worker(), part);
         }
 
         public Map<String, Long> merge() {
@@ -60,8 +55,8 @@ public class Aggregator {
         }
     }
 
+    private ConcurrentMap<String, Performance> workers = new ConcurrentStringMap<Performance>();
     private ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentStringMap<Boolean>();
-    private List<Performance> performance = Collections.synchronizedList(new LinkedList<Performance>());
     private Statistics parts = new Partial();
     private transient Map<String, Long> whole;
 
@@ -69,21 +64,25 @@ public class Aggregator {
         parts.add(part);
     }
 
-    public synchronized String getIpWithMaxTraffic() {
+    public synchronized String ipWithMaxTraffic() {
         whole = parts.merge();
-        Long maxTraffic = Long.MIN_VALUE;
-        String maxIp = null;
-        for (String ip : whole.keySet()) {
-            Long traffic = whole.get(ip);
-            if (maxTraffic < traffic) {
-                maxTraffic = traffic;
-                maxIp = ip;
-            }
-        }
-        return maxIp;
+        return keyWithMaxValue(whole);
     }
 
-    public Long getTraffic(String ip) {
+    private String keyWithMaxValue(Map<String, Long> map) {
+        Long maxValue = Long.MIN_VALUE;
+        String maxKey = "?";
+        for (String k : map.keySet()) {
+            Long v = map.get(k);
+            if (v > maxValue) {
+                maxValue = v;
+                maxKey = k;
+            }
+        }
+        return maxKey;
+    }
+
+    public Long traffic(String ip) {
         return whole.get(ip);
     }
 
@@ -95,11 +94,11 @@ public class Aggregator {
         return logIsParsed.containsKey(log);
     }
 
-    public void reportParsingPerformance(Performance p) {
-        performance.add(p);
+    public void reportPerformance(Performance performance) {
+        workers.put(NetUtil.worker(), performance);
     }
 
-    public AveragePerformance averageParsingPerformance() {
-        return new AveragePerformance(performance);
+    public AveragePerformance averagePerformance() {
+        return new AveragePerformance(workers.values());
     }
 }
