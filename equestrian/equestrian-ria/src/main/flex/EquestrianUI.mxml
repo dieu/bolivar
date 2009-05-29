@@ -332,7 +332,6 @@
                 addDataNodeInfo(app.nodeIp);
                 verifyAppTimer.start();
             } else {
-                dataNodeInfoTable = new ArrayCollection();
                 runApplication = false;
                 verifyAppTimer.stop();
                 if (app.time != "") {
@@ -392,6 +391,7 @@
             infoTestPanel.label = "Last total time: ";
             ip.text = "";
             traffic.text = "";
+            dataNodeInfoTable = new ArrayCollection();
             if (!runApplication) {
                 if (n != int(nMachines.value)) {
                     n = int(nMachines.value);
