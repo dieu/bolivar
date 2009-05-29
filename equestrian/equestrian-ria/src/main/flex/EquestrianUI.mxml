@@ -6,7 +6,7 @@
     <mx:Panel width="250" height="179" layout="absolute" id="login" title="Please enter password">
         <mx:Label x="35" y="27" text="Password"/>
         <mx:TextInput x="35" y="53" id="pass"/>
-        <mx:Button x="82.5" y="83" label="Entrer" click="isLogin()"/>
+        <mx:Button x="82.5" y="83" label="Enter" click="isLogin()"/>
     </mx:Panel>
     <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
         <mx:HBox>

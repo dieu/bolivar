@@ -71,7 +71,7 @@ public class History {
                         lineChartDataIdeal.put(key, timeNew);
                     }
                 } else {
-                    timeNew = lineChartDataIdeal.get(0) / 2 * (nWorkers - 1);
+                    timeNew = lineChartDataIdeal.get(keys.get(0)) / 2 * (nWorkers - 1);
                     lineChartDataIdeal.put(nWorkers, timeNew);
                 }
             }
