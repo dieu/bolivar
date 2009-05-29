@@ -3,7 +3,12 @@
                 backgroundGradientColors="[#8080c0, #ffffff]">
 
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
-    <mx:VBox left="10" right="10" top="10" bottom="10" height="100%" width="100%">
+    <mx:Panel width="250" height="179" layout="absolute" id="login" title="Please enter password">
+        <mx:Label x="35" y="27" text="Password"/>
+        <mx:TextInput x="35" y="53" id="pass"/>
+        <mx:Button x="82.5" y="83" label="Entrer" click="isLogin()"/>
+    </mx:Panel>
+    <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
         <mx:HBox>
             <mx:Canvas width="300" height="100%"><mx:TextArea width="100%" height="100%" text="This application demonstrates
 			calculating some OLAP analytics on historical data. In this concrete example,
@@ -16,10 +21,8 @@
                     <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
                     <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
                 </mx:HBox>
-                <mx:HBox horizontalCenter="0" y="40">
-                    <mx:Button id="clear" label="Clear table result" click="clearResult()"/>
-                    <mx:Button id="stop" label="Stop Application" click="stopApp()"/>
-                </mx:HBox>
+                <mx:Button id="clear" label="Clear table result" click="clearResult()" y="40" left="1"/>
+                <mx:Button id="stop" label="Stop Application" click="stopApp()" y="40" right="1"/>
             </mx:Canvas>
             <!--/mx:Canvas-->
             <mx:Canvas width="200" height="100%" color="white" backgroundColor="black">
@@ -114,6 +117,46 @@
                                 <mx:Legend horizontalCenter="0" dataProvider="{lineChart}"/>
                             </mx:VDividedBox>
                         </mx:Canvas>
+                        <mx:Canvas label="Line Chart #2" width="100%" height="100%">
+                            <mx:VDividedBox width="100%" height="100%">
+                                <mx:LineChart id="lineChart2" width="99%" height="95%" dataProvider="{dataLineChart2}" showDataTips="true">
+                                    <mx:seriesFilters>
+                                        <mx:Array/>
+                                    </mx:seriesFilters>
+                                    <mx:horizontalAxis>
+                                        <mx:CategoryAxis
+                                                dataProvider="{dataLineChart2}"
+                                                categoryField="Workers"
+                                                />
+                                    </mx:horizontalAxis>
+                                    <mx:series>
+                                        <mx:LineSeries
+                                                yField="Ideal"
+                                                displayName="Ideal"
+                                                >
+                                            <mx:lineStroke>
+                                                <mx:Stroke
+                                                        color="black"
+                                                        weight="3"
+                                                        />
+                                            </mx:lineStroke>
+                                        </mx:LineSeries>
+                                        <mx:LineSeries
+                                                yField="Total"
+                                                displayName="Total"
+                                                >
+                                            <mx:lineStroke>
+                                                <mx:Stroke
+                                                        color="red"
+                                                        weight="3"
+                                                        />
+                                            </mx:lineStroke>
+                                        </mx:LineSeries>
+                                    </mx:series>
+                                </mx:LineChart>
+                                <mx:Legend horizontalCenter="0" dataProvider="{lineChart2}"/>
+                            </mx:VDividedBox>
+                        </mx:Canvas>
                     </mx:TabNavigator>
                 </mx:VDividedBox>
             </mx:Panel>
@@ -150,26 +193,67 @@
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
         private var runApplication:Boolean = false;
+        private var truePsw:String = "questora";
         private var n:int = 0;
         private var nRun:int = 0;
         private var verifyAppTimer:Timer;
         private var isRunAppTimer:Timer;
+        private var cookies:SharedObject;
         [Bindable]
         public var dataColumnChart:ArrayCollection = new ArrayCollection();
         [Bindable]
         public var dataLineChart:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        public var dataLineChart2:ArrayCollection = new ArrayCollection();
         [Bindable]
         public var dataTestInfoTable:ArrayCollection = new ArrayCollection();
         [Bindable]
         public var dataNodeInfoTable:ArrayCollection = new ArrayCollection();
 
         private function initApp():void {
+            application.removeChild(main);
+            isUser(pass.text);
+        }
+
+        private function isLogin():void {
+            isUser(pass.text);
+        }
+
+        private function init():void {
             historyService.getHistory();
             historyService.getLineData();
             parseHostService.getCountNode();
             isRunAppTimer = new Timer(10000);
             isRunAppTimer.addEventListener("timer", isRunAppTimerHandler);
             equestrianService.isRun();
+        }
+
+        private function isUser(password:String):void {
+            if(password != truePsw) {
+                cookies = SharedObject.getLocal("password");
+                var psw:String = cookies.data["password"] as String;
+                if(psw == truePsw) {
+                    if(application.getChildren().lastIndexOf(main) < 0) {
+                        application.addChild(main);
+                    }
+                    application.removeChild(login);
+                    init();
+                } else {
+                    application.removeChild(main);
+                    if(application.getChildren().lastIndexOf(login) < 0) {
+                        application.addChild(login);
+                    }
+                }
+            } else {
+                if(application.getChildren().lastIndexOf(main) < 0) {
+                    application.addChild(main);
+                }
+                application.removeChild(login);
+                init();
+                cookies = SharedObject.getLocal("password");
+                cookies.data["password"] = password;
+                cookies.flush();
+            }
         }
 
         private function onResultGetHistory(event:ResultEvent):void {
@@ -195,6 +279,8 @@
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
                     dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
+                    dataLineChart2.addItem({Workers:String(1/int(data[0])), Ideal:String(1/int(data[1])),
+                        Total:String(1/int(data[2]))});
                 }
             }
         }
