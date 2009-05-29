@@ -319,9 +319,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
                                 .replace("</dow>","").replace("\r","").replace("\n", "")
                                 + ".compute-1.internal", "dowloading");
                     }
-                    if(word.startsWith("<par >")) {
-                        nodes.put(word.replace("<par >","")
-                                .replace("</par >","").replace("\r","").replace("\n", "")
+                    if(word.startsWith("<par>")) {
+                        nodes.put(word.replace("<par>","")
+                                .replace("</par>","").replace("\r","").replace("\n", "")
                                 + ".compute-1.internal", "parsing");
                     }
                     if(word.startsWith("<ret>")) {

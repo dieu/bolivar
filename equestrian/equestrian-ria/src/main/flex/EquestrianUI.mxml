@@ -25,7 +25,7 @@
                 <mx:Button id="stop" label="Stop Application" click="stopApp()" y="40" right="1"/>
             </mx:Canvas>
             <!--/mx:Canvas-->
-            <mx:Canvas width="200" height="100%" color="white" backgroundColor="black">
+            <mx:Canvas width="300" height="100%" color="white" backgroundColor="black">
                 <mx:Form>
                     <mx:FormItem label="Offender:"><mx:Label id="ip" text=""/></mx:FormItem>
                     <mx:FormItem label="Traffic used:"><mx:Label id="traffic" text=""/></mx:FormItem>
@@ -279,7 +279,7 @@
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
                     dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
-                    dataLineChart2.addItem({Workers:String(1/int(data[0])), Ideal:String(1/int(data[1])),
+                    dataLineChart2.addItem({Workers:data[0], Ideal:String(1/int(data[1])),
                         Total:String(1/int(data[2]))});
                 }
             }
