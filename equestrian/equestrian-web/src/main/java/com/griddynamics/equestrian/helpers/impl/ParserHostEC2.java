@@ -51,7 +51,7 @@ public class ParserHostEC2 implements ParserHost{
     public static void main(String [] args) throws Exception {
         ParserHostEC2 s = new ParserHostEC2();
         s.setAws(new AmazonKeys());
-        s.parse(2);
+        s.parse(30);
         return;
     }
 
@@ -121,10 +121,10 @@ public class ParserHostEC2 implements ParserHost{
     public Map<String,String> getNodeIp() {
         Map<String, String> nodes = new HashMap<String, String>();
         for(String node: workersIp) {
-            nodes.put(node, "starting");
+            nodes.put(node.split("[.]")[0], "starting");
         }
-        nodes.put(serverIp, "running");
-        nodes.put(schedulerIp, "running");
+        nodes.put(serverIp.split("[.]")[0], "running");
+        nodes.put(schedulerIp.split("[.]")[0], "running");
         return nodes;
     }
 

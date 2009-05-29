@@ -311,50 +311,42 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 for(String word: split) {
                     if(word.startsWith("<rem>")) {
                         String tag = word.replace("<rem>","")
-                                .replace("</rem>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</rem>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "removing");
                         }
                     }
                     if(word.startsWith("<dow>")) {
                         String tag = word.replace("<dow>","")
-                                .replace("</dow>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</dow>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
-                            nodes.put(word.replace("<dow>","")
-                                    .replace("</dow>","").replace("\r","").replace("\n", "")
-                                    + ".compute-1.internal", "dowloading");
+                            nodes.put(tag, "dowloading");
                         }
                     }
                     if(word.startsWith("<par>")) {
                         String tag = word.replace("<par>","")
-                                .replace("</par>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</par>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "parsing");
                         }
                     }
                     if(word.startsWith("<ret>")) {
                         String tag = word.replace("<ret>","")
-                                .replace("</ret>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</ret>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "returning");
                         }
                     }
                     if(word.startsWith("<fin>")) {
                         String tag = word.replace("<fin>","")
-                                .replace("</fin>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</fin>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "finished");
                         }
                     }
                     if(word.startsWith("<err>")) {
                         String tag = word.replace("<err>","")
-                                .replace("</err>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</err>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "error");
                         }
