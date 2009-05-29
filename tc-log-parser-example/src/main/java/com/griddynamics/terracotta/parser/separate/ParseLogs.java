@@ -125,10 +125,8 @@ public class ParseLogs implements Work {
     }
 
     private void find() {
-        Long started = System.currentTimeMillis();
         FileUtil.verifyDirExists(dir);
         logs = new File(dir).listFiles();
-        logger.info("Found logs in " + (System.currentTimeMillis() - started));
         performance.logs = (long) logs.length;
     }
 

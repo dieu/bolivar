@@ -5,7 +5,6 @@ import org.terracotta.message.routing.RoundRobinRouter;
 import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 import org.apache.log4j.Logger;
 import com.griddynamics.terracotta.JobService;
-import com.griddynamics.terracotta.parser.separate.Count;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import com.griddynamics.terracotta.util.FileUtil;
 import com.griddynamics.terracotta.util.NetUtil;
@@ -58,6 +57,7 @@ public class Workers {
     private List<WorkItem> workItems = new ArrayList<WorkItem>();
     private Map<String, Boolean> machines = new ConcurrentStringMap<Boolean>();
     private ForEachLog measurement;
+    private ForEachWorker measurementForEachWorker;
     private TimeMeter timeMeter;
     private String masterDir;
 
@@ -94,16 +94,16 @@ public class Workers {
                 return COUNTING;
             }
         });
-        reportWorkerCount();
+        reportCount();
     }
 
-    private void reportWorkerCount() {
+    private void reportCount() {
         logger.info("Found " + machines.size() + " workers");
     }
 
-    public void perform(ForEachLog measurements) {
-        this.measurement = measurements;
-        timeMeter.start(measurements.phase());
+    public void perform(ForEachLog measurement) {
+        this.measurement = measurement;
+        timeMeter.start(measurement.phase());
         scheduleAllLogs();
         waitForWorkers();
         timeMeter.stop();
@@ -140,5 +140,24 @@ public class Workers {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void perform(ForEachWorker measurement) {
+        measurementForEachWorker = measurement;
+        timeMeter.start(measurement.phase());
+        scheduleAllWorkers();
+        waitForWorkers();
+        timeMeter.stop();
+    }
+
+    private void scheduleAllWorkers() {
+        clearWorkItems();
+        for (int i = 0; i < machines.size(); i++)
+            scheduleOneWorker();
+    }
+
+    private void scheduleOneWorker() {
+        Work work = measurementForEachWorker.work();
+        schedule(work);
     }
 }

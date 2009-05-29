@@ -40,6 +40,6 @@ public class NetUtil {
     }
 
     private static String[] splitBySlash(String s) {
-        return s.split("\\/");
+        return s.split("/");
     }
 }
