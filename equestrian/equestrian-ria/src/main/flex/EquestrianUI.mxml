@@ -273,6 +273,7 @@
 
         private function onResultGetLineData(event:ResultEvent):void {
             dataLineChart = new ArrayCollection();
+            dataLineChart2 = new ArrayCollection();
             var result:String = event.result as String;
             if (result != "") {
                 var array:Array = result.split("|");
@@ -375,6 +376,7 @@
             dataTestInfoTable = new ArrayCollection();
             dataColumnChart = new ArrayCollection();
             dataLineChart = new ArrayCollection();
+            dataLineChart2 = new ArrayCollection();
         }
 
         private function stopApp():void {
