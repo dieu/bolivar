@@ -311,7 +311,6 @@
         }
 
         private function OnResultStop(event:ResultEvent):void {
-            dataTestInfoTable = new ArrayCollection();
             runApplication = false;
             verifyAppTimer.stop();
         }
