@@ -309,9 +309,35 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 outWorkers += getData(workers, 3);
                 String[] split = outWorkers.split(" ");
                 for(String word: split) {
+                    if(word.startsWith("<rem>")) {
+                        nodes.put(word.replace("<rem>","")
+                                .replace("</rem>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "removing");
+                    }
                     if(word.startsWith("<dow>")) {
                         nodes.put(word.replace("<dow>","")
-                                .replace("</dow>","").replace("\r","").replace("\n", ""), "dowloading");
+                                .replace("</dow>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "dowloading");
+                    }
+                    if(word.startsWith("<par>")) {
+                        nodes.put(word.replace("<par>","")
+                                .replace("</par>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "parsing");
+                    }
+                    if(word.startsWith("<ret>")) {
+                        nodes.put(word.replace("<ret>","")
+                                .replace("</ret>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "returning");
+                    }
+                    if(word.startsWith("<fin>")) {
+                        nodes.put(word.replace("<fin>","")
+                                .replace("</fin>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "finished");
+                    }
+                    if(word.startsWith("<err>")) {
+                        nodes.put(word.replace("<err>","")
+                                .replace("</err>","").replace("\r","").replace("\n", "")
+                                + ".compute-1.internal", "error");
                     }
                 }
                 infoNodes = nodes.toString().replace("{", "").replace("}", "");

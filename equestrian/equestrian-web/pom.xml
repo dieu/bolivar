@@ -62,6 +62,11 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.typica</groupId>
+            <artifactId>typica</artifactId>
+            <version>1.5</version>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>com.amazonaws</groupId>-->
             <!--<artifactId>ec2</artifactId>-->

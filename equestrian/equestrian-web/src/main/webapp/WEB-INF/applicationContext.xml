@@ -7,7 +7,11 @@
                   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <bean name="parserHost" class="com.griddynamics.equestrian.helpers.impl.ParserHostXml" scope="singleton"/>
+    <bean name="aws" class="com.griddynamics.equestrian.helpers.AmazonKeys" scope="singleton"/>
+    <!--<bean name="parserHost" class="com.griddynamics.equestrian.helpers.impl.ParserHostXml" scope="singleton"/>-->
+    <bean name="parserHost" class="com.griddynamics.equestrian.helpers.impl.ParserHostEC2" scope="singleton">
+        <property name="aws" ref="aws"/>
+    </bean>
     <bean name="application" class="com.griddynamics.equestrian.model.Application" scope="singleton"/>
     <bean name="historyEntity" class="com.griddynamics.equestrian.model.HistoryEntity" scope="singleton"/>
 
