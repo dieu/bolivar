@@ -142,6 +142,8 @@ public class Workers {
         }
     }
 
+    // Schedule for each log instead - this seems unreliable.
+    @Deprecated
     public void perform(ForEachWorker measurement) {
         measurementForEachWorker = measurement;
         timeMeter.start(measurement.phase());
