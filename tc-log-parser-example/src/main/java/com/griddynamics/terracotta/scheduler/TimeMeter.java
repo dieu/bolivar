@@ -12,13 +12,19 @@ import com.griddynamics.terracotta.util.StrUtil;
  * @author agorbunov @ 20.05.2009 14:15:22
  */
 public class TimeMeter {
-    private enum Phase {
+    public enum Phase {
         REMOVING,
         DOWNLOADING,
         PARSING,
         AGGREGATING;
+        public String toString() {
+            return nameInLowerCase();
+        }
         public String shortName() {
-            return name().toLowerCase().substring(0, 3);
+            return nameInLowerCase().substring(0, 3);
+        }
+        private String nameInLowerCase() {
+            return name().toLowerCase();
         }
     }
 
@@ -29,46 +35,41 @@ public class TimeMeter {
     private Long started;
     private Long duration;
 
-    public void removing() {
-        begin(Phase.REMOVING);
-    }
-
-    public void downloading() {
-        begin(Phase.DOWNLOADING);
-    }
-
-    public void parsing() {
-        begin(Phase.PARSING);
-    }
-
-    public void aggregating() {
-        begin(Phase.AGGREGATING);
-    }
-
-    private void begin(Phase phase) {
-        assertFalse(isMeasuring);
-        isMeasuring = true;
-        started = System.currentTimeMillis();
+    public void start(Phase phase) {
         this.phase = phase;
+        reportPhase();
+        startMeasuring();
+    }
+
+    private void reportPhase() {
         logger.info("Started " + phase);
     }
 
-    public void done() {
-        end();
+    private void startMeasuring() {
+        assertFalse(isMeasuring);
+        isMeasuring = true;
+        started = System.currentTimeMillis();
     }
 
-    private void end() {
+    public void done() {
+        stopMeasuring();
+        reportDuration();
+        if (isLastPhase())
+            reportTotal();
+    }
+
+    private void stopMeasuring() {
         assertTrue(isMeasuring);
         isMeasuring = false;
         duration = System.currentTimeMillis() - started;
         phaseDuration.put(phase, duration);
-        logger.info("Finished " + phase + " in " + formatDuration());
-        if (isLastPhase()) {
-            reportTotal();
-        }
     }
 
-    private String formatDuration() {
+    private void reportDuration() {
+        logger.info("Finished " + phase + " in " + durationFormatted());
+    }
+
+    private String durationFormatted() {
         return StrUtil.encloseWithTag(duration, phase.shortName());
     }
 
@@ -76,16 +77,24 @@ public class TimeMeter {
         return phase == lastPhase();
     }
 
+    private Phase lastPhase() {
+        return allPhases()[(allPhases().length - 1)];
+    }
+
+    private Phase[] allPhases() {
+        return Phase.values();
+    }
+
     private void reportTotal() {
         verifyPassedAllPhases();
-        logger.info("Finished analysis in " + formatTotal());
+        logger.info("Finished analysis in " + totalFormatted());
     }
 
     private void verifyPassedAllPhases() {
         assertEquals(allPhases().length, phaseDuration.size());
     }
 
-    private String formatTotal() {
+    private String totalFormatted() {
         return StrUtil.encloseWithTag(total(), "to");
     }
 
@@ -98,13 +107,5 @@ public class TimeMeter {
         for (Phase phase : phases)
             sum += phaseDuration.get(phase);
         return sum;
-    }
-
-    private Phase lastPhase() {
-        return allPhases()[(allPhases().length - 1)];
-    }
-
-    private Phase[] allPhases() {
-        return Phase.values();
     }
 }

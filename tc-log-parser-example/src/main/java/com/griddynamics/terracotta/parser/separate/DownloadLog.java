@@ -20,20 +20,8 @@ public class DownloadLog implements Work {
      * The constructor is private, but marked as public to suit Terracotta. */
     @Deprecated
     public DownloadLog(String url, String dir) {
-        url = testReportingOfMissingLog(url);
         wget = new Wget(url, dir);
         this.dir = dir;
-    }
-
-    private String testReportingOfMissingLog(String url) {
-        String missingLog = "traf-log-1522409746";
-        if (url.contains(missingLog))
-            return makeNotFound(url);
-        return url;
-    }
-
-    private String makeNotFound(String url) {
-        return url + "_not_found";
     }
 
     public void run() {

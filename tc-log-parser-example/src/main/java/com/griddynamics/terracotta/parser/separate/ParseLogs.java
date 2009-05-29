@@ -102,7 +102,7 @@ public class ParseLogs implements Work {
     private String dir;
     private File[] logs;
 
-    public static Work inUsing(String dir, Aggregator aggregator) {
+    public static Work fromTo(String dir, Aggregator aggregator) {
         return new Trackable(ParseLogs.class, dir, aggregator);
     }
 
