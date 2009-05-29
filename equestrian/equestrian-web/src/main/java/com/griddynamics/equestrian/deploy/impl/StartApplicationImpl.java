@@ -172,11 +172,16 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     e.printStackTrace();
                 }
             }
+            for(String key: nodes.keySet()) {
+                nodes.put(key, "stop");
+            }
+            infoNodes = nodes.toString().replace("{", "").replace("}", "");
             outScheduler = "";
             outWorkers = "";
             infoNodes = "";
             date = null;
             minute = 0;
+            application.setNodeIp(infoNodes);
             application.setSchedulerStatus(false);
         } else {
             application.setApplicationStatus("Wait...");

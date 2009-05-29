@@ -331,6 +331,7 @@
                 addDataNodeInfo(app.nodeIp);
                 verifyAppTimer.start();
             } else {
+                addDataNodeInfo(app.nodeIp);
                 runApplication = false;
                 verifyAppTimer.stop();
                 if (app.time != "") {
