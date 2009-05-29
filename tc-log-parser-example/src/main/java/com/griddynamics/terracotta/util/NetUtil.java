@@ -15,7 +15,7 @@ public class NetUtil {
         return first(hostAndIp());
     }
 
-    public static String localIp() {
+    public static String ip() {
         return second(hostAndIp());
     }
 

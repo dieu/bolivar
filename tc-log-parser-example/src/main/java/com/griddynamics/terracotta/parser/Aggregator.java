@@ -101,4 +101,8 @@ public class Aggregator {
     public AveragePerformance averagePerformance() {
         return new AveragePerformance(workers.values());
     }
+
+    public void countWorker() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
 }

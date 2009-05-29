@@ -13,6 +13,7 @@ import com.griddynamics.terracotta.util.StrUtil;
  */
 public class TimeMeter {
     public enum Phase {
+        COUNTING,
         REMOVING,
         DOWNLOADING,
         PARSING,
@@ -21,7 +22,7 @@ public class TimeMeter {
             return nameInLowerCase();
         }
         public String shortName() {
-            return nameInLowerCase().substring(0, 3);
+            return nameInLowerCase().substring(0, 2);
         }
         private String nameInLowerCase() {
             return name().toLowerCase();
@@ -51,7 +52,7 @@ public class TimeMeter {
         started = System.currentTimeMillis();
     }
 
-    public void done() {
+    public void stop() {
         stopMeasuring();
         reportDuration();
         if (isLastPhase())
@@ -66,10 +67,10 @@ public class TimeMeter {
     }
 
     private void reportDuration() {
-        logger.info("Finished " + phase + " in " + durationFormatted());
+        logger.info("Finished " + phase + " in " + formatDuration());
     }
 
-    private String durationFormatted() {
+    private String formatDuration() {
         return StrUtil.encloseWithTag(duration, phase.shortName());
     }
 
@@ -87,14 +88,14 @@ public class TimeMeter {
 
     private void reportTotal() {
         verifyPassedAllPhases();
-        logger.info("Finished analysis in " + totalFormatted());
+        logger.info("Finished analysis in " + formatTotal());
     }
 
     private void verifyPassedAllPhases() {
         assertEquals(allPhases().length, phaseDuration.size());
     }
 
-    private String totalFormatted() {
+    private String formatTotal() {
         return StrUtil.encloseWithTag(total(), "to");
     }
 

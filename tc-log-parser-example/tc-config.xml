@@ -31,6 +31,10 @@
                     <class-expression>com.griddynamics.terracotta.parser..*</class-expression>
                     <honor-transient>true</honor-transient>
                 </include>
+
+                <include>
+                    <class-expression>com.griddynamics.terracotta.scheduler.Workers.Count</class-expression>
+                </include>
             </instrumented-classes>
 
             <locks>

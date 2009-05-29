@@ -61,7 +61,7 @@ public class Scheduler {
 
     private void remove() {
         // TODO Schedule the task according to the number of workers, rather than the number of logs
-        workers.perform(new PerLog() {
+        workers.perform(new ForEachLog() {
             public Work work(String log) {
                 return RemoveLogs.from(workerDir);
             }
@@ -72,7 +72,7 @@ public class Scheduler {
     }
 
     private void download() {
-        workers.perform(new PerLog() {
+        workers.perform(new ForEachLog() {
             public Work work(String log) {
                 return DownloadLog.fromTo(url(log), workerDir);
             }
@@ -89,7 +89,7 @@ public class Scheduler {
     private void parse() {
         aggregator = new Aggregator();
         // TODO Schedule the task according to the number of workers, rather than the number of logs
-        workers.perform(new PerLog() {
+        workers.perform(new ForEachLog() {
             public Work work(String log) {
                 return ParseLogs.fromTo(workerDir, aggregator);
             }
@@ -103,7 +103,7 @@ public class Scheduler {
         timeMeter.start(AGGREGATING);
         String ip = aggregator.ipWithMaxTraffic();
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.traffic(ip) + "</traf> ");
-        timeMeter.done();
+        timeMeter.stop();
     }
 
     private void reportParsingPerformance() {
