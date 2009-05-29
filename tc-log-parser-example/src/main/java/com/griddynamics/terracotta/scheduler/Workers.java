@@ -66,7 +66,7 @@ public class Workers {
         this.timeMeter = timeMeter;
     }
 
-    public void setup() {
+    public void init() {
         connectToWorkers();
         countWorkers();
     }
@@ -142,7 +142,7 @@ public class Workers {
         }
     }
 
-    // Schedule for each log instead - this seems unreliable.
+    // Schedule for each log instead - seems unreliable 
     @Deprecated
     public void perform(ForEachWorker measurement) {
         measurementForEachWorker = measurement;

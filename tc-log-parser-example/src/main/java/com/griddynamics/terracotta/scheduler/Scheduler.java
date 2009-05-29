@@ -41,7 +41,7 @@ public class Scheduler {
     }
 
     private void connectToWorkers() {
-        workers.setup();
+        workers.init();
     }
 
     private void findMaxTraffic() {
