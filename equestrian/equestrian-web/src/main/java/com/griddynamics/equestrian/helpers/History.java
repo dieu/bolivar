@@ -52,7 +52,7 @@ public class History {
                 lineChartDataIdeal.put(nWorkers, timeNew);
                 keys.remove(0);
                 for(Integer key: keys) {
-                    timeNew /= 2;
+                    timeNew /= 2 * (key - 1);
                     lineChartDataIdeal.put(key, timeNew);
                 }
             }
@@ -67,11 +67,11 @@ public class History {
                     lineChartDataIdeal.clear();
                     lineChartDataIdeal.put(nWorkers, timeNew);
                     for(Integer key: keys) {
-                        timeNew /= 2;
+                        timeNew /= 2 * (key - 1);
                         lineChartDataIdeal.put(key, timeNew);
                     }
                 } else {
-                    timeNew = lineChartDataIdeal.get(keys.get(keys.size() - 1)) / 2;
+                    timeNew = lineChartDataIdeal.get(0) / 2 * (nWorkers - 1);
                     lineChartDataIdeal.put(nWorkers, timeNew);
                 }
             }
