@@ -273,6 +273,7 @@
 
         private function onResultGetLineData(event:ResultEvent):void {
             dataLineChart = new ArrayCollection();
+            dataLineChart2 = new ArrayCollection();
             var result:String = event.result as String;
             if (result != "") {
                 var array:Array = result.split("|");
@@ -331,7 +332,6 @@
                 addDataNodeInfo(app.nodeIp);
                 verifyAppTimer.start();
             } else {
-                dataNodeInfoTable = new ArrayCollection();
                 runApplication = false;
                 verifyAppTimer.stop();
                 if (app.time != "") {
@@ -375,6 +375,7 @@
             dataTestInfoTable = new ArrayCollection();
             dataColumnChart = new ArrayCollection();
             dataLineChart = new ArrayCollection();
+            dataLineChart2 = new ArrayCollection();
         }
 
         private function stopApp():void {
@@ -390,6 +391,7 @@
             infoTestPanel.label = "Last total time: ";
             ip.text = "";
             traffic.text = "";
+            dataNodeInfoTable = new ArrayCollection();
             if (!runApplication) {
                 if (n != int(nMachines.value)) {
                     n = int(nMachines.value);
