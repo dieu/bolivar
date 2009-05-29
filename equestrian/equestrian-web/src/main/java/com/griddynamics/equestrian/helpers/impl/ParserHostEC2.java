@@ -92,7 +92,7 @@ public class ParserHostEC2 implements ParserHost{
         for (ReservationDescription res : instances) {
             if (res.getInstances() != null) {
                 for (ReservationDescription.Instance inst : res.getInstances()) {
-                    if(inst.isRunning()) {
+                    if(inst.isRunning() && inst.getKeyName().equals(aws.getUserId())) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
                         }
