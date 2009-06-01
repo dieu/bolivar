@@ -11,20 +11,27 @@ import java.util.*;
  */
 public class History {
     private HistoryEntity historyEntity;
-    private Map<Integer, Integer> lineChartDataReal;
-    private Map<String, Integer> lineChartDataIdeal;
+    private Map<Integer, Float> lineChartDataReal;
+    private Map<Integer, Float> lineChartDataIdeal;
 
     public static void main(String[] arg) {
         History s = new History();
-        s.add("1", "2", "12", "12", "55382", "12", "23");
-        s.add("1", "1", "12", "12", "99160", "12", "232");
-        s.add("1", "3", "12", "12", "33300", "12", "232");
+        s.add("1", "10", "12", "12", "24348", "12", "23");
+        s.add("1", "1", "12", "12", "124452", "12", "232");
+        s.add("1", "2", "12", "12", "72308", "12", "232");
+        s.add("1", "3", "12", "12", "50728", "12", "232");
+        s.add("1", "5", "12", "12", "34649", "12", "232");
+        s.add("1", "6", "12", "12", "29109", "12", "232");
+        s.add("1", "15", "12", "12", "23206", "12", "232");
+        s.add("1", "20", "12", "12", "60403", "12", "232");
+        s.add("1", "22", "12", "12", "20919", "12", "232");
+        s.add("1", "1", "12", "12", "131531", "12", "232");
         return;
     }
 
     public History() {
-        lineChartDataReal = new HashMap<Integer, Integer>();
-        lineChartDataIdeal = new HashMap<String, Integer>();
+        lineChartDataReal = new TreeMap<Integer, Float>();
+        lineChartDataIdeal = new TreeMap<Integer, Float>();
     }
 
     public void setHistoryEntity(HistoryEntity historyEntity) {
@@ -33,52 +40,53 @@ public class History {
 
     public void add(String date, String workers,
                     String parsing, String returning, String time, String ip, String traf) {
-//        historyEntity.setDate(date);
-//        historyEntity.setWorkers(workers);
-//        historyEntity.setParsing(parsing);
-//        historyEntity.setReturning(returning);
-//        historyEntity.setTime(time);
-//        historyEntity.setIp(ip);
-//        historyEntity.setTraf(traf);
+        historyEntity.setDate(date);
+        historyEntity.setWorkers(workers);
+        historyEntity.setParsing(parsing);
+        historyEntity.setReturning(returning);
+        historyEntity.setTime(time);
+        historyEntity.setIp(ip);
+        historyEntity.setTraf(traf);
 
         int nWorkers = Integer.valueOf(workers);
         if(lineChartDataReal.containsKey(nWorkers)) {
-            int timeOld = lineChartDataReal.get(nWorkers);
-            int timeNew = (Integer.valueOf(time) + timeOld) / 2;
+            Float timeOld = lineChartDataReal.get(nWorkers);
+            Float timeNew = (Integer.valueOf(time) + timeOld) / 2;
             lineChartDataReal.put(nWorkers, timeNew);
-            if(nWorkers == Integer.parseInt(lineChartDataIdeal.keySet().iterator().next())) {
-                List<String> keys = new ArrayList<String>(lineChartDataIdeal.keySet());
+            if(nWorkers == lineChartDataIdeal.keySet().iterator().next()) {
+                List<Integer> keys = new ArrayList<Integer>(lineChartDataIdeal.keySet());
                 lineChartDataIdeal.clear();
-                lineChartDataIdeal.put(String.valueOf(nWorkers), timeNew);
+                lineChartDataIdeal.put(nWorkers, timeNew);
                 for(int i = 1; i < keys.size(); i++) {
-                    Integer key = Integer.parseInt(keys.get(i));
-                    timeNew /= Math.pow(2, ((key - 1) - (lineChartDataIdeal.get(keys.get(i-1)) - 1)));
-                    lineChartDataIdeal.put(String.valueOf(key), timeNew);
+                    Integer key = keys.get(i);
+                    timeNew /= (float) Math.pow(2, ((key - 1) - (keys.get(i-1) - 1)));
+                    lineChartDataIdeal.put(key, timeNew);
                 }
             }
         } else {
-            int timeNew = Integer.valueOf(time);
+            Float timeNew = Float.valueOf(time);
             if(lineChartDataReal.size() == 0) {
                 lineChartDataReal.put(nWorkers, timeNew);
-                lineChartDataIdeal.put(String.valueOf(nWorkers), timeNew);
+                lineChartDataIdeal.put(nWorkers, timeNew);
             } else {
                 List<Integer> keys = new ArrayList<Integer>(lineChartDataReal.keySet());
-                List<Integer> values = new ArrayList<Integer>(lineChartDataIdeal.values());
+                List<Float> values = new ArrayList<Float>(lineChartDataIdeal.values());
                 if(nWorkers < keys.get(0)) {
                     lineChartDataIdeal.clear();
-                    lineChartDataIdeal.put(String.valueOf(nWorkers), timeNew);
-                    timeNew /= Math.pow(2, ((keys.get(0) - 1) - (nWorkers - 1)));
-                    lineChartDataIdeal.put(String.valueOf(keys.get(0)), timeNew);
+                    lineChartDataIdeal.put(nWorkers, timeNew);
+                    timeNew /= (float) Math.pow(2, ((keys.get(0) - 1) - (nWorkers - 1)));
+                    lineChartDataIdeal.put(keys.get(0), timeNew);
                     for(int i = 1; i < keys.size(); i++) {
                         Integer key = keys.get(i);
-                        timeNew /= Math.pow(2, ((key - 1) - (lineChartDataIdeal.get(String.valueOf(keys.get(i-1))) - 1)));
-                        lineChartDataIdeal.put(String.valueOf(key), timeNew);
+                        timeNew /= (float) Math.pow(2, ((key - 1) -
+                                (keys.get(i-1) - 1)));
+                        lineChartDataIdeal.put(key, timeNew);
                     }
                 } else {
-                    timeNew = lineChartDataIdeal.get(String.valueOf(keys.get(0))) / (int) Math.pow(2, (nWorkers - 1));
-                    lineChartDataIdeal.put(String.valueOf(nWorkers), timeNew);                    
+                    timeNew = lineChartDataIdeal.get(keys.get(0)) / (int) Math.pow(2, (nWorkers - 1));
+                    lineChartDataIdeal.put(nWorkers, timeNew);                    
                 }
-                timeNew = Integer.valueOf(time);
+                timeNew = Float.valueOf(time);
                 lineChartDataReal.put(nWorkers, timeNew);
             }
         }
@@ -106,8 +114,8 @@ public class History {
     public String getLineData() {
         StringBuilder result = new StringBuilder("");
         List<Integer> workers = new ArrayList<Integer>(lineChartDataReal.keySet());
-        List<Integer> valueReal = new ArrayList<Integer>(lineChartDataReal.values());
-        List<Integer> valueIdeal = new ArrayList<Integer>(lineChartDataIdeal.values());
+        List<Float> valueReal = new ArrayList<Float>(lineChartDataReal.values());
+        List<Float> valueIdeal = new ArrayList<Float>(lineChartDataIdeal.values());
         for(int i = 0; i < workers.size(); i++) {
             result.append(workers.get(i) + ";")
                     .append(valueIdeal.get(i) + ";")

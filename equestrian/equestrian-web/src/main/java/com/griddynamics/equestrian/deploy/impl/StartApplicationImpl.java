@@ -81,12 +81,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             date = Calendar.getInstance().getTime();
             minute = Calendar.getInstance().get(Calendar.MINUTE);
             init(nWorkers, minute);
-            upload = Runtime.getRuntime().exec(uploadCommand, null, dir);
-            isRunUpload = true;
-            while(isRunUpload) {
-                getData(upload, 2);
-                Thread.sleep(1000L);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

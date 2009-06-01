@@ -10,9 +10,7 @@
     </mx:Panel>
     <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
         <mx:HBox>
-            <mx:Canvas width="300" height="100%"><mx:TextArea width="100%" height="100%" text="This application demonstrates
-			calculating some OLAP analytics on historical data. In this concrete example,
-			we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
+            <mx:Canvas width="300" height="100%"><mx:TextArea width="100%" height="100%" text="This application demonstrates calculating some OLAP analytics on historical data. In this concrete example,	we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
             </mx:Canvas>
             <!--mx:Canvas width="200" height="100%"-->
             <mx:Canvas>
@@ -316,6 +314,7 @@
         }
 
         private function onResultDeploy(event:ResultEvent):void {
+            equestrianService.start();
         }
 
         private function onResultStart(event:ResultEvent):void {
@@ -336,6 +335,7 @@
                 verifyAppTimer.stop();
                 if (app.time != "") {
                     nRun += 1;
+                    isRunAppTimer.start();
                     infoTestPanel.label = "Last total time: " + app.time + "ms";
                     ip.text = app.ip;
                     traffic.text = app.traf;
@@ -380,6 +380,7 @@
 
         private function stopApp():void {
             equestrianService.stop();
+            isRunAppTimer.start();
         }
 
         private function onFault(event:FaultEvent):void {
@@ -391,13 +392,11 @@
             infoTestPanel.label = "Last total time: ";
             ip.text = "";
             traffic.text = "";
+            isRunAppTimer.stop();
             dataNodeInfoTable = new ArrayCollection();
             if (!runApplication) {
-                if (n != int(nMachines.value)) {
                     n = int(nMachines.value);
                     equestrianService.deploy(nMachines.value as int);
-                }
-                equestrianService.start();
             }
         }
 
