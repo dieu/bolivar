@@ -42,6 +42,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private Application application;
     private Date date = null;
     private File dir;
+    private FileWriter schedulerLogs;
+    private FileWriter workersLogs;
     private Map<String, String> nodes;
 
     public StartApplicationImpl() {
@@ -100,9 +102,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
             Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
             server = Runtime.getRuntime().exec(runServerCommand, null, dir);
-            Thread.sleep(1000L);
+            Thread.sleep(5000L);
             workers = Runtime.getRuntime().exec(runWorkersCommand, null, dir);
-            Thread.sleep(1000L);
+            Thread.sleep(10000L);
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
@@ -156,10 +158,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
             if(!outScheduler.equals("") && separator.equals("/")) {
                 try {
-                    FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
                     schedulerLogs.write(outScheduler);
                     schedulerLogs.close();
-                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
                     workersLogs.write(outWorkers);
                     workersLogs.close();
                 } catch (IOException e) {
@@ -190,10 +190,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public void stop() {
         if(separator.equals("/")) {
             try {
-                FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
                 schedulerLogs.write(outScheduler);
                 schedulerLogs.close();
-                FileWriter workersLogs = new FileWriter(files + "workers.txt");
                 workersLogs.write(outWorkers);
                 workersLogs.close();
             } catch (IOException e) {
@@ -284,6 +282,12 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
             this.files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
+            try {
+                schedulerLogs =  new FileWriter(files + "scheduler.txt");
+                workersLogs = new FileWriter(files + "workers.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             new File(dir).mkdirs();
         }
 
@@ -292,11 +296,20 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private class ReadSchedulerOut extends Thread {
         public void run() {
             while (isRunScheduler) {
-                outScheduler += getData(scheduler, 1);
+                String temp = getData(scheduler, 1);
+                outScheduler += temp;
                 try {
+                    if(temp != null) {
+                        schedulerLogs.write(temp);
+                        schedulerLogs.flush();
+                    }
                     sleep(1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+
                 }
             }
         }
@@ -305,7 +318,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private class ReadWorkersOut extends Thread {
         public void run() {
             while (isRunScheduler) {
-                outWorkers += getData(workers, 3);
+                outWorkers = getData(workers, 3);
                 String[] split = outWorkers.split(" ");
                 for(String word: split) {
                     if(word.startsWith("<rem>")) {
@@ -353,9 +366,17 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 }
                 infoNodes = nodes.toString().replace("{", "").replace("}", "");
                 try {
+                    if(outScheduler != null) {
+                        workersLogs.write(outWorkers);
+                        workersLogs.flush();
+                    }
                     sleep(1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+
                 }
             }
         }

@@ -5,7 +5,7 @@
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
     <mx:Panel width="250" height="179" layout="absolute" id="login" title="Please enter password">
         <mx:Label x="35" y="27" text="Password"/>
-        <mx:TextInput x="35" y="53" id="pass"/>
+        <mx:TextInput x="35" y="53" id="pass" displayAsPassword="true"/>
         <mx:Button x="82.5" y="83" label="Enter" click="isLogin()"/>
     </mx:Panel>
     <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
@@ -46,8 +46,8 @@
                             <mx:DataGridColumn dataField="N" headerText="#" width="40"/>
                             <mx:DataGridColumn dataField="Date" minWidth="100"/>
                             <mx:DataGridColumn dataField="Workers"/>
-                            <mx:DataGridColumn dataField="Parsing" headerText="Parsing Ave., ms"/>
-                            <mx:DataGridColumn dataField="Returning" headerText="Returning Ave., ms"/>
+                            <mx:DataGridColumn dataField="Parsing" headerText="Parsing avg., ms"/>
+                            <mx:DataGridColumn dataField="Returning" headerText="Returning avg., ms"/>
                             <mx:DataGridColumn dataField="Total" headerText="Total time, ms"/>
                             <mx:DataGridColumn dataField="IP"/>
                             <mx:DataGridColumn dataField="Traffic"/>
@@ -255,6 +255,7 @@
         }
 
         private function onResultGetHistory(event:ResultEvent):void {
+            dataTestInfoTable = new ArrayCollection();
             dataColumnChart = new ArrayCollection();
             var result:String = event.result as String;
             if (result != "") {
