@@ -38,6 +38,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String regAll = "[a-zA-Z\\d\\s\\S]*";
     private String regTime = "\\s*<to>\\d+</to>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
+    private Pattern error = Pattern.compile(regAll + "WARN - Can't connect to server" + regAll);
     private ParserHost parserHost;
     private Application application;
     private Date date = null;
@@ -158,9 +159,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
             if(!outScheduler.equals("") && separator.equals("/")) {
                 try {
-                    schedulerLogs.write(outScheduler);
                     schedulerLogs.close();
-                    workersLogs.write(outWorkers);
                     workersLogs.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -190,9 +189,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public void stop() {
         if(separator.equals("/")) {
             try {
-                schedulerLogs.write(outScheduler);
                 schedulerLogs.close();
-                workersLogs.write(outWorkers);
                 workersLogs.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -318,8 +315,20 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private class ReadWorkersOut extends Thread {
         public void run() {
             while (isRunScheduler) {
-                outWorkers = getData(workers, 3);
-                String[] split = outWorkers.split(" ");
+                String temp = getData(workers, 3);
+                //WARN - Can't connect to server
+                if(error.matcher(temp).matches()) {
+                    if(server != null) {
+                        server.destroy();
+                    }
+                    try {
+                        server = Runtime.getRuntime().exec(runServerCommand, null, dir);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                outWorkers += temp;
+                String[] split = temp.split(" ");
                 for(String word: split) {
                     if(word.startsWith("<rem>")) {
                         String tag = word.replace("<rem>","")
@@ -366,8 +375,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 }
                 infoNodes = nodes.toString().replace("{", "").replace("}", "");
                 try {
-                    if(outScheduler != null) {
-                        workersLogs.write(outWorkers);
+                    if(temp != null) {
+                        workersLogs.write(temp);
                         workersLogs.flush();
                     }
                     sleep(1000L);

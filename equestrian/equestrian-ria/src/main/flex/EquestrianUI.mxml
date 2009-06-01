@@ -279,8 +279,8 @@
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
                     dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
-                    dataLineChart2.addItem({Workers:data[0], Ideal:String(1/int(data[1])),
-                        Total:String(1/int(data[2]))});
+                    dataLineChart2.addItem({Workers:data[0], Ideal:String(1/data[1]),
+                        Total:String(1/data[2])});
                 }
             }
         }
