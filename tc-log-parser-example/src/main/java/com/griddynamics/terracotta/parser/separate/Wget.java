@@ -10,46 +10,6 @@ import com.griddynamics.terracotta.util.StrUtil;
  * @author agorbunov @ 08.05.2009 16:30:17
  */
 public class Wget {
-
-    private static class CollectedOutput extends Thread {
-        private BufferedReader process;
-        private StringBuffer output;
-
-        public CollectedOutput(InputStream process) {
-            this.process = new BufferedReader(new InputStreamReader(process));
-            this.output = new StringBuffer();
-        }
-
-        public void startCollecting() {
-            super.start();
-        }
-
-        public void run() {
-            try {
-                readOutput();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void readOutput() throws IOException {
-            while (true) {
-                String s = process.readLine();
-                if (s == null)
-                    break;
-                output.append(s);
-            }
-        }
-
-        public boolean isEmpty() {
-            return output.length() == 0;
-        }
-
-        public String toString() {
-            return output.toString();
-        }
-    }
-
     private static final Logger logger = Logger.getLogger(Wget.class);
     private String url;
     private String localDir;

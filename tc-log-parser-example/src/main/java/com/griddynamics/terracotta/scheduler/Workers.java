@@ -1,23 +1,18 @@
 package com.griddynamics.terracotta.scheduler;
 
-import org.terracotta.workmanager.dynamic.DynamicWorkManager;
-import org.terracotta.message.routing.RoundRobinRouter;
-import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
-import org.apache.log4j.Logger;
 import com.griddynamics.terracotta.JobService;
-import com.griddynamics.terracotta.util.ThreadUtil;
+import com.griddynamics.terracotta.scheduler.Phase;
 import com.griddynamics.terracotta.util.FileUtil;
-import com.griddynamics.terracotta.util.NetUtil;
+import com.griddynamics.terracotta.util.ThreadUtil;
 import commonj.work.Work;
 import commonj.work.WorkItem;
+import org.apache.log4j.Logger;
+import org.terracotta.message.routing.RoundRobinRouter;
+import org.terracotta.workmanager.dynamic.DynamicWorkManager;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-
-import com.griddynamics.terracotta.scheduler.TimeMeter.Phase;
-import static com.griddynamics.terracotta.scheduler.TimeMeter.Phase.COUNTING;
+import java.util.List;
 
 /**
  * @author agorbunov @ 29.05.2009 17:00:07
@@ -35,35 +30,37 @@ public class Workers {
         public Phase phase();
     }
 
-    public static class Count implements Work {
-        private Map<String, Boolean> machines;
-        public Count(Map<String, Boolean> machines) {
-            this.machines = machines;
-        }
-        public void run() {
-            machines.put(NetUtil.worker(), Boolean.TRUE);
-        }
-        public boolean isDaemon() {
-            return false;
-        }
-        public void release() {
-            // Do nothing.
-        }
-    }
+//    public static class Count implements Work {
+//        private Map<String, Boolean> machines;
+//        public Count(Map<String, Boolean> machines) {
+//            this.machines = machines;
+//        }
+//        public void run() {
+//            machines.put(NetUtil.worker(), Boolean.TRUE);
+//        }
+//        public boolean isDaemon() {
+//            return false;
+//        }
+//        public void release() {
+//            // Do nothing.
+//        }
+//    }
 
     private static final Long SECOND = 1000L;
     private static Logger logger = Logger.getLogger(Workers.class);
     private DynamicWorkManager workManager;
     private List<WorkItem> workItems = new ArrayList<WorkItem>();
-    private Map<String, Boolean> machines = new ConcurrentStringMap<Boolean>();
+//    private Map<String, Boolean> machines = new ConcurrentStringMap<Boolean>();
+    private int countWorkers;
     private ForEachLog measurement;
     private ForEachWorker measurementForEachWorker;
     private TimeMeter timeMeter;
     private String masterDir;
 
-    public Workers(String masterDir, TimeMeter timeMeter) {
+    public Workers(String masterDir, TimeMeter timeMeter, int countWorkers) {
         this.masterDir = masterDir;
         this.timeMeter = timeMeter;
+        this.countWorkers = countWorkers;
     }
 
     public void setup() {
@@ -86,19 +83,19 @@ public class Workers {
     }
 
     private void countWorkers() {
-        perform(new ForEachLog() {
-            public Work work(String log) {
-                return new Count(machines);
-            }
-            public Phase phase() {
-                return COUNTING;
-            }
-        });
+//        perform(new ForEachLog() {
+//            public Work work(String log) {
+//                return new Count(machines);
+//            }
+//            public Phase phase() {
+//                return COUNTING;
+//            }
+//        });
         reportCount();
     }
 
     private void reportCount() {
-        logger.info("Found " + machines.size() + " workers");
+        logger.info("Found " + countWorkers /*machines.size()*/ + " workers");
     }
 
     public void perform(ForEachLog measurement) {
@@ -154,7 +151,7 @@ public class Workers {
 
     private void scheduleAllWorkers() {
         clearWorkItems();
-        for (int i = 0; i < machines.size(); i++)
+        for (int i = 0; i < countWorkers /* machines.size() */; i++)
             scheduleOneWorker();
     }
 

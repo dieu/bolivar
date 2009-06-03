@@ -1,6 +1,5 @@
 package com.griddynamics.terracotta.parser.separate;
 
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.ERROR;
 import com.griddynamics.terracotta.parser.wrapper.Wrapper;
 import static com.griddynamics.terracotta.util.ErrUtil.runtimeException;
 import commonj.work.Work;
@@ -28,7 +27,7 @@ public class Trackable extends Wrapper {
     protected void reportFailure() {
         // A local variable instead of a field to prevent UnlockedSharedObjectException.
         Tracker tracker = new Tracker();
-        tracker.phase(ERROR);
+        tracker.phase(Phase.ERROR);
     }
 
     private void rethrow(Throwable e) {

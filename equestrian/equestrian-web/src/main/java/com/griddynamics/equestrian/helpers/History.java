@@ -3,6 +3,8 @@ package com.griddynamics.equestrian.helpers;
 import com.griddynamics.equestrian.model.HistoryEntity;
 
 import java.util.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author: apanasenko aka dieu
@@ -11,6 +13,7 @@ import java.util.*;
  */
 public class History {
     private HistoryEntity historyEntity;
+    private String pathChartToCVS;
     private Map<Integer, Float> lineChartDataReal;
     private Map<Integer, Float> lineChartDataIdeal;
 
@@ -32,6 +35,13 @@ public class History {
     public History() {
         lineChartDataReal = new TreeMap<Integer, Float>();
         lineChartDataIdeal = new TreeMap<Integer, Float>();
+        if(System.getProperty("file.separator").equals("\\")) {
+            pathChartToCVS = ApplicationPath.APPLICATION_PATH_WIN;
+
+        } else {
+            pathChartToCVS = ApplicationPath.APPLICATION_PATH_NIX;
+        }
+        pathChartToCVS += Calendar.getInstance().getTime().toString() + ".cvs";
     }
 
     public void setHistoryEntity(HistoryEntity historyEntity) {
@@ -58,9 +68,8 @@ public class History {
                 lineChartDataIdeal.clear();
                 lineChartDataIdeal.put(nWorkers, timeNew);
                 for(int i = 1; i < keys.size(); i++) {
-                    Integer key = keys.get(i);
-                    timeNew /= (float) Math.pow(2, ((key - 1) - (keys.get(i-1) - 1)));
-                    lineChartDataIdeal.put(key, timeNew);
+                    int key = keys.get(i);
+                    lineChartDataIdeal.put(key, (float) (timeNew * (1.0 / key)));
                 }
             }
         } else {
@@ -74,21 +83,24 @@ public class History {
                 if(nWorkers < keys.get(0)) {
                     lineChartDataIdeal.clear();
                     lineChartDataIdeal.put(nWorkers, timeNew);
-                    timeNew /= (float) Math.pow(2, ((keys.get(0) - 1) - (nWorkers - 1)));
-                    lineChartDataIdeal.put(keys.get(0), timeNew);
-                    for(int i = 1; i < keys.size(); i++) {
-                        Integer key = keys.get(i);
-                        timeNew /= (float) Math.pow(2, ((key - 1) -
-                                (keys.get(i-1) - 1)));
-                        lineChartDataIdeal.put(key, timeNew);
+                    for(int key: keys) {
+                        lineChartDataIdeal.put(key, (float) (timeNew * (1.0 / key)));
                     }
                 } else {
-                    timeNew = lineChartDataIdeal.get(keys.get(0)) / (int) Math.pow(2, (nWorkers - 1));
-                    lineChartDataIdeal.put(nWorkers, timeNew);                    
+                    timeNew = (float) (lineChartDataIdeal.get(keys.get(0)) * (1.0 / nWorkers));
+                    lineChartDataIdeal.put(nWorkers, timeNew);
                 }
                 timeNew = Float.valueOf(time);
                 lineChartDataReal.put(nWorkers, timeNew);
             }
+        }
+        try {
+            FileWriter chartToCVS = new FileWriter(pathChartToCVS, false);
+            chartToCVS.write(lineChartDataReal.toString().replace("{", "").replace("}", "")
+                    .replace(",", "\n").replace(" ", "").replace("=", ", "));
+            chartToCVS.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -127,6 +139,10 @@ public class History {
         } else {
             return result.deleteCharAt(result.length() - 1).toString();
         }
+    }
+
+    public void finalize() {
+
     }
 }
 

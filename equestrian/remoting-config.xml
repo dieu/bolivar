@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service"
+         class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object"
+                            class="flex.messaging.services.remoting.adapters.JavaAdapter"
+                            default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="channel-amf"/>
+    </default-channels>
+
+    <destination id="equestrianService">
+        <properties>
+            <factory>spring</factory>
+            <source>startApplication</source>
+        </properties>
+    </destination>
+
+    <destination id="historyService">
+        <properties>
+            <factory>spring</factory>
+            <source>history</source>
+        </properties>
+    </destination>
+
+    <destination id="parseHostService">
+        <properties>
+            <factory>spring</factory>
+            <source>parserHost</source>
+        </properties>
+    </destination>
+</service>

@@ -1,14 +1,9 @@
 package com.griddynamics.terracotta.parser.separate;
 
+import com.griddynamics.terracotta.util.FileUtil;
 import commonj.work.Work;
 
 import java.io.File;
-
-import com.griddynamics.terracotta.util.FileUtil;
-
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.REMOVING;
-import com.griddynamics.terracotta.parser.separate.Trackable;
-import com.griddynamics.terracotta.parser.separate.Tracker;
 
 /**
  * @author agorbunov @ 08.05.2009 16:22:35
@@ -29,7 +24,7 @@ public class RemoveLogs implements Work {
     }
 
     public void run() {
-        phase.phase(REMOVING);
+        phase.phase(Phase.REMOVING);
         FileUtil.deleteDirContent(dir);
     }
 

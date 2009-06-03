@@ -65,8 +65,7 @@ public class ParseLog implements Work {
         } else {
             inputStreamReader = new FileReader(log);
         }
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        return bufferedReader;
+        return new BufferedReader(inputStreamReader);
     }
 
     private void putOrUpdateSumEntry(Map<String, Long> sum, String ip, long n) {

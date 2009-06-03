@@ -132,6 +132,7 @@ public class ParserHostEC2 implements ParserHost{
         if(!serverIp.equals("") && !schedulerIp.equals("") && workersIp.size() != 0) {
             StringBuilder contentFile = new StringBuilder("");
             contentFile.append("SERVER_ADDR = \"" + serverIp + "\" \n");
+            contentFile.append("COUNT_WORKERS = \"" + workersIp.size() + "\" \n");
             contentFile.append("JAVA_HOME = \"/usr/lib/jvm/java-6-sun\" \n\n");
             contentFile.append("role :workers, ");
             for(String ip: workersIp) {
@@ -204,7 +205,7 @@ public class ParserHostEC2 implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -DcountWorkers=#{COUNT_WORKERS} -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_server, :roles => :server do\n" +

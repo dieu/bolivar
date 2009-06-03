@@ -44,7 +44,7 @@
                     <mx:DataGrid id="tableTestInfo" dataProvider="{dataTestInfoTable}" width="100%" height="100%">
                         <mx:columns>
                             <mx:DataGridColumn dataField="N" headerText="#" width="40"/>
-                            <mx:DataGridColumn dataField="Date" minWidth="100"/>
+                            <mx:DataGridColumn dataField="Date" minWidth="200"/>
                             <mx:DataGridColumn dataField="Workers"/>
                             <mx:DataGridColumn dataField="Parsing" headerText="Parsing avg., ms"/>
                             <mx:DataGridColumn dataField="Returning" headerText="Returning avg., ms"/>
@@ -81,10 +81,16 @@
                                     <mx:seriesFilters>
                                         <mx:Array/>
                                     </mx:seriesFilters>
+                                    <mx:verticalAxis>
+                                        <mx:LinearAxis baseAtZero="false"
+                                                       title="Time"
+                                                       labelFunction="linearAxis_labelFunc" />
+                                    </mx:verticalAxis>
                                     <mx:horizontalAxis>
                                         <mx:CategoryAxis
                                                 dataProvider="{dataLineChart}"
                                                 categoryField="Workers"
+                                                title="Worker"
                                                 />
                                     </mx:horizontalAxis>
                                     <mx:series>
@@ -121,10 +127,14 @@
                                     <mx:seriesFilters>
                                         <mx:Array/>
                                     </mx:seriesFilters>
+                                    <mx:verticalAxis>
+                                        <mx:LinearAxis baseAtZero="false"/>
+                                    </mx:verticalAxis>
                                     <mx:horizontalAxis>
                                         <mx:CategoryAxis
                                                 dataProvider="{dataLineChart2}"
                                                 categoryField="Workers"
+                                                title="Worker"
                                                 />
                                     </mx:horizontalAxis>
                                     <mx:series>
@@ -187,7 +197,7 @@
         import mx.controls.Alert;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
-
+        import mx.charts.chartClasses.IAxis;
         import com.griddynamics.equestrian.entity.ApplicationEntity;
 
         private var runApplication:Boolean = false;
@@ -207,6 +217,11 @@
         public var dataTestInfoTable:ArrayCollection = new ArrayCollection();
         [Bindable]
         public var dataNodeInfoTable:ArrayCollection = new ArrayCollection();
+
+
+        private function linearAxis_labelFunc(item:Object, prevValue:Object, axis:IAxis):String {
+            return item + " ms";
+        }
 
         private function initApp():void {
             application.removeChild(main);
@@ -279,8 +294,8 @@
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
                     dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
-                    dataLineChart2.addItem({Workers:data[0], Ideal:String(1/data[1]),
-                        Total:String(1/data[2])});
+                    dataLineChart2.addItem({Workers:data[0], Ideal:String((1/data[1]) * 1000),
+                        Total:String((1/data[2]) * 1000)});
                 }
             }
         }
@@ -396,8 +411,8 @@
             isRunAppTimer.stop();
             dataNodeInfoTable = new ArrayCollection();
             if (!runApplication) {
-                    n = int(nMachines.value);
-                    equestrianService.deploy(nMachines.value as int);
+                n = int(nMachines.value);
+                equestrianService.deploy(nMachines.value as int);
             }
         }
 

@@ -1,18 +1,17 @@
 package com.griddynamics.terracotta.scheduler;
 
-import org.apache.log4j.Logger;
-import static org.junit.Assert.assertNotNull;
-
 import com.griddynamics.terracotta.parser.Aggregator;
-import com.griddynamics.terracotta.parser.separate.RemoveLogs;
+import com.griddynamics.terracotta.parser.separate.AveragePerformance;
 import com.griddynamics.terracotta.parser.separate.DownloadLog;
 import com.griddynamics.terracotta.parser.separate.ParseLogs;
-import com.griddynamics.terracotta.parser.separate.ParseLogs.AveragePerformance;
+import com.griddynamics.terracotta.parser.separate.RemoveLogs;
+import static com.griddynamics.terracotta.scheduler.Phase.*;
+import static com.griddynamics.terracotta.scheduler.Workers.ForEachLog;
+import static com.griddynamics.terracotta.scheduler.Workers.ForEachWorker;
 import static com.griddynamics.terracotta.util.StrUtil.encloseWithTag;
-import com.griddynamics.terracotta.scheduler.TimeMeter.Phase;
-import static com.griddynamics.terracotta.scheduler.TimeMeter.Phase.*;
 import commonj.work.Work;
-import static com.griddynamics.terracotta.scheduler.Workers.*;
+import org.apache.log4j.Logger;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author agorbunov @ 07.05.2009 18:12:31
@@ -25,13 +24,14 @@ public class Scheduler {
     private Workers workers;
     private Aggregator aggregator;
 
-    public Scheduler(String masterDir, String masterUrl, String workerDir) {
-        this.workers = new Workers(masterDir, timeMeter);
+    public Scheduler(String masterDir, String masterUrl, String workerDir, String countWorkers) {
+        this.workers = new Workers(masterDir, timeMeter, Integer.parseInt(countWorkers));
         this.masterUrl = masterUrl;
         this.workerDir = workerDir;
         assertNotNull(masterDir);
         assertNotNull(masterUrl);
         assertNotNull(workerDir);
+        assertNotNull(countWorkers);
     }
 
     public void findMaxTrafficWithSeveralWorkers() {
@@ -89,8 +89,8 @@ public class Scheduler {
     private void parse() {
         aggregator = new Aggregator();
         // TODO Schedule the task according to the number of workers, rather than the number of logs
-        workers.perform(new ForEachLog() {
-            public Work work(String log) {
+        workers.perform(new ForEachWorker() {
+            public Work work(/*String log*/) {
                 return ParseLogs.fromTo(workerDir, aggregator);
             }
             public Phase phase() {

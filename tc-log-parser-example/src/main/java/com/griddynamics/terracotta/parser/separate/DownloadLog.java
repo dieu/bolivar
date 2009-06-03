@@ -2,7 +2,6 @@ package com.griddynamics.terracotta.parser.separate;
 
 import commonj.work.Work;
 import com.griddynamics.terracotta.util.FileUtil;
-import static com.griddynamics.terracotta.parser.separate.Tracker.Phase.DOWNLOADING;
 
 /**
  * @author agorbunov @ 08.05.2009 15:10:15
@@ -39,7 +38,7 @@ public class DownloadLog implements Work {
     }
 
     private void startDownloading() {
-        phase.phase(DOWNLOADING);
+        phase.phase(Phase.DOWNLOADING);
         wget.startDownloading();
     }
 
