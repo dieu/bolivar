@@ -1,7 +1,6 @@
 package com.griddynamics.terracotta.scheduler;
 
 import com.griddynamics.terracotta.JobService;
-import com.griddynamics.terracotta.scheduler.Phase;
 import com.griddynamics.terracotta.util.FileUtil;
 import com.griddynamics.terracotta.util.ThreadUtil;
 import commonj.work.Work;
@@ -18,19 +17,8 @@ import java.util.List;
  * @author agorbunov @ 29.05.2009 17:00:07
  */
 public class Workers {
-    public static interface Measurement {
-        // No methods - a marker interface.
-    }
-    public static interface ForEachLog extends Measurement {
-        public Work work(String log);
-        public Phase phase();
-    }
-    public static interface ForEachWorker extends Measurement {
-        public Work work();
-        public Phase phase();
-    }
 
-//    public static class Count implements Work {
+    //    public static class Count implements Work {
 //        private Map<String, Boolean> machines;
 //        public Count(Map<String, Boolean> machines) {
 //            this.machines = machines;

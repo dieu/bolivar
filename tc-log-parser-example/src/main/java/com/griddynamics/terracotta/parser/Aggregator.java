@@ -16,9 +16,8 @@ import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 public class Aggregator {
     // Here we can see another Terracotta issue.
     // The classes below are actually private, but marked as public to allow Terracotta to instrument them.
-
-    private ConcurrentMap<String, Performance> workers = new ConcurrentStringMap<Performance>();
 //    private ConcurrentMap<String, Boolean> logIsParsed = new ConcurrentStringMap<Boolean>();
+    private ConcurrentMap<String, Performance> workers = new ConcurrentStringMap<Performance>();
     private Statistics parts = new Partial();
     private transient Map<String, Long> whole;
 
@@ -64,7 +63,7 @@ public class Aggregator {
         return new AveragePerformance(workers.values());
     }
 
-    public void countWorker() {
-        //To change body of created methods use File | Settings | File Templates.
-    }
+//    public void countWorker() {
+//        //To change body of created methods use File | Settings | File Templates.
+//    }
 }

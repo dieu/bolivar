@@ -26,6 +26,7 @@ import javax.xml.parsers.SAXParser;
  */
 public class ParserHostEC2 implements ParserHost{
     private List<String> workersIp;
+    Map<String, String> nodes;
     private String serverIp;
     private String schedulerIp;
     private String pathApp;
@@ -39,6 +40,7 @@ public class ParserHostEC2 implements ParserHost{
             pathApp = ApplicationPath.APPLICATION_PATH_NIX;
         }
         workersIp = new ArrayList<String>();
+        nodes = new HashMap<String, String>();
         serverIp = "";
         schedulerIp = "";
         n = 0;
@@ -67,12 +69,15 @@ public class ParserHostEC2 implements ParserHost{
                     if(inst.isRunning() && inst.getKeyName().equals(aws.getUserId())) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "starting");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getPrivateDnsName();
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                         if(inst.getImageId().equals(aws.getSchedulerImageId())) {
                             schedulerIp = inst.getPrivateDnsName();
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                     }
                 }
@@ -119,12 +124,6 @@ public class ParserHostEC2 implements ParserHost{
     }
 
     public Map<String,String> getNodeIp() {
-        Map<String, String> nodes = new HashMap<String, String>();
-        for(String node: workersIp) {
-            nodes.put(node.split("[.]")[0], "starting");
-        }
-        nodes.put(serverIp.split("[.]")[0], "running");
-        nodes.put(schedulerIp.split("[.]")[0], "running");
         return nodes;
     }
 
@@ -193,11 +192,6 @@ public class ParserHostEC2 implements ParserHost{
                     "  # upload jars\n" +
                     "  JARS.each { |jar| scp(File.join(EXAMPLE_DIR, \"target\", jar), jar) }\n" +
                     "  scp(File.join(MISC, DSO_BOOT), DSO_BOOT)\n" +
-                    "\n" +
-                    "  # upload and unpack terracotta\n" +
-                    "  tc_tar = TC_DIR + \".tar.gz\"\n" +
-                    "  scp(File.join(MISC, tc_tar), tc_tar)\n" +
-                    "  run \"cd #{TARGET_DIR} && tar xzf #{tc_tar}\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_workers, :roles => :workers do\n" +

@@ -1,6 +1,7 @@
 package com.griddynamics.terracotta;
 
 import com.griddynamics.terracotta.scheduler.Scheduler;
+import com.griddynamics.terracotta.scheduler.Worker;
 import org.terracotta.workmanager.dynamic.DynamicWorker;
 import org.terracotta.workmanager.dynamic.DynamicWorkerFactory;
 
@@ -19,6 +20,7 @@ public class JobService {
         DynamicWorkerFactory dynamicWorkerFactory = new DynamicWorkerFactory(topologyName, null, Executors.newScheduledThreadPool(1));
         DynamicWorker worker = dynamicWorkerFactory.create();
         worker.start();
+        new Worker().run();
     }
 
     /**
