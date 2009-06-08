@@ -1,9 +1,13 @@
 package com.griddynamics.terracotta.worker.factory;
 
-import com.griddynamics.terracotta.helpers.*;
+import com.griddynamics.terracotta.helpers.MyCountdownLatch;
+import com.griddynamics.terracotta.helpers.ParseContext;
+import com.griddynamics.terracotta.helpers.TimeMetr;
+import com.griddynamics.terracotta.helpers.TypeMeasurement;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author: apanasenko aka dieu
@@ -16,7 +20,7 @@ public class TestNotify implements Runnable{
     public static String localDir;
     public static long startTime;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
-    private static final List<TimeMetr> timeMetrList = new ArrayList<TimeMetr>();
+    private static final List<TimeMetr> timeMetrList = Collections.synchronizedList(new ArrayList<TimeMetr>());
 
 
     public void run() {
