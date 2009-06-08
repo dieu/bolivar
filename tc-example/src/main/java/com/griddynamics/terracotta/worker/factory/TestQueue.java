@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Date: 04.06.2009
  * Time: 13:16:29
  */
-public class TestQueue implements Runnable{
+public class TestQueue implements Runnable {
     private static MyCountdownLatch cdl;
     private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
     private static String localDir;

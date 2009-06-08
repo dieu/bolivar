@@ -21,9 +21,9 @@ public class Worker implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(typeOfWork.equals("parsing")) {
+        if (typeOfWork.equals("parsing")) {
             PhaseFactory.startLogParsing();
-        } else if(typeOfWork.equals("test")) {
+        } else if (typeOfWork.equals("test")) {
             PhaseFactory.startTestPerformance();
         }
     }

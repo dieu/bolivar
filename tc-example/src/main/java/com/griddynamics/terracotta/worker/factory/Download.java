@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Date: 04.06.2009
  * Time: 13:16:29
  */
-public class Download implements Runnable{
+public class Download implements Runnable {
     private static MyCountdownLatch cdl;
     private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
     private static String localDir;

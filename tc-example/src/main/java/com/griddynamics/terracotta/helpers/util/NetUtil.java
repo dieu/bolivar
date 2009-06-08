@@ -1,6 +1,7 @@
 package com.griddynamics.terracotta.helpers.util;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @author agorbunov @ 27.05.2009 14:48:13
@@ -21,13 +22,13 @@ public class NetUtil {
 
     private static String hostAndIp() {
         try {
-            return address();
-        } catch (Exception e) {
+            return localAddress();
+        } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static String address() throws Exception {
+    private static String localAddress() throws UnknownHostException {
         return InetAddress.getLocalHost().toString();
     }
 

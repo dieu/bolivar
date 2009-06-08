@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Date: 03.06.2009
  * Time: 15:33:19
  */
-public class TestNotify implements Runnable{
+public class TestNotify implements Runnable {
     public static final ParseContext parseContext = new ParseContext();
     public static MyCountdownLatch cdl;
     public static String localDir;

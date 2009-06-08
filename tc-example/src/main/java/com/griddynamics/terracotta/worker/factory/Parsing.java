@@ -9,7 +9,7 @@ import com.griddynamics.terracotta.helpers.ParseContext;
  * Date: 03.06.2009
  * Time: 15:33:19
  */
-public class Parsing implements Runnable{
+public class Parsing implements Runnable {
     public static final ParseContext parseContext = new ParseContext();
     public static MyCountdownLatch cdl;
     public static String localDir;
