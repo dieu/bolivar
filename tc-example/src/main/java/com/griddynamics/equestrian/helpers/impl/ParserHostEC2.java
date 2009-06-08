@@ -26,7 +26,7 @@ import javax.xml.parsers.SAXParser;
  */
 public class ParserHostEC2 implements ParserHost{
     private List<String> workersIp;
-    Map<String, String> nodes;
+    private Map<String, String> nodes;
     private String serverIp;
     private String schedulerIp;
     private String pathApp;
@@ -49,15 +49,7 @@ public class ParserHostEC2 implements ParserHost{
     public void setAws(AmazonKeys aws) {
         this.aws = aws;
     }
-
-    public static void main(String [] args) throws Exception {
-        ParserHostEC2 s = new ParserHostEC2();
-        s.setAws(new AmazonKeys());
-        s.parse(30);
-        return;
-    }
-
-
+    
     public int parse(int n) throws Exception {
         this.n = n;
         nodes.clear();
@@ -69,15 +61,15 @@ public class ParserHostEC2 implements ParserHost{
                 for (ReservationDescription.Instance inst : res.getInstances()) {
                     if(inst.isRunning() && inst.getKeyName().equals(aws.getUserId())) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
-                            workersIp.add(inst.getPrivateDnsName());
+                            workersIp.add(inst.getDnsName());
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "starting");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
-                            serverIp = inst.getPrivateDnsName();
+                            serverIp = inst.getDnsName();
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                         if(inst.getImageId().equals(aws.getSchedulerImageId())) {
-                            schedulerIp = inst.getPrivateDnsName();
+                            schedulerIp = inst.getDnsName();
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                     }
@@ -146,7 +138,7 @@ public class ParserHostEC2 implements ParserHost{
                     "set :user, 'agorbunov'\n" +
                     "set :password, '123456'\n" +
                     "\n" +
-                    "EXAMPLE_DIR = \"tc-log-parser-example\"\n" +
+                    "EXAMPLE_DIR = \"tc-example\"\n" +
                     "TARGET_DIR = \"bolivar\"\n" +
                     "NODE = \"node-unit.jar\"\n" +
                     "SCHEDULER = \"scheduler-unit.jar\"\n" +
@@ -167,7 +159,7 @@ public class ParserHostEC2 implements ParserHost{
                     "\n" +
                     "desc \"Build the project from sources\"\n" +
                     "task :build do\n" +
-                    "  system(\"cd tc-log-parser-example && mvn clean package && mvn package -P Worker\")\n" +
+                    "  system(\"cd tc-example && mvn clean package && mvn package -P Worker -P Run\")\n" +
                     "end\n" +
                     "\n" +
                     "desc \"Uploads tc-config.xml to all nodes\"\n" +
@@ -196,7 +188,7 @@ public class ParserHostEC2 implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_workers, :roles => :workers do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=test -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +

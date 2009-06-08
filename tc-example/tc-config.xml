@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tc:tc-config xmlns:tc="http://www.terracotta.org/config"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-4.xsd">
+
+    <servers>
+        <server host="%i" name="org.terracotta.modules.sample-hostname">
+            <dso>
+                <persistence>
+                    <mode>permanent-store</mode>
+                </persistence>
+            </dso>
+        </server>
+        <update-check>
+            <enabled>true</enabled>
+        </update-check>
+    </servers>
+
+    <system>
+        <configuration-model>development</configuration-model>
+    </system>
+
+    <clients>
+        <modules>
+            <module name="tim-masterworker" version="1.4.1"/>
+            <module name="tim-synchronizedcollection" version="2.4.1"/>
+            <module name="tim-concurrent-collections" version="1.1.1"/>
+        </modules>
+        <logs>%(user.home)/terracotta/client-logs/org.terracotta.modules.sample/%D</logs>
+    </clients>
+
+
+    <application>
+        <dso>
+            <instrumented-classes>
+                <include>
+                    <class-expression>com.griddynamics.terracotta.helpers..*</class-expression>
+                    <honor-transient>true</honor-transient>
+                </include>
+            </instrumented-classes>
+
+            <locks>
+                <autolock>
+                    <method-expression>
+                        * com.griddynamics.terracotta.helpers.Aggregator..*(..)
+                    </method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>
+                        * com.griddynamics.terracotta.helpers.ParseContext..*(..)
+                    </method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.scheduler.Scheduler.parsing(..)</method-expression>
+                    <lock-level>write</lock-level>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.countDown(..)</method-expression>
+                    <lock-level>write</lock-level>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.await(..)</method-expression>
+                    <lock-level>write</lock-level>
+                </autolock>
+            </locks>
+            <roots>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Parsing.parseContext</field-name>
+                    <root-name>parseContext</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.parseContext</field-name>
+                    <root-name>parseContext</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.parseContext</field-name>
+                    <root-name>parseContext</root-name>
+                </root>
+
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Parsing.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Download.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Parsing.localDir</field-name>
+                    <root-name>localDir</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Download.localDir</field-name>
+                    <root-name>localDir</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.localDir</field-name>
+                    <root-name>localDir</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.localDir</field-name>
+                    <root-name>localDir</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.localDir</field-name>
+                    <root-name>localDir</root-name>
+                </root>
+
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.Download.queue</field-name>
+                    <root-name>queue</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.queue</field-name>
+                    <root-name>queue</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.queue</field-name>
+                    <root-name>queue</root-name>
+                </root>
+
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.timeMetrList</field-name>
+                    <root-name>timeMetrList</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.timeMetrList</field-name>
+                    <root-name>timeMetrList</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.timeMetrList</field-name>
+                    <root-name>timeMetrList</root-name>
+                </root>
+
+                 <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.startTime</field-name>
+                    <root-name>startTime</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.startTime</field-name>
+                    <root-name>startTime</root-name>
+                </root>
+            </roots>
+        </dso>
+    </application>
+</tc:tc-config>

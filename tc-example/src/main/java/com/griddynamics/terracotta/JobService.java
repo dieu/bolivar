@@ -1,26 +1,19 @@
 package com.griddynamics.terracotta;
 
+import com.griddynamics.terracotta.worker.factory.Parsing;
+import com.griddynamics.terracotta.worker.Worker;
 import com.griddynamics.terracotta.scheduler.Scheduler;
-import com.griddynamics.terracotta.scheduler.Worker;
-import org.terracotta.workmanager.dynamic.DynamicWorker;
-import org.terracotta.workmanager.dynamic.DynamicWorkerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
 
 public class JobService {
-    public static final String topologyName = "parserTopology";
-
     /**
      * Starts the worker.
      *
      * @throws Exception - rethrown worker.start() exception.
      */
-    public void startWorker() throws Exception {
-        DynamicWorkerFactory dynamicWorkerFactory = new DynamicWorkerFactory(topologyName, null, Executors.newScheduledThreadPool(1));
-        DynamicWorker worker = dynamicWorkerFactory.create();
-        worker.start();
-        new Worker().run();
+    public void startWorker(String typeOfWork) throws Exception {
+        new Worker(typeOfWork).run();
     }
 
     /**
@@ -32,6 +25,6 @@ public class JobService {
      * @throws IOException          - checkDirectory()'s exception. Thrown when directory doesn't exists or provided location is not a directory
      */
     public void lunchJob(String dir, String dirUrl, String localDir, String countWorkers) throws InterruptedException, IOException {
-        new Scheduler(dir, dirUrl, localDir, countWorkers).findMaxTrafficWithSeveralWorkers();
+        new Scheduler(countWorkers, dir, dirUrl, localDir).start();
     }
 }

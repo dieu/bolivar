@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
  */
-public class ParseLogs implements Work {
+public class ParseLogs /*implements Work*/ {
     private static Logger logger = Logger.getLogger(ParseLogs.class);
     private Map<String, Long> trafficByIp = new HashMap<String, Long>();
     private Performance performance = new Performance();
@@ -22,9 +22,9 @@ public class ParseLogs implements Work {
     private String dir;
     private File[] logs;
 
-    public static Work fromTo(String dir, Aggregator aggregator) {
-        return new Trackable(ParseLogs.class, dir, aggregator);
-    }
+//    public static Work fromTo(String dir, Aggregator aggregator) {
+//        return new Trackable(ParseLogs.class, dir, aggregator);
+//    }
 
     /* Instead of this constructor, call ParseLogs.inUsing(dir, aggregator).
      * The constructor is private, but marked as public to suit Terracotta. */
