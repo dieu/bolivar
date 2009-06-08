@@ -28,15 +28,16 @@ public class StartApplicationImpl {
     private String outScheduler = "";
     private String outWorkers = "";
     private String infoNodes = "";
-    private String files = "";
     private int nWorkers = 0;
     private int minute = 0;
     private boolean isRunScheduler = false;
     private boolean isRunUpload = false;
+    private boolean isRunBuild = false;
     private Process server;
     private Process workers;
     private Process scheduler;
     private Process upload;
+    private Process build;
     private String regAll = "[a-zA-Z\\d\\s\\S]*";
     private String regTime = "\\s*<to>\\d+</to>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
@@ -74,8 +75,6 @@ public class StartApplicationImpl {
     }
 
     public void deploy() throws Exception {
-        Runtime.getRuntime().exec(buildCommand, null, dir);
-        Thread.sleep(10000L);
         parserHost.clear();
         nWorkers = parserHost.parse(Integer.MAX_VALUE);
         upload = Runtime.getRuntime().exec(uploadCommand, null, dir);
@@ -132,6 +131,18 @@ public class StartApplicationImpl {
         }
     }
 
+    public void clear() {
+        outScheduler = "";
+        outWorkers = "";
+        infoNodes = "";
+        nWorkers = 0;
+        minute = 0;
+        isRunScheduler = false;
+        isRunUpload = false;
+        isRunBuild = false;
+        date = null;
+    }
+
     private String getData(Process process, int id) {
         StringBuilder out = new StringBuilder("");
         if(process != null) {
@@ -165,6 +176,10 @@ public class StartApplicationImpl {
                     case 3:
                         workers.destroy();
                         break;
+                    case 4:
+                        isRunBuild = false;
+                        build.destroy();
+                        break;
                     default: break;
                 }
             }
@@ -177,6 +192,9 @@ public class StartApplicationImpl {
                     isRunUpload = false;
                     break;
                 case 3:
+                    break;
+                case 4:
+                    isRunBuild = false;
                     break;
                 default: break;
             }
@@ -211,7 +229,7 @@ public class StartApplicationImpl {
             String dir  = ApplicationPath.APPLICATION_PATH_NIX + "remote-logs/"
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
-            this.files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
+            String files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
             try {
                 schedulerLogs =  new FileWriter(files + "scheduler.txt");
                 workersLogs = new FileWriter(files + "workers.txt");
