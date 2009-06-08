@@ -17,7 +17,7 @@ public class PhaseFactory {
     }
 
     public static void startTestPerformance() {
-        new TestQueue().run();
-        new TestNotify().run();
+        new Thread(new TestQueue()).start();
+        new Thread(new TestNotify()).start();
     }
 }

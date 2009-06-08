@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: apanasenko aka dieu
@@ -29,7 +30,7 @@ public class Scheduler {
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
-    private static final List<TimeMetr> timeMetrList = Collections.synchronizedList(new ArrayList<TimeMetr>());
+    private static final LinkedBlockingQueue<TimeMetr> timeMetrList = new LinkedBlockingQueue<TimeMetr>();
     private static final ParseContext parseContext = new ParseContext();
 
     public Scheduler(String numnerOfWorker, String masterDir, String localDir, String httpUrl) {
@@ -86,18 +87,24 @@ public class Scheduler {
     private void report() {
         String ip = aggregator.ipWithMaxTraffic();
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getTraffic() + "</traf> ");
-        synchronized (timeMetrList) {
-            for(TimeMetr timeMetr: timeMetrList) {
-                if(timeMetr.getTypeMeasurement() == TypeMeasurement.QUEUE)
+        try {
+            TimeMetr timeMetr = timeMetrList.poll(30, TimeUnit.SECONDS);
+            for(;timeMetr != null;) {
+                if(timeMetr.getTypeMeasurement() == TypeMeasurement.QUEUE) {
                     logger.info("Put: " + (timeMetr.getPutQueue() - startMeasurementQueue)
                             + " Peek: " + (timeMetr.getPeekQueue() - startMeasurementQueue)
                             + " CDL: " + (timeMetr.getCountDown() - startMeasurementQueue)
                             + " ");
+                }
+                timeMetr = timeMetrList.poll(30, TimeUnit.SECONDS);
             }
-            logger.info(" T: " + (endMeasurementQueue - startMeasurementQueue)
-                    + " W:  " + numnerOfWorker
-                    + " ");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        logger.info(" T: " + (endMeasurementQueue - startMeasurementQueue)
+                + " W:  " + numnerOfWorker
+                + " CDL: " + cdl.getCount());
+
 //        AveragePerformance ap = aggregator.averagePerformance();
 //        logger.info("Parsing performance:");
 //        logger.info("Parsed: " + encloseWithTag(ap.parsed(), "op"));
