@@ -35,8 +35,8 @@ public class TestNotify implements Runnable{
                 endNotify = System.currentTimeMillis();
             }
             TimeMetr timeMetr = new TimeMetr(TypeMeasurement.NOTIFY);
-            timeMetr.setStartMeasurement(startTime);
-            timeMetr.setEndMeasurement(endNotify);
+            timeMetr.setPutQueue(startTime);
+            timeMetr.setPeekQueue(endNotify);
             synchronized (timeMetrList) {
                 timeMetrList.add(timeMetr);
             }

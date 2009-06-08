@@ -6,38 +6,37 @@ package com.griddynamics.terracotta.helpers;
  *         Time: 13:03:18
  */
 public class TimeMetr {
-    private long startMeasurement;
-    private long endMeasurement;
-    private long resultMeasurement;
+    private long PutQueue;
+    private long PeekQueue;
+    private long countDown;
     private TypeMeasurement typeMeasurement;
 
     public TimeMetr(TypeMeasurement typeMeasurement) {
         this.typeMeasurement = typeMeasurement;
     }
 
-    public long getStartMeasurement() {
-        return startMeasurement;
+    public long getPutQueue() {
+        return PutQueue;
     }
 
-    public void setStartMeasurement(long startMeasurement) {
-        this.startMeasurement = startMeasurement;
+    public void setPutQueue(long putQueue) {
+        PutQueue = putQueue;
     }
 
-    public long getEndMeasurement() {
-        return endMeasurement;
+    public long getPeekQueue() {
+        return PeekQueue;
     }
 
-    public void setEndMeasurement(long endMeasurement) {
-        this.endMeasurement = endMeasurement;
-        this.resultMeasurement = this.endMeasurement - this.startMeasurement;
+    public void setPeekQueue(long peekQueue) {
+        PeekQueue = peekQueue;
     }
 
-    public long getResultMeasurement() {
-        return resultMeasurement;
+    public long getCountDown() {
+        return countDown;
     }
 
-    public void setResultMeasurement(long resultMeasurement) {
-        this.resultMeasurement = resultMeasurement;
+    public void setCountDown(long countDown) {
+        this.countDown = countDown;
     }
 
     public TypeMeasurement getTypeMeasurement() {

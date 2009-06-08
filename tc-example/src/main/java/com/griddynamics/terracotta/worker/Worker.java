@@ -15,12 +15,7 @@ public class Worker implements Runnable {
         this.typeOfWork = typeOfWork;
     }
 
-    public void run() {
-        try {
-            Thread.sleep(30000L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void run() {   
         if(typeOfWork.equals("parsing")) {
             PhaseFactory.startLogParsing();
         } else if(typeOfWork.equals("test")) {

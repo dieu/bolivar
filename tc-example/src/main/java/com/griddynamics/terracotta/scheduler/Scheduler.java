@@ -19,11 +19,13 @@ public class Scheduler {
     private int numnerOfWorker;
     private String masterDir;
     private String httpUrl;
+    private long startMeasurementQueue;
+    private long endMeasurementQueue;
     private Aggregator aggregator;
     private static Logger logger = Logger.getLogger(Scheduler.class);
     private static String localDir;
     private static long startTime;
-    private static MyCountdownLatch cdl;    
+    private static MyCountdownLatch cdl;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
@@ -46,17 +48,14 @@ public class Scheduler {
     private void dowload() throws InterruptedException {
         String[] logs = logs();
         cdl = new MyCountdownLatch(logs.length);
+        startMeasurementQueue = System.currentTimeMillis();
         for(String log: logs) {
-            TimeMetr timeMetr = new TimeMetr(TypeMeasurement.PUTQUEUE);
-            timeMetr.setStartMeasurement(System.currentTimeMillis());
+            TimeMetr timeMetr = new TimeMetr(TypeMeasurement.QUEUE);
+            timeMetr.setPutQueue(System.currentTimeMillis());
             queue.put(timeMetr);
-//            queue.put(new TaskDowloading(fileToUrl(log), localDir));
-//            timeMetr.setEndMeasurement(System.currentTimeMillis());
-//            synchronized (timeMetrList) {
-//                timeMetrList.add(timeMetr);
-//            }
         }
         cdl.await();
+        endMeasurementQueue = System.currentTimeMillis();
     }
 
     private void parsing(int numberOfWorker) {
@@ -89,10 +88,15 @@ public class Scheduler {
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getTraffic() + "</traf> ");
         synchronized (timeMetrList) {
             for(TimeMetr timeMetr: timeMetrList) {
-                logger.info("R: " + timeMetr.getResultMeasurement()
-                        + " T: "
-                        + timeMetr.getTypeMeasurement());
+                if(timeMetr.getTypeMeasurement() == TypeMeasurement.QUEUE)
+                    logger.info("Put: " + (timeMetr.getPutQueue() - startMeasurementQueue)
+                            + " Peek: " + (timeMetr.getPeekQueue() - startMeasurementQueue)
+                            + " CDL: " + (timeMetr.getCountDown() - startMeasurementQueue)
+                            + " ");
             }
+            logger.info(" T: " + (endMeasurementQueue - startMeasurementQueue)
+                    + " W:  " + numnerOfWorker
+                    + " ");
         }
 //        AveragePerformance ap = aggregator.averagePerformance();
 //        logger.info("Parsing performance:");

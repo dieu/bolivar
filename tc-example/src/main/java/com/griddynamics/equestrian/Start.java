@@ -42,6 +42,7 @@ public class Start {
         for(int i = min; i <= max; i += step) {
             application.start(i);
             application.verify();
+            application.clear();
         }
         System.exit(0);
     }

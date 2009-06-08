@@ -159,7 +159,7 @@ public class ParserHostEC2 implements ParserHost{
                     "\n" +
                     "desc \"Build the project from sources\"\n" +
                     "task :build do\n" +
-                    "  system(\"cd tc-example && mvn clean package && mvn package -P Worker \")\n" +
+                    "  system(\"cd tc-example && mvn clean package && mvn package -P Worker && mvn package -P Run \")\n" +
                     "end\n" +
                     "\n" +
                     "desc \"Uploads tc-config.xml to all nodes\"\n" +

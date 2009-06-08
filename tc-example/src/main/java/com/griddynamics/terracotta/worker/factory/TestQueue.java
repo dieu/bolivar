@@ -9,12 +9,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author: apanasenko aka dieu
  * Date: 04.06.2009
  * Time: 13:16:29
  */
 public class TestQueue implements Runnable{
+    private Logger logger = Logger.getLogger(TestQueue.class);
     private static MyCountdownLatch cdl;
     private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
     private static String localDir;
@@ -28,18 +31,17 @@ public class TestQueue implements Runnable{
     private void runDownload() {
         try {
             while(true) {
-//
-//                timeMetr.setStartMeasurement(System.currentTimeMillis());
                 TimeMetr task = queue.take();
                 long end = System.currentTimeMillis();
-                TimeMetr timeMetr = new TimeMetr(TypeMeasurement.TAKEQUEUE);
-                timeMetr.setStartMeasurement(task.getStartMeasurement());
-                timeMetr.setEndMeasurement(end);
-//                timeMetr.setEndMeasurement(System.currentTimeMillis());
+                TimeMetr timeMetr = new TimeMetr(TypeMeasurement.QUEUE);
+                timeMetr.setPutQueue(task.getPutQueue());
+                timeMetr.setPeekQueue(end);
+                cdl.countDown();
+                timeMetr.setCountDown(System.currentTimeMillis());
+                logger.info("end job");
                 synchronized (timeMetrList) {
                     timeMetrList.add(timeMetr);
                 }
-                cdl.countDown();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

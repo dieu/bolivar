@@ -6,7 +6,6 @@ package com.griddynamics.terracotta.helpers;
  *         Time: 13:05:23
  */
 public enum TypeMeasurement {
-    PUTQUEUE,
-    TAKEQUEUE,
+    QUEUE,
     NOTIFY,
 }
