@@ -92,7 +92,7 @@ public class Scheduler {
             for(;timeMetr != null;) {
                 if(timeMetr.getTypeMeasurement() == TypeMeasurement.QUEUE) {
                     logger.info("Put: " + (timeMetr.getPutQueue() - startMeasurementQueue)
-                            + " Peek: " + (timeMetr.getPeekQueue() - startMeasurementQueue)
+                            + " Peek: " + timeMetr.getPeekQueue()
                             + " CDL: " + (timeMetr.getCountDown() - startMeasurementQueue)
                             + " ");
                 }
