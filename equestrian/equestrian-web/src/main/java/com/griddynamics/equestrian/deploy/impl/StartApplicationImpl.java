@@ -38,10 +38,13 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private String regAll = "[a-zA-Z\\d\\s\\S]*";
     private String regTime = "\\s*<to>\\d+</to>\\s*";
     private Pattern patTime = Pattern.compile(regAll + regTime + regAll);
+    private Pattern error = Pattern.compile(regAll + "WARN - Can't connect to server" + regAll);
     private ParserHost parserHost;
     private Application application;
     private Date date = null;
     private File dir;
+    private FileWriter schedulerLogs;
+    private FileWriter workersLogs;
     private Map<String, String> nodes;
 
     public StartApplicationImpl() {
@@ -81,12 +84,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             date = Calendar.getInstance().getTime();
             minute = Calendar.getInstance().get(Calendar.MINUTE);
             init(nWorkers, minute);
-            upload = Runtime.getRuntime().exec(uploadCommand, null, dir);
-            isRunUpload = true;
-            while(isRunUpload) {
-                getData(upload, 2);
-                Thread.sleep(1000L);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -106,9 +103,9 @@ public class StartApplicationImpl implements StartApplication<Application> {
             Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
             server = Runtime.getRuntime().exec(runServerCommand, null, dir);
-            Thread.sleep(1000L);
+            Thread.sleep(5000L);
             workers = Runtime.getRuntime().exec(runWorkersCommand, null, dir);
-            Thread.sleep(1000L);
+            Thread.sleep(10000L);
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
@@ -162,21 +159,22 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
             if(!outScheduler.equals("") && separator.equals("/")) {
                 try {
-                    FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
-                    schedulerLogs.write(outScheduler);
                     schedulerLogs.close();
-                    FileWriter workersLogs = new FileWriter(files + "workers.txt");
-                    workersLogs.write(outWorkers);
                     workersLogs.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+            for(String key: nodes.keySet()) {
+                nodes.put(key, "stop");
+            }
+            infoNodes = nodes.toString().replace("{", "").replace("}", "");
             outScheduler = "";
             outWorkers = "";
             infoNodes = "";
             date = null;
             minute = 0;
+            application.setNodeIp(infoNodes);
             application.setSchedulerStatus(false);
         } else {
             application.setApplicationStatus("Wait...");
@@ -191,11 +189,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public void stop() {
         if(separator.equals("/")) {
             try {
-                FileWriter schedulerLogs = new FileWriter(files + "scheduler.txt");
-                schedulerLogs.write(outScheduler);
                 schedulerLogs.close();
-                FileWriter workersLogs = new FileWriter(files + "workers.txt");
-                workersLogs.write(outWorkers);
                 workersLogs.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -285,6 +279,12 @@ public class StartApplicationImpl implements StartApplication<Application> {
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
             this.files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
+            try {
+                schedulerLogs =  new FileWriter(files + "scheduler.txt");
+                workersLogs = new FileWriter(files + "workers.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             new File(dir).mkdirs();
         }
 
@@ -293,11 +293,20 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private class ReadSchedulerOut extends Thread {
         public void run() {
             while (isRunScheduler) {
-                outScheduler += getData(scheduler, 1);
+                String temp = getData(scheduler, 1);
+                outScheduler += temp;
                 try {
+                    if(temp != null) {
+                        schedulerLogs.write(temp);
+                        schedulerLogs.flush();
+                    }
                     sleep(1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+
                 }
             }
         }
@@ -306,55 +315,59 @@ public class StartApplicationImpl implements StartApplication<Application> {
     private class ReadWorkersOut extends Thread {
         public void run() {
             while (isRunScheduler) {
-                outWorkers += getData(workers, 3);
-                String[] split = outWorkers.split(" ");
+                String temp = getData(workers, 3);
+                //WARN - Can't connect to server
+                if(error.matcher(temp).matches()) {
+                    if(server != null) {
+                        server.destroy();
+                    }
+                    try {
+                        server = Runtime.getRuntime().exec(runServerCommand, null, dir);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                outWorkers += temp;
+                String[] split = temp.split(" ");
                 for(String word: split) {
                     if(word.startsWith("<rem>")) {
                         String tag = word.replace("<rem>","")
-                                .replace("</rem>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</rem>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "removing");
                         }
                     }
                     if(word.startsWith("<dow>")) {
                         String tag = word.replace("<dow>","")
-                                .replace("</dow>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</dow>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
-                            nodes.put(word.replace("<dow>","")
-                                    .replace("</dow>","").replace("\r","").replace("\n", "")
-                                    + ".compute-1.internal", "dowloading");
+                            nodes.put(tag, "dowloading");
                         }
                     }
                     if(word.startsWith("<par>")) {
                         String tag = word.replace("<par>","")
-                                .replace("</par>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</par>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "parsing");
                         }
                     }
                     if(word.startsWith("<ret>")) {
                         String tag = word.replace("<ret>","")
-                                .replace("</ret>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</ret>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "returning");
                         }
                     }
                     if(word.startsWith("<fin>")) {
                         String tag = word.replace("<fin>","")
-                                .replace("</fin>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</fin>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "finished");
                         }
                     }
                     if(word.startsWith("<err>")) {
                         String tag = word.replace("<err>","")
-                                .replace("</err>","").replace("\r","").replace("\n", "")
-                                + ".compute-1.internal";
+                                .replace("</err>","").replace("\r","").replace("\n", "");
                         if(nodes.containsKey(tag)) {
                             nodes.put(tag, "error");
                         }
@@ -362,9 +375,17 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 }
                 infoNodes = nodes.toString().replace("{", "").replace("}", "");
                 try {
+                    if(temp != null) {
+                        workersLogs.write(temp);
+                        workersLogs.flush();
+                    }
                     sleep(1000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+
                 }
             }
         }

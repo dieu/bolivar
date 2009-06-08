@@ -1,17 +1,14 @@
 package com.griddynamics.terracotta;
 
-import org.apache.log4j.Logger;
+import com.griddynamics.terracotta.scheduler.Scheduler;
 import org.terracotta.workmanager.dynamic.DynamicWorker;
 import org.terracotta.workmanager.dynamic.DynamicWorkerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
 
-import com.griddynamics.terracotta.scheduler.Scheduler;
-
 public class JobService {
     public static final String topologyName = "parserTopology";
-    private static final Logger logger = Logger.getLogger(JobService.class);
 
     /**
      * Starts the worker.
@@ -32,7 +29,7 @@ public class JobService {
      * @throws InterruptedException - workManager.waitForAll()'s exception.
      * @throws IOException          - checkDirectory()'s exception. Thrown when directory doesn't exists or provided location is not a directory
      */
-    public void lunchJob(String dir, String dirUrl, String localDir) throws InterruptedException, IOException {
-        new Scheduler(dir, dirUrl, localDir).findMaxTrafficWithSeveralWorkers();
+    public void lunchJob(String dir, String dirUrl, String localDir, String countWorkers) throws InterruptedException, IOException {
+        new Scheduler(dir, dirUrl, localDir, countWorkers).findMaxTrafficWithSeveralWorkers();
     }
 }

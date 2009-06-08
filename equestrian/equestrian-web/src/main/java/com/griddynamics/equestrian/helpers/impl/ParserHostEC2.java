@@ -51,7 +51,7 @@ public class ParserHostEC2 implements ParserHost{
     public static void main(String [] args) throws Exception {
         ParserHostEC2 s = new ParserHostEC2();
         s.setAws(new AmazonKeys());
-        s.parse(2);
+        s.parse(30);
         return;
     }
 
@@ -121,10 +121,10 @@ public class ParserHostEC2 implements ParserHost{
     public Map<String,String> getNodeIp() {
         Map<String, String> nodes = new HashMap<String, String>();
         for(String node: workersIp) {
-            nodes.put(node, "starting");
+            nodes.put(node.split("[.]")[0], "starting");
         }
-        nodes.put(serverIp, "running");
-        nodes.put(schedulerIp, "running");
+        nodes.put(serverIp.split("[.]")[0], "running");
+        nodes.put(schedulerIp.split("[.]")[0], "running");
         return nodes;
     }
 
@@ -132,6 +132,7 @@ public class ParserHostEC2 implements ParserHost{
         if(!serverIp.equals("") && !schedulerIp.equals("") && workersIp.size() != 0) {
             StringBuilder contentFile = new StringBuilder("");
             contentFile.append("SERVER_ADDR = \"" + serverIp + "\" \n");
+            contentFile.append("COUNT_WORKERS = \"" + workersIp.size() + "\" \n");
             contentFile.append("JAVA_HOME = \"/usr/lib/jvm/java-6-sun\" \n\n");
             contentFile.append("role :workers, ");
             for(String ip: workersIp) {
@@ -204,7 +205,7 @@ public class ParserHostEC2 implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -DcountWorkers=#{COUNT_WORKERS} -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_server, :roles => :server do\n" +

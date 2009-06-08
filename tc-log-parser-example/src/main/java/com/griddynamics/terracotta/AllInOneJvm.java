@@ -15,6 +15,7 @@ public class AllInOneJvm {
         jobService.startWorker();
         jobService.startWorker();
         jobService.startWorker();
-        jobService.lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"), System.getProperty("downloadedDir"));
+        jobService.lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"),
+                System.getProperty("downloadedDir"), System.getProperty("countWorkers"));
     }
 }

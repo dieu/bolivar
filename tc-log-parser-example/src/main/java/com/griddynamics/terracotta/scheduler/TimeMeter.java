@@ -12,23 +12,6 @@ import com.griddynamics.terracotta.util.StrUtil;
  * @author agorbunov @ 20.05.2009 14:15:22
  */
 public class TimeMeter {
-    public enum Phase {
-        COUNTING,
-        REMOVING,
-        DOWNLOADING,
-        PARSING,
-        AGGREGATING;
-        public String toString() {
-            return nameInLowerCase();
-        }
-        public String shortName() {
-            return nameInLowerCase().substring(0, 2);
-        }
-        private String nameInLowerCase() {
-            return name().toLowerCase();
-        }
-    }
-
     private static final Logger logger = Logger.getLogger(TimeMeter.class);
     private Map<Phase, Long> phaseDuration = new HashMap<Phase, Long>();
     private boolean isMeasuring;
@@ -100,7 +83,7 @@ public class TimeMeter {
     }
 
     private Long total() {
-        return sum(Phase.DOWNLOADING, Phase.PARSING, Phase.AGGREGATING);
+        return sum(Phase.PARSING, Phase.AGGREGATING);
     }
 
     private Long sum(Phase... phases) {

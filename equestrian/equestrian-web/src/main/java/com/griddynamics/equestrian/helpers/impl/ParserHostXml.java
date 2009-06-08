@@ -83,10 +83,10 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     public Map<String,String> getNodeIp() {
         Map<String, String> nodes = new HashMap<String, String>();
         for(String node: workersIp) {
-            nodes.put(node, "starting");
+            nodes.put(node.split("[.]")[0], "starting");
         }
-        nodes.put(serverIp, "running");
-        nodes.put(schedulerIp, "running");
+        nodes.put(serverIp.split("[.]")[0], "running");
+        nodes.put(schedulerIp.split("[.]")[0], "running");
         return nodes;
     }
 

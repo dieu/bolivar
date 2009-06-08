@@ -10,19 +10,6 @@ import com.griddynamics.terracotta.util.NetUtil;
 // TODO Measure the duration of each phase
 // TODO Merge with SchedulerMeter, and extract common steps to a superclass
 public class Tracker {
-    public static enum Phase {
-        REMOVING("rem"),
-        DOWNLOADING("dow"),
-        PARSING("par"),
-        RETURNING("ret"),
-        DONE("fin"),
-        ERROR("err");
-        public final String tag;
-        Phase(String tag) {
-            this.tag = tag;
-        }
-    }
-
     private static Logger logger = Logger.getLogger(Tracker.class);
     private Phase phase;
 
