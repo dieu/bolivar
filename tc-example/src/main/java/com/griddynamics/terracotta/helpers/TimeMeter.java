@@ -5,13 +5,13 @@ package com.griddynamics.terracotta.helpers;
  *         Date: 05.06.2009
  *         Time: 13:03:18
  */
-public class TimeMetr {
+public class TimeMeter {
     private long startMeasurement;
     private long endMeasurement;
     private long resultMeasurement;
     private TypeMeasurement typeMeasurement;
 
-    public TimeMetr(TypeMeasurement typeMeasurement) {
+    public TimeMeter(TypeMeasurement typeMeasurement) {
         this.typeMeasurement = typeMeasurement;
     }
 

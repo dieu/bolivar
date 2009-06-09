@@ -1,10 +1,7 @@
 package com.griddynamics.terracotta.worker.factory;
 
-import com.griddynamics.terracotta.helpers.TaskDowloading;
-import com.griddynamics.terracotta.helpers.util.FileUtil;
-import com.griddynamics.terracotta.helpers.Wget;
 import com.griddynamics.terracotta.helpers.MyCountdownLatch;
-import com.griddynamics.terracotta.helpers.TimeMetr;
+import com.griddynamics.terracotta.helpers.TimeMeter;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Download implements Runnable {
     private static MyCountdownLatch cdl;
-    private static LinkedBlockingQueue<TimeMetr> queue = new LinkedBlockingQueue<TimeMetr>();
+    private static LinkedBlockingQueue<TimeMeter> queue = new LinkedBlockingQueue<TimeMeter>();
     private static String localDir;
 
     public void run() {

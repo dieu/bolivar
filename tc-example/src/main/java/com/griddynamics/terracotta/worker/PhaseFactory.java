@@ -17,6 +17,11 @@ public class PhaseFactory {
     }
 
     public static void startTestPerformance() {
+        /*try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }*/
         new TestQueue().run();
         new TestNotify().run();
     }
