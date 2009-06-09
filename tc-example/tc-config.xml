@@ -52,7 +52,9 @@
                 </autolock>
                 <autolock>
                     <method-expression>* com.griddynamics.terracotta.scheduler.Scheduler.parsing(..)</method-expression>
-                    <lock-level>write</lock-level>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.worker.factory.TestNotify.runParsing(..)</method-expression>                    
                 </autolock>
                 <autolock>
                     <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.countDown(..)</method-expression>

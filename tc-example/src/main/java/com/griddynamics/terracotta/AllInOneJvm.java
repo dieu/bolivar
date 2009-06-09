@@ -12,8 +12,8 @@ public class AllInOneJvm {
      */
     public static void main(String[] args) throws Exception {
         JobService jobService = new JobService();
-        jobService.startWorker(System.getProperty("typeOfWork"));
-        jobService.startWorker(System.getProperty("typeOfWork"));
+//        jobService.startWorker(System.getProperty("typeOfWork"));
+//        jobService.startWorker(System.getProperty("typeOfWork"));
         jobService.startWorker(System.getProperty("typeOfWork"));
         jobService.lunchJob(System.getProperty("localDir"), System.getProperty("httpUrl"),
                 System.getProperty("downloadedDir"), System.getProperty("countWorkers"));
