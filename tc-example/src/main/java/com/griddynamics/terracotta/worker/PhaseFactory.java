@@ -22,7 +22,7 @@ public class PhaseFactory {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }*/
-        new TestQueue().run();
+        //new TestQueue().run();
         new TestNotify().run();
     }
 }

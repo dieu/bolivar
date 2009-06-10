@@ -36,7 +36,7 @@ public class Scheduler {
     }
 
     public void start() throws InterruptedException {
-        dowload();
+        //dowload();
         parsing(numnerOfWorker);
         report();
     }

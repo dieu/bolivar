@@ -42,9 +42,11 @@ public class TestNotify implements Runnable {
             synchronized (timeMeterList) {
                 timeMeterList.add(timeMeter);
             }
-            logger.info("Marking work as completed");
+            logger.info("Marked the work as completed");
+            Long startedNotifying = System.currentTimeMillis();
             cdl.countDown();
             logger.info("Done");
+            logger.info("Notified in " + (System.currentTimeMillis() - startedNotifying));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

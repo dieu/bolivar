@@ -1,7 +1,7 @@
-SERVER_ADDR = "ec2-75-101-175-173.compute-1.amazonaws.com"
+SERVER_ADDR = "ec2-75-101-198-207.compute-1.amazonaws.com"
 JAVA_HOME = "/usr/lib/jvm/java-6-sun"
 
-role :workers, "ec2-75-101-171-173.compute-1.amazonaws.com"
+role :workers, "ec2-174-129-107-184.compute-1.amazonaws.com"
 #"ec2-67-202-19-159.compute-1.amazonaws.com", "ec2-174-129-173-47.compute-1.amazonaws.com" 
 role :scheduler, SERVER_ADDR
 role :server, SERVER_ADDR

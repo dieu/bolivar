@@ -135,16 +135,16 @@
                 </root>
 
                 <root>
-                    <field-name>timeMeterList</field-name>
-                    <root-name>timeMetrList</root-name>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.timeMeterList</field-name>
+                    <root-name>timeMeterList</root-name>
                 </root>
                 <root>
-                    <field-name>timeMeterList</field-name>
-                    <root-name>timeMetrList</root-name>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.timeMeterList</field-name>
+                    <root-name>timeMeterList</root-name>
                 </root>
                 <root>
-                    <field-name>timeMeterList</field-name>
-                    <root-name>timeMetrList</root-name>
+                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.timeMeterList</field-name>
+                    <root-name>timeMeterList</root-name>
                 </root>
 
                  <root>
