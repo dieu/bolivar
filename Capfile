@@ -1,15 +1,15 @@
-SERVER_ADDR = "ec2-75-101-198-207.compute-1.amazonaws.com"
+SERVER_ADDR = "ec2-75-101-214-44.compute-1.amazonaws.com"
 JAVA_HOME = "/usr/lib/jvm/java-6-sun"
 
-role :workers, "ec2-174-129-107-184.compute-1.amazonaws.com"
-#"ec2-67-202-19-159.compute-1.amazonaws.com", "ec2-174-129-173-47.compute-1.amazonaws.com" 
+role :workers, "ec2-72-44-56-197.compute-1.amazonaws.com", "ec2-67-202-15-230.compute-1.amazonaws.com", "ec2-75-101-172-215.compute-1.amazonaws.com", "ec2-174-129-170-178.compute-1.amazonaws.com", "ec2-174-129-148-165.compute-1.amazonaws.com"
+#, "ec2-72-44-55-164.compute-1.amazonaws.com", "ec2-75-101-169-200.compute-1.amazonaws.com", "ec2-75-101-172-28.compute-1.amazonaws.com", "ec2-174-129-130-202.compute-1.amazonaws.com", "ec2-72-44-54-123.compute-1.amazonaws.com", "ec2-75-101-171-28.compute-1.amazonaws.com", "ec2-174-129-143-128.compute-1.amazonaws.com", "ec2-174-129-153-185.compute-1.amazonaws.com", "ec2-174-129-134-245.compute-1.amazonaws.com", "ec2-174-129-102-1.compute-1.amazonaws.com", "ec2-174-129-109-100.compute-1.amazonaws.com", "ec2-174-129-138-13.compute-1.amazonaws.com", "ec2-174-129-159-153.compute-1.amazonaws.com", "ec2-72-44-49-139.compute-1.amazonaws.com", "ec2-174-129-107-184.compute-1.amazonaws.com"
 role :scheduler, SERVER_ADDR
 role :server, SERVER_ADDR
 
 set :user, 'agorbunov'
 set :password, '123456'
 
-EXAMPLE_DIR = "tc-example"
+EXAMPLE_DIR = "parser-with-blocking-queue"
 TARGET_DIR = "bolivar"
 NODE = "node-unit.jar"
 SCHEDULER = "scheduler-unit.jar"
@@ -18,6 +18,7 @@ DSO_BOOT = "dso-boot.linux.java-6.10.jar"
 TC_DIR = "terracotta-3.0.0"
 CONFIG = "tc-config.xml"
 MISC = "misc"
+DOWNLOADED_LOGS = "downloaded-logs"
 
 def scp(src, dst)
   body = File.open(src, "rb") { |f| f.read }
@@ -27,6 +28,11 @@ end
 
 def target(dir)
   File.join(TARGET_DIR, dir)
+end
+
+task :show_workers, :roles => :workers do
+  workers = find_servers(:roles => :workers)
+  print workers.length
 end
 
 desc "Build the project from sources"
@@ -65,11 +71,13 @@ task :upload_all do
 end
 
 task :run_workers, :roles => :workers do
-  run "java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=test -jar #{TARGET_DIR}/#{NODE} 2>&1"
+  run "rm -f #{DOWNLOADED_LOGS}/*"
+  run "java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=parsing -jar #{TARGET_DIR}/#{NODE} 2>&1"
 end
 
 task :run_scheduler, :roles => :scheduler do
-  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -DcountWorkers=1 -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1"
+  workers = find_servers(:roles => :workers)
+  run "java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=#{DOWNLOADED_LOGS} -DcountWorkers=#{workers.length} -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1"
 end
 
 task :run_server, :roles => :server do
