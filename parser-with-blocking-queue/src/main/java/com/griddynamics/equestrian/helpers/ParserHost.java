@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 08.05.2009
  * Time: 14:09:21
  */

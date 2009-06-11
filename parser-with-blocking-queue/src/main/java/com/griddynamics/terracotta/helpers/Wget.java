@@ -1,16 +1,11 @@
 package com.griddynamics.terracotta.helpers;
 
-import org.apache.log4j.Logger;
-
-import java.io.*;
-
-import com.griddynamics.terracotta.helpers.util.StrUtil;
+import java.io.IOException;
 
 /**
  * @author agorbunov @ 08.05.2009 16:30:17
  */
 public class Wget {
-    private static final Logger logger = Logger.getLogger(Wget.class);
     private String url;
     private String localDir;
     private transient Process wget;
@@ -33,7 +28,6 @@ public class Wget {
 
     private void invokeWget() throws IOException {
         String[] command = commandForDownloading();
-        //logger.info("Invoking command " + StrUtil.arrayToString(command));
         wget = Runtime.getRuntime().exec(command);
     }
 

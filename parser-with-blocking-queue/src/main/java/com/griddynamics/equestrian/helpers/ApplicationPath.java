@@ -1,7 +1,7 @@
 package com.griddynamics.equestrian.helpers;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 06.05.2009
  * Time: 13:37:01
  */

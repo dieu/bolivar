@@ -1,18 +1,18 @@
 package com.griddynamics.terracotta.helpers;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 03.06.2009
  * Time: 18:28:47
  */
-public class MyCountdownLatch {
+public class CountdownLatch {
     private int count = -1;
 
-    public MyCountdownLatch() {
+    public CountdownLatch() {
         // Default constructor.
     }
 
-    public MyCountdownLatch(int count) {
+    public CountdownLatch(int count) {
         this.count = count;
     }
 
@@ -34,7 +34,6 @@ public class MyCountdownLatch {
     public synchronized void await() throws InterruptedException {
         if (count == 0) {
             notifyAll();
-            return;
         } else {
             while (count > 0) {
                 wait();

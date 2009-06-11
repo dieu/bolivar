@@ -12,7 +12,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 29.04.2009
  * Time: 19:46:27
  */

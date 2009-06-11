@@ -20,7 +20,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 27.05.2009
  * Time: 14:18:50
  */

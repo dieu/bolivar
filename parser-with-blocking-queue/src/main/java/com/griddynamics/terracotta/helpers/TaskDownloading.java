@@ -1,15 +1,15 @@
 package com.griddynamics.terracotta.helpers;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 04.06.2009
  * Time: 13:28:27
  */
-public class TaskDowloading {
+public class TaskDownloading {
     private String url;
     private String localDir;
 
-    public TaskDowloading(String url, String localDir) {
+    public TaskDownloading(String url, String localDir) {
         this.url = url;
         this.localDir = localDir;
     }

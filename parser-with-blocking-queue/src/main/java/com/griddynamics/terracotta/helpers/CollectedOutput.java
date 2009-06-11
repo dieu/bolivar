@@ -6,9 +6,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 
 /**
- * @author: apanasenko aka dieu
- * Date: 03.06.2009
- * Time: 14:19:13
+ * @author agorbunov @ 08.05.2009 16:30:17
  */
 public class CollectedOutput extends Thread {
     private BufferedReader process;

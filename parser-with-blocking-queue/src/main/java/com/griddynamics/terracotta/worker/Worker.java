@@ -1,25 +1,17 @@
 package com.griddynamics.terracotta.worker;
 
-import com.griddynamics.terracotta.worker.factory.Download;
-import com.griddynamics.terracotta.worker.factory.Parsing;
+import com.griddynamics.terracotta.worker.Download;
+import com.griddynamics.terracotta.worker.Parsing;
 
 /**
- * @author: apanasenko aka dieu
+ * @author apanasenko aka dieu
  * Date: 04.06.2009
  * Time: 13:18:24
  */
 public class Worker implements Runnable {
-    private String typeOfWork;
-
-    public Worker(String typeOfWork) {
-        this.typeOfWork = typeOfWork;
-    }
 
     public void run() {
-        if (typeOfWork.equals("parsing")) {
-            PhaseFactory.startLogParsing();
-        } else if (typeOfWork.equals("test")) {
-            PhaseFactory.startTestPerformance();
-        }
+        new Thread(new Download()).start();
+        new Thread(new Parsing()).start();
     }
 }
