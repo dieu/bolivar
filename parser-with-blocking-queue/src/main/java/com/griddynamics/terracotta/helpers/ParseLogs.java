@@ -41,7 +41,7 @@ public class ParseLogs {
         logger.info("Parsing...");
         for (File log : logs)  {
             logger.info(log);
-            trafficByIp.putAll(new ParseLog(log).parseTo());
+            new ParseLog(log).parseTo(trafficByIp);
         }
     }
 

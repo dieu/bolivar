@@ -21,8 +21,7 @@ public class ParseLog {
         this.log = log;
     }
 
-    public Map<String, Long> parseTo() {
-        Map<String, Long> ipTraffic = new HashMap<String, Long>();
+    public void parseTo(Map<String, Long> ipTraffic) {
         BufferedReader log;
         try {
             log = getReader();
@@ -36,10 +35,10 @@ public class ParseLog {
             }
             log.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return ipTraffic;
     }
+
     private BufferedReader getReader() throws IOException {
         InputStreamReader inputStreamReader;
         if (log.startsWith(PROTOCOL)) {
