@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tc:tc-config xmlns:tc="http://www.terracotta.org/config"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-4.xsd">
+
+    <servers>
+        <server host="%i" name="org.terracotta.modules.sample-hostname">
+            <dso>
+                <persistence>
+                    <mode>permanent-store</mode>
+                </persistence>
+            </dso>
+        </server>
+        <update-check>
+            <enabled>true</enabled>
+        </update-check>
+    </servers>
+
+    <system>
+        <configuration-model>development</configuration-model>
+    </system>
+
+    <clients>
+        <modules>
+            <module name="tim-masterworker" version="1.4.1"/>
+            <module name="tim-synchronizedcollection" version="2.4.1"/>
+            <module name="tim-concurrent-collections" version="1.1.1"/>
+        </modules>
+        <logs>%(user.home)/terracotta/client-logs/org.terracotta.modules.sample/%D</logs>
+    </clients>
+
+    <application>
+        <dso>
+            <instrumented-classes>
+                <include>
+                    <class-expression>com.griddynamics.terracotta..*</class-expression>
+                    <honor-transient>true</honor-transient>
+                </include>
+            </instrumented-classes>
+
+            <locks>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.Aggregator..*(..)</method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.ParseContext..*(..)</method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.scheduler.Scheduler.*(..)</method-expression>
+                </autolock>                
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.worker.factory.Parsing.runParsing(..)</method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.countDown(..)</method-expression>
+                    <lock-level>write</lock-level>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.await(..)</method-expression>
+                    <lock-level>write</lock-level>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.*(..)</method-expression>
+                </autolock>
+            </locks>
+
+            <roots>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.parseContext</field-name>
+                    <root-name>parseContext</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.cdl</field-name>
+                    <root-name>cdl</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.workerDir</field-name>
+                    <root-name>workerDir</root-name>
+                </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.queue</field-name>
+                    <root-name>queue</root-name>
+                </root>
+            </roots>
+        </dso>
+    </application>                
+</tc:tc-config>
