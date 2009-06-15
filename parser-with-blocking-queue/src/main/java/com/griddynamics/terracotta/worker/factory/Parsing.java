@@ -1,8 +1,9 @@
 package com.griddynamics.terracotta.worker.factory;
 
 import com.griddynamics.terracotta.helpers.ParseLogs;
-import com.griddynamics.terracotta.helpers.MyCountdownLatch;
+import com.griddynamics.terracotta.helpers.CountdownLatch;
 import com.griddynamics.terracotta.helpers.ParseContext;
+import com.griddynamics.terracotta.helpers.util.NetUtil;
 import org.apache.log4j.Logger;
 
 /**
@@ -13,7 +14,7 @@ import org.apache.log4j.Logger;
 public class Parsing implements Runnable {
     private static Logger logger = Logger.getLogger(Parsing.class);
     public static final ParseContext parseContext = new ParseContext();
-    public static MyCountdownLatch cdl;
+    public static CountdownLatch cdl;
     public static String localDir;
 
     public void run() {
@@ -25,9 +26,11 @@ public class Parsing implements Runnable {
             synchronized (parseContext) {
                 parseContext.wait();
             }
-            ParseLogs parseLogs = new ParseLogs(localDir, parseContext.getAggregator());
+            logger.info("<par>" + NetUtil.host() + "</par>");
+            ParseLogs parseLogs = new ParseLogs(localDir, parseContext.getAggregator(), System.currentTimeMillis());
             parseLogs.run();
             cdl.countDown();
+            logger.info("<fin>" + NetUtil.host() + "</fin>");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

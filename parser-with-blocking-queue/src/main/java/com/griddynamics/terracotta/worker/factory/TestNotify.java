@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 public class TestNotify implements Runnable {
     private static final Logger logger = Logger.getLogger(TestNotify.class);
     public static final ParseContext parseContext = new ParseContext();
-    public static MyCountdownLatch cdl;
+    public static CountdownLatch cdl;
     public static String localDir;
     public static long startTime;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})

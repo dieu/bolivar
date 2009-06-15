@@ -7,11 +7,9 @@ package com.griddynamics.terracotta.helpers;
  */
 public class TaskDowloading {
     private String url;
-    private String localDir;
 
-    public TaskDowloading(String url, String localDir) {
+    public TaskDowloading(String url) {
         this.url = url;
-        this.localDir = localDir;
     }
 
     public String getUrl() {
@@ -20,13 +18,5 @@ public class TaskDowloading {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getLocalDir() {
-        return localDir;
-    }
-
-    public void setLocalDir(String localDir) {
-        this.localDir = localDir;
     }
 }

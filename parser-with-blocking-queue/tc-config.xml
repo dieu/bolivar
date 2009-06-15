@@ -60,15 +60,15 @@
                     <method-expression>* com.griddynamics.terracotta.worker.factory.Parsing.runParsing(..)</method-expression>
                 </autolock>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.countDown(..)</method-expression>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.countDown(..)</method-expression>
                     <lock-level>write</lock-level>
                 </autolock>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.await(..)</method-expression>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.await(..)</method-expression>
                     <lock-level>write</lock-level>
                 </autolock>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.helpers.MyCountdownLatch.*(..)</method-expression>
+                    <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.*(..)</method-expression>
                 </autolock>
             </locks>
             <roots>
@@ -138,28 +138,6 @@
                 <root>
                     <field-name>com.griddynamics.terracotta.scheduler.Scheduler.queue</field-name>
                     <root-name>queue</root-name>
-                </root>
-
-                <root>
-                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.timeMeterList</field-name>
-                    <root-name>timeMeterList</root-name>
-                </root>
-                <root>
-                    <field-name>com.griddynamics.terracotta.worker.factory.TestQueue.timeMeterList</field-name>
-                    <root-name>timeMeterList</root-name>
-                </root>
-                <root>
-                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.timeMeterList</field-name>
-                    <root-name>timeMeterList</root-name>
-                </root>
-
-                 <root>
-                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.startTime</field-name>
-                    <root-name>startTime</root-name>
-                </root>
-                <root>
-                    <field-name>com.griddynamics.terracotta.worker.factory.TestNotify.startTime</field-name>
-                    <root-name>startTime</root-name>
                 </root>
             </roots>
         </dso>

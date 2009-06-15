@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class TestQueue implements Runnable {
     private static final Logger logger = Logger.getLogger(TestQueue.class);
-    private static MyCountdownLatch cdl;
+    private static CountdownLatch cdl;
     private static LinkedBlockingQueue<TimeMeter> queue = new LinkedBlockingQueue<TimeMeter>();
     private static String localDir;
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})

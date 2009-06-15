@@ -5,14 +5,14 @@ package com.griddynamics.terracotta.helpers;
  * Date: 03.06.2009
  * Time: 18:28:47
  */
-public class MyCountdownLatch {
+public class CountdownLatch {
     private int count = -1;
 
-    public MyCountdownLatch() {
+    public CountdownLatch() {
         // Default constructor.
     }
 
-    public MyCountdownLatch(int count) {
+    public CountdownLatch(int count) {
         this.count = count;
     }
 

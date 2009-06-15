@@ -5,7 +5,6 @@ import com.griddynamics.terracotta.helpers.util.FileUtil;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -16,18 +15,16 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Scheduler {
     private int numnerOfWorker;
+    private long endParsing;
+    private long returning;
     private String masterDir;
     private String httpUrl;
     private Aggregator aggregator;
     private static Logger logger = Logger.getLogger(Scheduler.class);
     private static String localDir;
-    private static long startTime;
-    private static MyCountdownLatch cdl = new MyCountdownLatch();
+    private static CountdownLatch cdl = new CountdownLatch();
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
-    //private static LinkedBlockingQueue<TimeMeter> queue = new LinkedBlockingQueue<TimeMeter>();
     private static BlockingQueue<TaskDowloading> queue = new LinkedBlockingQueue<TaskDowloading>();
-    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
-    private static final List<TimeMeter> timeMeterList = Collections.synchronizedList(new ArrayList<TimeMeter>());
     private static final ParseContext parseContext = new ParseContext();
 
     public Scheduler(String numnerOfWorker, String masterDir, String httpUrl, String localDir) {
@@ -49,17 +46,8 @@ public class Scheduler {
         String[] logs = logs();
         cdl.reset(logs.length);
         for(String log: logs) {
-            TimeMeter timeMeter = new TimeMeter(TypeMeasurement.PUTQUEUE);
-            timeMeter.setStartMeasurement(System.currentTimeMillis());
-            //Long startedPutting = System.currentTimeMillis();
-            //queue.put(timeMeter);
-            //logger.info("Put in " + (System.currentTimeMillis() - startedPutting));
-            TaskDowloading task = new TaskDowloading(fileToUrl(log), localDir);
+            TaskDowloading task = new TaskDowloading(fileToUrl(log));
             queue.put(task);
-            timeMeter.setEndMeasurement(System.currentTimeMillis());
-            synchronized (timeMeterList) {
-                //timeMeterList.add(timeMeter);
-            }
         }
         cdl.await();
         logger.info("Downloaded in " + (System.currentTimeMillis() - startedDownloading));
@@ -67,9 +55,8 @@ public class Scheduler {
 
     private void parsing(int numberOfWorker) {
         logger.info("Parsing...");
-        Long startedParsing = System.currentTimeMillis();
+        long startedParsing = System.currentTimeMillis();
         synchronized (parseContext) {
-            startTime = System.currentTimeMillis();
             cdl.reset(numberOfWorker);
             parseContext.notifyAll();
         }
@@ -78,8 +65,11 @@ public class Scheduler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        returning = System.currentTimeMillis();
         aggregator = parseContext.getAggregator();
-        logger.info("Parsed in " + (System.currentTimeMillis() - startedParsing));
+        returning = System.currentTimeMillis() - returning;
+        endParsing = System.currentTimeMillis() - startedParsing;
+        logger.info("Parsed in " + endParsing);
     }
 
     private String[] logs() {
@@ -96,12 +86,8 @@ public class Scheduler {
     private void report() {
         String ip = aggregator.ipWithMaxTraffic();
         logger.info("Ip <ip>" + ip + "</ip> has maximum traffic: <traf>" + aggregator.getTraffic() + "</traf> ");
-        synchronized (timeMeterList) {
-            for(TimeMeter timeMeter : timeMeterList) {
-                logger.info("R: " + timeMeter.getResultMeasurement()
-                        + " T: "
-                        + timeMeter.getTypeMeasurement());
-            }
-        }
+        logger.info("Total time <to>" + endParsing + "</to>");
+        logger.info("Parsing <op>" + aggregator.getAvgTimeParsing() + "</op>");
+        logger.info("Returning <or>" + returning + "</or>");
     }
 }

@@ -316,7 +316,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
         public void run() {
             while (isRunScheduler) {
                 String temp = getData(workers, 3);
-                //WARN - Can't connect to server
                 if(error.matcher(temp).matches()) {
                     if(server != null) {
                         server.destroy();

@@ -12,14 +12,16 @@ import java.io.File;
  */
 public class ParseLogs {
     private static Logger logger = Logger.getLogger(ParseLogs.class);
+    private long startParsing;
     private ConcurrentStringMap<Long> trafficByIp = new ConcurrentStringMap<Long>();
     private Aggregator aggregator;
     private String dir;
     private File[] logs;
 
-    public ParseLogs(String dir, Aggregator aggregator) {
+    public ParseLogs(String dir, Aggregator aggregator, long startParsing) {
         this.dir = dir;
         this.aggregator = aggregator;
+        this.startParsing = startParsing;
     }
 
     public void run() {
@@ -47,7 +49,8 @@ public class ParseLogs {
 
     private void report() {
         if (!trafficByIp.isEmpty()) {
-            aggregator.add(NetUtil.worker(), trafficByIp);
+            long endParsing = System.currentTimeMillis() - startParsing;
+            aggregator.add(NetUtil.worker(), trafficByIp, endParsing);
         }
     }
 }

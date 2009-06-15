@@ -196,7 +196,7 @@ public class ParserHostEC2 implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_workers, :roles => :workers do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=parsing -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
                     "end\n" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +

@@ -11,6 +11,7 @@ import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
  */
 public class Aggregator {
     private ConcurrentMap<String, ConcurrentStringMap<Long>> traffic;
+    private ConcurrentStringMap<Long> times;
     private transient long maxTraffic = Integer.MIN_VALUE;
     private transient String ipMaxTraffic = null;
 
@@ -18,8 +19,9 @@ public class Aggregator {
         traffic = new ConcurrentStringMap<ConcurrentStringMap<Long>>();
     }
 
-    public void add(String hostWorker, ConcurrentStringMap<Long> part) {
+    public void add(String hostWorker, ConcurrentStringMap<Long> part, long time) {
         traffic.putIfAbsent(hostWorker, part);
+        times.putIfAbsent(hostWorker, time);
     }
 
     public synchronized String ipWithMaxTraffic() {
@@ -52,5 +54,16 @@ public class Aggregator {
 
     public long getTraffic() {
         return maxTraffic;
+    }
+
+    public long getAvgTimeParsing() {
+        long sum = 0;
+        int i = 0;
+        for(Long time: times.values()) {
+            sum += time;
+            i++;
+        }
+        sum /= i;
+        return sum;
     }
 }
