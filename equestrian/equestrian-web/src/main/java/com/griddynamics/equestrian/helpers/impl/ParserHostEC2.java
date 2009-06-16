@@ -170,6 +170,7 @@ public class ParserHostEC2 implements ParserHost{
                     "TC_DIR = \"terracotta-3.0.0\"\n" +
                     "CONFIG = \"tc-config.xml\"\n" +
                     "MISC = \"misc\"\n" +
+                    "DOWNLOADED_LOGS = \"downloaded-logs\"\n" +
                     "\n" +
                     "def scp(src, dst)\n" +
                     "  body = File.open(src, \"rb\") { |f| f.read }\n" +
@@ -211,12 +212,14 @@ public class ParserHostEC2 implements ParserHost{
                     "end\n" +
                     "\n" +
                     "task :run_workers, :roles => :workers do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=parsing -jar #{TARGET_DIR}/#{NODE} \"\n" + //> /dev/null 2>&1 &\"\n" +
-                    "end\n" +
+                    "  run \"rm -f #{DOWNLOADED_LOGS}/*\"\n" +
+                    "  run \"java -Xms512m -Xmx512m -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DtypeOfWork=parsing -jar #{TARGET_DIR}/#{NODE} 2>&1\"\n" +
+                    "end" +
                     "\n" +
                     "task :run_scheduler, :roles => :scheduler do\n" +
-                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)}  -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=downloaded-logs -DcountWorkers=#{COUNT_WORKERS} -jar #{TARGET_DIR}/#{SCHEDULER} \"\n" + //2>&1 &\"\n" +
-                    "end\n" +
+                    "  workers = find_servers(:roles => :workers)\n" +
+                    "  run \"java -Xbootclasspath/p:#{TARGET_DIR}/#{DSO_BOOT} -Dtc.install-root=#{File.join(TARGET_DIR, TC_DIR)} -Dtc.server=#{SERVER_ADDR} -Dtc.config=#{TARGET_DIR}/tc-config.xml -DlocalDir=/var/www/html/logs -DhttpUrl=http://#{SERVER_ADDR}/html/logs/ -DdownloadedDir=#{DOWNLOADED_LOGS} -DcountWorkers=#{workers.length} -jar #{TARGET_DIR}/#{SCHEDULER} 2>&1\"\n" +
+                    "end" +
                     "\n" +
                     "task :run_server, :roles => :server do\n" +
                     "  run \"export JAVA_HOME=#{JAVA_HOME} && #{File.join(TARGET_DIR, TC_DIR, \"bin\", \"start-tc-server.sh\")} \"\n" +//> /dev/null 2>&1 &\"\n" +
