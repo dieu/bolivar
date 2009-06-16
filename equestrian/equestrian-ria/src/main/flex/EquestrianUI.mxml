@@ -7,7 +7,7 @@
             <mx:Label text="Max workers: "/>
             <mx:NumericStepper id="countNewNodes"/>
         </mx:HBox>
-        <mx:Button label="Create" click="createNode"/>
+        <mx:Button label="Create" click="createNode()"/>
     </mx:VBox>
 
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
