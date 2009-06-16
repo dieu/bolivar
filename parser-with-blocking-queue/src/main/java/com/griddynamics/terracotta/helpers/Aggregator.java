@@ -17,6 +17,7 @@ public class Aggregator {
 
     public Aggregator() {
         traffic = new ConcurrentStringMap<ConcurrentStringMap<Long>>();
+        times = new ConcurrentStringMap<Long>();
     }
 
     public void add(String hostWorker, ConcurrentStringMap<Long> part, long time) {
