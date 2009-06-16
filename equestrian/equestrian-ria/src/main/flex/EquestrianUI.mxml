@@ -2,13 +2,24 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="initApp()"
                 backgroundGradientColors="[#8080c0, #ffffff]">
 
-    <mx:VBox  id="createNodes" horizontalAlign="center" height="100%" width="100%">
+    <mx:VBox id="createNodes" width="100%">
         <mx:HBox>
-            <mx:Label text="Max workers: "/>
-            <mx:NumericStepper id="countNewNodes"/>
+            <mx:Label text="Server: "/>
+            <mx:NumericStepper id="server" maximum="1" minimum="0"/>
         </mx:HBox>
-        <mx:Button label="Create" click="createNode()"/>
+        <mx:HBox>
+            <mx:Label text="Scheduler: "/>
+            <mx:NumericStepper id="scheduler" maximum="1" minimum="0"/>
+        </mx:HBox>
+        <mx:HBox>
+            <mx:Label id="addWorkers" text="Add workers: "/>
+            <mx:NumericStepper id="countNewNodes" minimum="0"/>
+        </mx:HBox>
     </mx:VBox>
+    <mx:HBox id="createButton" horizontalAlign="center" width="100%">
+        <mx:Button  label="Create" horizontalCenter="0" click="createNode()"/>
+    </mx:HBox>
+
 
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
     <mx:Panel width="250" height="179" layout="absolute" id="login" title="Please enter password">
@@ -18,7 +29,8 @@
     </mx:Panel>
     <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
         <mx:HBox>
-            <mx:Canvas width="300" height="100%"><mx:TextArea width="100%" height="100%" text="This application demonstrates calculating some OLAP analytics on historical data. In this concrete example,	we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
+            <mx:Canvas width="300" height="100%">
+                <mx:TextArea width="100%" height="100%" text="This application demonstrates calculating some OLAP analytics on historical data. In this concrete example,	we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
             </mx:Canvas>
             <!--mx:Canvas width="200" height="100%"-->
             <mx:Canvas>
@@ -27,8 +39,11 @@
                     <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
                     <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
                 </mx:HBox>
-                <mx:Button id="clear" label="Clear table result" click="clearResult()" y="40" left="1"/>
-                <mx:Button id="stop" label="Stop Application" click="stopApp()" y="40" right="1"/>
+                <mx:HBox horizontalCenter="0" y="40">
+                    <mx:Button id="clear" label="Clear table result" click="clearResult()"/>
+                    <mx:Button id="stop" label="Stop Application" click="stopApp()" />
+                    <mx:Button label="Create Workers" click="openWindow()"/>
+                </mx:HBox>
             </mx:Canvas>
             <!--/mx:Canvas-->
             <mx:Canvas width="300" height="100%" color="white" backgroundColor="black">
@@ -198,6 +213,8 @@
     <mx:RemoteObject id="parseHostService" showBusyCursor="true"
                      fault="onFault(event)" destination="parseHostService">
         <mx:method name="getCountNode" result="onResultGetCountNode(event)" fault="onFault(event)"/>
+        <mx:method name="getSchedulerSize" result="onResultGetSchedulerSize(event)" fault="onFault(event)"/>
+        <mx:method name="getServerSize" result="onResultGetServerSize(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
     <mx:RemoteObject id="startVirtualService" showBusyCursor="true"
@@ -221,12 +238,14 @@
         import mx.core.IFlexDisplayObject
 
         private var runApplication:Boolean = false;
+        private var runCreate:Boolean = false;
         private var truePsw:String = "questora";
         private var n:int = 0;
         private var nRun:int = 0;
         private var verifyAppTimer:Timer;
         private var isRunAppTimer:Timer;
         private var cookies:SharedObject;
+        private var countScheduler:int;
         public var createNodeWindow:TitleWindow = new TitleWindow();
         [Bindable]
         public var dataColumnChart:ArrayCollection = new ArrayCollection();
@@ -245,6 +264,7 @@
         }
 
         private function initApp():void {
+            application.removeChild(createButton);
             application.removeChild(createNodes);
             application.removeChild(main);
             isUser(pass.text);
@@ -325,7 +345,7 @@
         private function onResultGetCountNode(event:ResultEvent):void {
             nMachines.maximum = event.result as int;
             countNode.text += String(event.result);
-            if(int(countNode.text) == 0) {
+            if(nMachines.maximum == 0) {
                 openWindow();
             }
         }
@@ -454,10 +474,81 @@
         }
 
         public function openWindow():void {
+            parseHostService.getSchedulerSize();
+        }
+
+
+        public function populateWindow():void {
+            createNodeWindow.addChild(createNodes);
+            createNodeWindow.addChild(createButton);
+        }
+
+        public function closeTitleWindow(event:MouseEvent):void {
+            PopUpManager.removePopUp(event.currentTarget.parent);
+        }
+
+        private function removeMe(event:Event):void {
+            if(runCreate == false) {
+                PopUpManager.removePopUp(createNodeWindow);
+            } else {
+                Alert.show("Please wait", "Create nodes");
+            }
+        }
+
+        private function createNode():void {
+            runCreate = true;
+            var count:int = int(countNewNodes.value);
+            var countScheduler:int = 0;
+            var countServer:int = 0;
+            if(scheduler.enabled == true) {
+                countScheduler = scheduler.value as int;
+            }
+            if(server.enabled == true) {
+                countServer = server.value as int;
+            }
+            startVirtualService.create(count, countScheduler, countServer);
+        }
+
+        private function onResultCreateNode(event:ResultEvent):void {
+            startVirtualService.verify();
+        }
+
+        private function onResultVerifyCreateNode(event:ResultEvent):void {
+            if(event.result as Boolean == true) {
+                countNode.text = "Max Workers ";
+                parseHostService.getCountNode();
+                runCreate = false;
+                PopUpManager.removePopUp(createNodeWindow);
+            } else {
+                startVirtualService.verify();
+            }
+        }
+
+        private function onResultGetSchedulerSize(event:ResultEvent):void {
+            countScheduler = int(event.result);
+            parseHostService.getServerSize();
+        }
+
+        private function onResultGetServerSize(event:ResultEvent):void {
+            var countServer:int = int(event.result);
+            scheduler.value = countScheduler;
+            server.value = countServer;
+            if(countServer > 0) {
+                server.enabled = false;
+            } else {
+                server.enabled = true;
+            }
+            if(countScheduler > 0) {
+                scheduler.enabled = false;
+            } else {
+                scheduler.enabled = true;
+            }
+            addWorkers.text = "Workers: " + String(nMachines.maximum) + ". Add workers: ";
+
             createNodeWindow = new TitleWindow();
             createNodeWindow.title = "Create workers";
-            createNodeWindow.width= 200;
-            createNodeWindow.height= 100;
+            createNodeWindow.width= 250;
+            createNodeWindow.height= 160;
             createNodeWindow.showCloseButton = true;
             createNodeWindow.addEventListener("close", removeMe);
 
@@ -467,34 +558,5 @@
             PopUpManager.centerPopUp(createNodeWindow);
         }
 
-
-        public function populateWindow():void {
-            createNodeWindow.addChild(createNodes);
-        }
-
-        public function closeTitleWindow(event:MouseEvent):void {
-            PopUpManager.removePopUp(event.currentTarget.parent);
-        }
-
-        private function removeMe(event:Event):void {
-            PopUpManager.removePopUp(createNodeWindow);
-        }
-
-        private function createNode():void {
-            var count:int = int(countNewNodes.value);
-            startVirtualService.create(count);
-        }
-
-        private function onResultCreateNode(event:ResultEvent):void {
-            startVirtualService.verify();
-        }
-
-        private function onResultVerifyCreateNode(event:ResultEvent):void {
-            if(event.result as Boolean == true) {
-                parseHostService.getCountNode();
-            } else {
-                startVirtualService.verify();
-            }
-        }
         ]]></mx:Script>
 </mx:Application>

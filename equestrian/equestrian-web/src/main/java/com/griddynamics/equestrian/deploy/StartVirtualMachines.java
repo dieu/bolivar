@@ -6,6 +6,6 @@ package com.griddynamics.equestrian.deploy;
  * Time: 19:03:27
  */
 public interface StartVirtualMachines {
-	void create(int nMachines);
+	void create(int countWorkers, int countScheduler, int countServer);
 	boolean verify();
 }

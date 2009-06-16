@@ -67,7 +67,7 @@ public class ParserHostEC2 implements ParserHost{
         for (ReservationDescription res : instances) {
             if (res.getInstances() != null) {
                 for (ReservationDescription.Instance inst : res.getInstances()) {
-                    if(inst.isRunning() && (!aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
+                    if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "starting");
@@ -98,7 +98,7 @@ public class ParserHostEC2 implements ParserHost{
         for (ReservationDescription res : instances) {
             if (res.getInstances() != null) {
                 for (ReservationDescription.Instance inst : res.getInstances()) {
-                    if(inst.isRunning() && (!aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
+                    if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
                         }
@@ -113,7 +113,8 @@ public class ParserHostEC2 implements ParserHost{
             }
         }
         int count = workersIp.size();
-        clear();
+        workersIp = new ArrayList<String>();
+        n = 0;
         return count;
     }
 
@@ -126,6 +127,20 @@ public class ParserHostEC2 implements ParserHost{
 
     public Map<String,String> getNodeIp() {
         return nodes;
+    }
+
+    public int getSchedulerSize() {
+        if(!schedulerIp.equals("")) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public int getServerSize() {
+        if(!serverIp.equals("")) {
+            return 1;
+        }
+        return 0;
     }
 
     private void writeCapFile() throws IOException {

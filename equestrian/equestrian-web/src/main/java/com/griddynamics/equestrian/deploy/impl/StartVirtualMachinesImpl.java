@@ -2,13 +2,11 @@ package com.griddynamics.equestrian.deploy.impl;
 
 import com.griddynamics.equestrian.deploy.StartVirtualMachines;
 import com.griddynamics.equestrian.helpers.AmazonKeys;
-import com.xerox.amazonws.ec2.Jec2;
-import com.xerox.amazonws.ec2.LaunchConfiguration;
-import com.xerox.amazonws.ec2.EC2Exception;
-import com.xerox.amazonws.ec2.ReservationDescription;
+import com.xerox.amazonws.ec2.*;
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author: apanasenko aka dieu
@@ -17,56 +15,70 @@ import java.util.List;
  */
 public class StartVirtualMachinesImpl implements StartVirtualMachines {
     private AmazonKeys aws;
-    private ReservationDescription scheduler;
-    private ReservationDescription server;
-    private ReservationDescription workers;
 
     public StartVirtualMachinesImpl() {
-        scheduler = null;
-        server = null;
-        workers = null;
     }
 
-    public void create(int nMachines) {
+    public void create(int countWorkers, int countScheduler, int countServer) {
         Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
         try {
             LaunchConfiguration configuration = new LaunchConfiguration(aws.getSchedulerImageId(), 1, 1);
-            scheduler = ec2.runInstances(configuration);
-            if(!aws.getSchedulerImageId().equals(aws.getServerImageId())) {
+            configuration.setInstanceType(InstanceType.LARGE);
+            if(countScheduler != 0) {
+                ec2.runInstances(configuration);
+            }
+            if(!aws.getSchedulerImageId().equals(aws.getServerImageId()) && countServer != 0) {
                 configuration.setImageId(aws.getServerImageId());
                 configuration.setMinCount(1);
                 configuration.setMaxCount(1);
-                server = ec2.runInstances(configuration);
+                configuration.setInstanceType(InstanceType.LARGE);
+                ec2.runInstances(configuration);
             }
             configuration.setImageId(aws.getWorkerImageId());
-            configuration.setMinCount(nMachines);
-            configuration.setMaxCount(nMachines);
-            workers = ec2.runInstances(configuration);
+            configuration.setMinCount(countWorkers);
+            configuration.setMaxCount(countWorkers);
+            configuration.setInstanceType(InstanceType.LARGE);
+            ec2.runInstances(configuration);
         } catch (EC2Exception e) {
             e.printStackTrace();
         }
     }
 
     public boolean verify() {
-        List<Instance> scheduler = this.scheduler.getInstances();
-        List<Instance> server = this.server.getInstances();
-        List<Instance> workers = this.workers.getInstances();
-        for(Instance item: scheduler) {
-            if(item.isRunning()) {
-                return false;
-            }
-        }
-        if(server != null) {
-            for(Instance item: server) {
-                if(item.isRunning()) {
-                    return false;
+        try {
+            Thread.sleep(15000L);
+            Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
+            List<String> params = new ArrayList<String>();
+            List<ReservationDescription> instances = ec2.describeInstances(params);
+            for (ReservationDescription res : instances) {
+                if (res.getInstances() != null) {
+                    for (ReservationDescription.Instance inst : res.getInstances()) {
+                        if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
+                            if(inst.getImageId().equals(aws.getWorkerImageId())) {
+                                if(!inst.isRunning()) {
+                                    return  false;
+                                }
+                            }
+                            if(inst.getImageId().equals(aws.getServerImageId())) {
+                                if(!inst.isRunning()) {
+                                    return  false;
+                                }
+                            }
+                            if(inst.getImageId().equals(aws.getSchedulerImageId())) {
+                                if(!inst.isRunning()) {
+                                    return  false;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
-        for(Instance item: workers) {
-            if(item.isRunning()) {
-                return false;
-            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        } catch (EC2Exception e) {
+            e.printStackTrace();
+            return false;
         }
         return true;
     }
