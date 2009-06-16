@@ -480,7 +480,7 @@
             PopUpManager.removePopUp(createNodeWindow);
         }
 
-        private function createNode(evant:Event):void {
+        private function createNode():void {
             var count:int = int(countNewNodes.value);
             startVirtualService.create(count);
         }
