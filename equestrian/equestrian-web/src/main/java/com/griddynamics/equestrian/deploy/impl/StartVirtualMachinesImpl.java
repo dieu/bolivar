@@ -1,6 +1,14 @@
 package com.griddynamics.equestrian.deploy.impl;
 
 import com.griddynamics.equestrian.deploy.StartVirtualMachines;
+import com.griddynamics.equestrian.helpers.AmazonKeys;
+import com.xerox.amazonws.ec2.Jec2;
+import com.xerox.amazonws.ec2.LaunchConfiguration;
+import com.xerox.amazonws.ec2.EC2Exception;
+import com.xerox.amazonws.ec2.ReservationDescription;
+import com.xerox.amazonws.ec2.ReservationDescription.Instance;
+
+import java.util.List;
 
 /**
  * @author: apanasenko aka dieu
@@ -8,106 +16,62 @@ import com.griddynamics.equestrian.deploy.StartVirtualMachines;
  * Time: 19:48:35
  */
 public class StartVirtualMachinesImpl implements StartVirtualMachines {
-//    private AmazonEC2 service;
-//    private DescribeImagesRequest request;
+    private AmazonKeys aws;
+    private ReservationDescription scheduler;
+    private ReservationDescription server;
+    private ReservationDescription workers;
+
+    public StartVirtualMachinesImpl() {
+        scheduler = null;
+        server = null;
+        workers = null;
+    }
 
     public void create(int nMachines) {
-//        String accessKeyId = AccessKey.ACCESS_KEY_ID;
-//        String accessKeySecret = AccessKey.ACCESS_KEY_SECRET;
-////        this.service = new AmazonEC2Client(accessKeyId, accessKeySecret);
-//
-////        AmazonEC2Config config = new AmazonEC2Config();
-////        config.setSignatureVersion("0");
-////        this.service = new AmazonEC2Client(accessKeyId, accessKeySecret, config);
-//
-//        this.service = new AmazonEC2Mock();
-//        this.request = new DescribeImagesRequest();
+        Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
+        try {
+            LaunchConfiguration configuration = new LaunchConfiguration(aws.getSchedulerImageId(), 1, 1);
+            scheduler = ec2.runInstances(configuration);
+            if(!aws.getSchedulerImageId().equals(aws.getServerImageId())) {
+                configuration.setImageId(aws.getServerImageId());
+                configuration.setMinCount(1);
+                configuration.setMaxCount(1);
+                server = ec2.runInstances(configuration);
+            }
+            configuration.setImageId(aws.getWorkerImageId());
+            configuration.setMinCount(nMachines);
+            configuration.setMaxCount(nMachines);
+            workers = ec2.runInstances(configuration);
+        } catch (EC2Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean verify() {
-//        try {
-//            DescribeImagesResponse response = service.describeImages(request);
-//            if (response.isSetDescribeImagesResult()) {
-//                DescribeImagesResult describeImagesResult = response.getDescribeImagesResult();
-//                List<Image> imageList = describeImagesResult.getImage();
-//                for (Image image : imageList) {
-//                    if (image.isSetImageId()) {
-//                        System.out.print("                ImageId");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getImageId());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetImageLocation()) {
-//                        System.out.print("                ImageLocation");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getImageLocation());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetImageState()) {
-//                        System.out.print("                ImageState");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getImageState());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetOwnerId()) {
-//                        System.out.print("                OwnerId");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getOwnerId());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetVisibility()) {
-//                        System.out.print("                Visibility");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getVisibility());
-//                        System.out.println();
-//                    }
-//                    List<String> productCodeList  =  image.getProductCode();
-//                    for (String productCode : productCodeList) {
-//                        System.out.print("                ProductCode");
-//                        System.out.println();
-//                        System.out.print("                    " + productCode);
-//                    }
-//                    if (image.isSetArchitecture()) {
-//                        System.out.print("                Architecture");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getArchitecture());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetImageType()) {
-//                        System.out.print("                ImageType");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getImageType());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetKernelId()) {
-//                        System.out.print("                KernelId");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getKernelId());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetRamdiskId()) {
-//                        System.out.print("                RamdiskId");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getRamdiskId());
-//                        System.out.println();
-//                    }
-//                    if (image.isSetPlatform()) {
-//                        System.out.print("                Platform");
-//                        System.out.println();
-//                        System.out.print("                    " + image.getPlatform());
-//                        System.out.println();
-//                    }
-//                }
-//            }
-//        } catch (AmazonEC2Exception ex) {
-//            System.out.println("Caught Exception: " + ex.getMessage());
-//            System.out.println("Response Status Code: " + ex.getStatusCode());
-//            System.out.println("Error Code: " + ex.getErrorCode());
-//            System.out.println("Error Type: " + ex.getErrorType());
-//            System.out.println("Request ID: " + ex.getRequestId());
-//            System.out.print("XML: " + ex.getXML());
-//        }
-
+        List<Instance> scheduler = this.scheduler.getInstances();
+        List<Instance> server = this.server.getInstances();
+        List<Instance> workers = this.workers.getInstances();
+        for(Instance item: scheduler) {
+            if(item.isRunning()) {
+                return false;
+            }
+        }
+        if(server != null) {
+            for(Instance item: server) {
+                if(item.isRunning()) {
+                    return false;
+                }
+            }
+        }
+        for(Instance item: workers) {
+            if(item.isRunning()) {
+                return false;
+            }
+        }
         return true;
+    }
+
+    public void setAws(AmazonKeys aws) {
+        this.aws = aws;
     }
 }

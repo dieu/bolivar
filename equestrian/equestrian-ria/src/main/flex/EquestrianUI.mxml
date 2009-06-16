@@ -2,6 +2,14 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="initApp()"
                 backgroundGradientColors="[#8080c0, #ffffff]">
 
+    <mx:VBox  id="createNodes" horizontalAlign="center" height="100%" width="100%">
+        <mx:HBox>
+            <mx:Label text="Max workers: "/>
+            <mx:NumericStepper id="countNewNodes"/>
+        </mx:HBox>
+        <mx:Button label="Create" click="createNode"/>
+    </mx:VBox>
+
     <mx:SolidColor id="colorChart" color="red" alpha="0.3"/>
     <mx:Panel width="250" height="179" layout="absolute" id="login" title="Please enter password">
         <mx:Label x="35" y="27" text="Password"/>
@@ -192,6 +200,13 @@
         <mx:method name="getCountNode" result="onResultGetCountNode(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
+    <mx:RemoteObject id="startVirtualService" showBusyCursor="true"
+                     fault="onFault(event)" destination="startVirtualService">
+        <mx:method name="create" result="onResultCreateNode(event)" fault="onFault(event)"/>
+        <mx:method name="verify" result="onResultVerifyCreateNode(event)" fault="onFault(event)"/>
+    </mx:RemoteObject>
+
+
     <mx:Script><![CDATA[
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
@@ -199,6 +214,11 @@
         import mx.rpc.events.ResultEvent;
         import mx.charts.chartClasses.IAxis;
         import com.griddynamics.equestrian.entity.ApplicationEntity;
+        import mx.containers.TitleWindow;
+        import flash.events.*;
+        import mx.managers.PopUpManager;
+        import mx.controls.Button;
+        import mx.core.IFlexDisplayObject
 
         private var runApplication:Boolean = false;
         private var truePsw:String = "questora";
@@ -207,6 +227,7 @@
         private var verifyAppTimer:Timer;
         private var isRunAppTimer:Timer;
         private var cookies:SharedObject;
+        public var createNodeWindow:TitleWindow = new TitleWindow();
         [Bindable]
         public var dataColumnChart:ArrayCollection = new ArrayCollection();
         [Bindable]
@@ -224,6 +245,7 @@
         }
 
         private function initApp():void {
+            application.removeChild(createNodes);
             application.removeChild(main);
             isUser(pass.text);
         }
@@ -303,6 +325,9 @@
         private function onResultGetCountNode(event:ResultEvent):void {
             nMachines.maximum = event.result as int;
             countNode.text += String(event.result);
+            if(countNode.text == 0) {
+                openWindow();
+            }
         }
 
         private function OnResultIsRun(event:ResultEvent):void {
@@ -310,12 +335,14 @@
                 if (startApp.enabled && !runApplication) {
                     Alert.show("Please wait", "System busy");
                     startApp.enabled = false;
+                    stop.enabled = false;
                 }
-                clusterStatus.label = "Cluster Status: Busy";
+                clusterStatus.title = "Cluster Status: Busy";
             } else {
                 if (!startApp.enabled) {
                     Alert.show("The system is ready for use", "Welcome");
                     startApp.enabled = true;
+                    stop.enabled = true;
                     historyService.getHistory();
                     historyService.getLineData();
                 }
@@ -424,6 +451,50 @@
         public function isRunAppTimerHandler(event:TimerEvent):void {
             isRunAppTimer.stop();
             equestrianService.isRun();
+        }
+
+        public function openWindow():void {
+            createNodeWindow = new TitleWindow();
+            createNodeWindow.title = "Create workers";
+            createNodeWindow.width= 200;
+            createNodeWindow.height= 100;
+            createNodeWindow.showCloseButton = true;
+            createNodeWindow.addEventListener("close", removeMe);
+
+            populateWindow();
+
+            PopUpManager.addPopUp(createNodeWindow, this, true);
+            PopUpManager.centerPopUp(createNodeWindow);
+        }
+
+
+        public function populateWindow():void {
+            createNodeWindow.addChild(createNodes);
+        }
+
+        public function closeTitleWindow(event:MouseEvent):void {
+            PopUpManager.removePopUp(event.currentTarget.parent);
+        }
+
+        private function removeMe(event:Event):void {
+            PopUpManager.removePopUp(createNodeWindow);
+        }
+
+        private function createNode(evant:Event):void {
+            var count:int = int(countNewNodes.value);
+            startVirtualService.create(count);
+        }
+
+        private function onResultCreateNode(event:ResultEvent):void {
+            startVirtualService.verify();
+        }
+
+        private function onResultVerifyCreateNode(event:ResultEvent):void {
+            if(event.result as Boolean == true) {
+                parseHostService.getCountNode();
+            } else {
+                startVirtualService.verify();
+            }
         }
         ]]></mx:Script>
 </mx:Application>

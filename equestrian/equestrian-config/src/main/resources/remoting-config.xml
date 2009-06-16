@@ -32,4 +32,11 @@
             <source>parserHost</source>
         </properties>
     </destination>
+
+    <destination id="startVirtualService">
+        <properties>
+            <factory>spring</factory>
+            <source>startVirtual</source>
+        </properties>
+    </destination>
 </service>

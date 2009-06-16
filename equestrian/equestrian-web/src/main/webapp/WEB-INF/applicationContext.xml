@@ -23,4 +23,8 @@
     <bean name="history" class="com.griddynamics.equestrian.helpers.History" scope="singleton">
         <property name="historyEntity" ref="historyEntity"/>
     </bean>
+
+    <bean name="startVirtual" class="com.griddynamics.equestrian.deploy.impl.StartVirtualMachinesImpl" scope="singleton">
+
+    </bean>
 </beans>
