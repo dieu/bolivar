@@ -325,7 +325,7 @@
         private function onResultGetCountNode(event:ResultEvent):void {
             nMachines.maximum = event.result as int;
             countNode.text += String(event.result);
-            if(countNode.text == 0) {
+            if(int(countNode.text) == 0) {
                 openWindow();
             }
         }

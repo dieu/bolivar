@@ -63,7 +63,7 @@ public class Aggregator {
             sum += time;
             i++;
         }
-        sum /= i;
+        sum /= i;        
         return sum;
     }
 }
