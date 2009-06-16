@@ -25,6 +25,6 @@
     </bean>
 
     <bean name="startVirtual" class="com.griddynamics.equestrian.deploy.impl.StartVirtualMachinesImpl" scope="singleton">
-
+        <property name="aws" ref="aws"/>
     </bean>
 </beans>
