@@ -189,8 +189,10 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public void stop() {
         if(separator.equals("/")) {
             try {
-                schedulerLogs.close();
-                workersLogs.close();
+                if(schedulerLogs != null) {
+                    schedulerLogs.close();
+                    workersLogs.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

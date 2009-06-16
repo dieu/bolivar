@@ -69,15 +69,15 @@ public class ParserHostEC2 implements ParserHost{
                 for (ReservationDescription.Instance inst : res.getInstances()) {
                     if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
-                            workersIp.add(inst.getPrivateDnsName());
+                            workersIp.add(inst.getDnsName());
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "starting");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
-                            serverIp = inst.getPrivateDnsName();
+                            serverIp = inst.getDnsName();
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                         if(inst.getImageId().equals(aws.getSchedulerImageId())) {
-                            schedulerIp = inst.getPrivateDnsName();
+                            schedulerIp = inst.getDnsName();
                             nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                     }
@@ -161,7 +161,7 @@ public class ParserHostEC2 implements ParserHost{
                     "set :user, 'agorbunov'\n" +
                     "set :password, '123456'\n" +
                     "\n" +
-                    "EXAMPLE_DIR = \"tc-log-parser-example\"\n" +
+                    "EXAMPLE_DIR = \"parser-with-blocking-queue\"\n" +
                     "TARGET_DIR = \"bolivar\"\n" +
                     "NODE = \"node-unit.jar\"\n" +
                     "SCHEDULER = \"scheduler-unit.jar\"\n" +
@@ -182,7 +182,7 @@ public class ParserHostEC2 implements ParserHost{
                     "\n" +
                     "desc \"Build the project from sources\"\n" +
                     "task :build do\n" +
-                    "  system(\"cd tc-log-parser-example && mvn clean package && mvn package -P Worker\")\n" +
+                    "  system(\"cd parser-with-blocking-queue && mvn clean package && mvn package -P Worker\")\n" +
                     "end\n" +
                     "\n" +
                     "desc \"Uploads tc-config.xml to all nodes\"\n" +

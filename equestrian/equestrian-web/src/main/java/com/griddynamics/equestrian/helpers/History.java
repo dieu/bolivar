@@ -41,7 +41,8 @@ public class History {
         } else {
             pathChartToCVS = ApplicationPath.APPLICATION_PATH_NIX;
         }
-        pathChartToCVS += Calendar.getInstance().getTime().toString() + ".csv";
+        pathChartToCVS += Calendar.getInstance().get(Calendar.DATE) + "_" + Calendar.getInstance().get(Calendar.HOUR)
+                + "_" + Calendar.getInstance().get(Calendar.MINUTE) + ".csv";
     }
 
     public void setHistoryEntity(HistoryEntity historyEntity) {
