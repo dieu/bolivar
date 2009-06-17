@@ -39,4 +39,11 @@
             <source>startVirtual</source>
         </properties>
     </destination>
+
+    <destination id="stopVirtualService">
+        <properties>
+            <factory>spring</factory>
+            <source>stopVirtual</source>
+        </properties>
+    </destination>
 </service>

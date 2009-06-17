@@ -18,6 +18,7 @@
     </mx:VBox>
     <mx:HBox id="createButton" horizontalAlign="center" width="100%">
         <mx:Button  label="Create" horizontalCenter="0" click="createNode()"/>
+        <mx:Button  label="Shutdown cloud" horizontalCenter="0" click="shutdownCloud()"/>
     </mx:HBox>
 
 
@@ -221,6 +222,11 @@
                      fault="onFault(event)" destination="startVirtualService">
         <mx:method name="create" result="onResultCreateNode(event)" fault="onFault(event)"/>
         <mx:method name="verify" result="onResultVerifyCreateNode(event)" fault="onFault(event)"/>
+    </mx:RemoteObject>
+
+    <mx:RemoteObject id="stopVirtualService" showBusyCursor="true"
+                     fault="onFault(event)" destination="stopVirtualService">
+        <mx:method name="stop" result="onResultStopNode(event)" fault="onFault(event)"/>
     </mx:RemoteObject>
 
 
@@ -556,6 +562,23 @@
 
             PopUpManager.addPopUp(createNodeWindow, this, true);
             PopUpManager.centerPopUp(createNodeWindow);
+        }
+
+        private function shutdownCloud():void {
+            Alert.show("Are you sure?", "Shutdown Cloud", Alert.OK | Alert.CANCEL, this, alertListener, null, Alert.OK)
+        }
+
+        private function onResultStopNode() {
+            countNode.text = "Max Workers ";
+            parseHostService.getCountNode();
+            runCreate = false;
+            PopUpManager.removePopUp(createNodeWindow);
+        }
+
+        private function alertListener(eventObj:CloseEvent):void {            
+            if (eventObj.detail==Alert.OK) {
+                stopVirtualService.stop();
+            }
         }
 
         ]]></mx:Script>
