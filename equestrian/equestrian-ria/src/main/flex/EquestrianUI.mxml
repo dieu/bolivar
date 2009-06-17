@@ -233,6 +233,7 @@
     <mx:Script><![CDATA[
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
         import mx.charts.chartClasses.IAxis;
@@ -575,7 +576,7 @@
             PopUpManager.removePopUp(createNodeWindow);
         }
 
-        private function alertListener(eventObj:CloseEvent):void {            
+        private function alertListener(eventObj:CloseEvent):void {
             if (eventObj.detail==Alert.OK) {
                 stopVirtualService.stop();
             }
