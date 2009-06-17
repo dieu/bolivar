@@ -569,7 +569,7 @@
             Alert.show("Are you sure?", "Shutdown Cloud", Alert.OK | Alert.CANCEL, this, alertListener, null, Alert.OK)
         }
 
-        private function onResultStopNode() {
+        private function onResultStopNode(event:ResultEvent) {
             countNode.text = "Max Workers ";
             parseHostService.getCountNode();
             runCreate = false;
