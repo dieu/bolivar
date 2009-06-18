@@ -37,13 +37,8 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
     }
 
     public ParserHostXml() {
-        if(System.getProperty("file.separator").equals("\\")) {
-            pathLog = ApplicationPath.HOST_LOG_PATH_WIN;
-            pathApp = ApplicationPath.APPLICATION_PATH_WIN;
-        } else {
-            pathLog = ApplicationPath.HOST_LOG_PATH_NIX;
-            pathApp = ApplicationPath.APPLICATION_PATH_NIX;
-        }
+        pathLog = ApplicationPath.HOST_LOG_PATH;
+        pathApp = ApplicationPath.APPLICATION_PATH;
         workersIp = new ArrayList<String>();
         serverIp = "";
         schedulerIp = "";

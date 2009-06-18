@@ -34,11 +34,7 @@ public class ParserHostEC2 implements ParserHost{
     private AmazonKeys aws;
 
     public ParserHostEC2() {
-        if(System.getProperty("file.separator").equals("\\")) {
-            pathApp = ApplicationPath.APPLICATION_PATH_WIN;
-        } else {
-            pathApp = ApplicationPath.APPLICATION_PATH_NIX;
-        }
+        pathApp = ApplicationPath.APPLICATION_PATH;
         workersIp = new ArrayList<String>();
         nodes = new HashMap<String, String>();
         serverIp = "";

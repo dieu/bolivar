@@ -35,12 +35,7 @@ public class History {
     public History() {
         lineChartDataReal = new TreeMap<Integer, Float>();
         lineChartDataIdeal = new TreeMap<Integer, Float>();
-        if(System.getProperty("file.separator").equals("\\")) {
-            pathChartToCVS = ApplicationPath.APPLICATION_PATH_WIN;
-
-        } else {
-            pathChartToCVS = ApplicationPath.APPLICATION_PATH_NIX;
-        }
+        pathChartToCVS = ApplicationPath.APPLICATION_PATH;
         pathChartToCVS += Calendar.getInstance().get(Calendar.DATE) + "_" + Calendar.getInstance().get(Calendar.HOUR)
                 + "_" + Calendar.getInstance().get(Calendar.MINUTE) + ".csv";
     }

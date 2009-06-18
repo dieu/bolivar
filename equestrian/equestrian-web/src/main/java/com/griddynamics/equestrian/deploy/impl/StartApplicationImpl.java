@@ -50,19 +50,19 @@ public class StartApplicationImpl implements StartApplication<Application> {
     public StartApplicationImpl() {
         separator = System.getProperty("file.separator");
         if(separator.equals("\\")) {
-            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd upload_all";
-            runServerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_server";
-            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_workers";
-            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd run_scheduler";
-            runKillCommand = ApplicationPath.CAPISTRANO_PATH_WIN + "cap.cmd kill";
-            dir = new File(ApplicationPath.APPLICATION_PATH_WIN);
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH + "cap.cmd upload_all";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_server";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_workers";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd run_scheduler";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap.cmd kill";
+            dir = new File(ApplicationPath.APPLICATION_PATH);
         } else {
-            uploadCommand  = ApplicationPath.CAPISTRANO_PATH_NIX + "cap upload_all";
-            runServerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_server";
-            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_workers";
-            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap run_scheduler";
-            runKillCommand = ApplicationPath.CAPISTRANO_PATH_NIX + "cap kill";
-            dir = new File(ApplicationPath.APPLICATION_PATH_NIX);
+            uploadCommand  = ApplicationPath.CAPISTRANO_PATH + "cap upload_all";
+            runServerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_server";
+            runWorkersCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_workers";
+            runSchedulerCommand = ApplicationPath.CAPISTRANO_PATH + "cap run_scheduler";
+            runKillCommand = ApplicationPath.CAPISTRANO_PATH + "cap kill";
+            dir = new File(ApplicationPath.APPLICATION_PATH);
         }
     }
 
@@ -277,7 +277,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
         } else {
             Calendar calendar = Calendar.getInstance();
-            String dir  = ApplicationPath.APPLICATION_PATH_NIX + "remote-logs/"
+            String dir  = ApplicationPath.APPLICATION_PATH + "remote-logs/"
                     + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
                     + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
             this.files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";

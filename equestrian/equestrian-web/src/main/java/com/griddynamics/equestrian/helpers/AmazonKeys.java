@@ -23,16 +23,11 @@ public class AmazonKeys {
     private String schedulerImageId = "";
 
     public static void main(String[] ars) {
-           new AmazonKeys();
+        new AmazonKeys();
     }
 
     public AmazonKeys() {
-        File aws;
-        if(System.getProperty("file.separator").equals("\\")) {
-            aws  = new File(ApplicationPath.APPLICATION_PATH_WIN + "aws.keys");
-        } else {
-            aws  = new File(ApplicationPath.APPLICATION_PATH_NIX + "aws.keys");
-        }
+        File aws = new File(ApplicationPath.APPLICATION_PATH + "aws.keys");
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();
