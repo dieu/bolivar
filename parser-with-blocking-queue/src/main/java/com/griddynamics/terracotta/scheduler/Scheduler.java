@@ -1,12 +1,20 @@
 package com.griddynamics.terracotta.scheduler;
 
-import com.griddynamics.terracotta.helpers.*;
+import com.griddynamics.terracotta.helpers.Aggregator;
+import com.griddynamics.terracotta.helpers.CountdownLatch;
+import com.griddynamics.terracotta.helpers.Pipe;
+import com.griddynamics.terracotta.helpers.TaskDownloading;
 import com.griddynamics.terracotta.helpers.util.FileUtil;
+import com.griddynamics.terracotta.helpers.WaitPipe;
 import org.apache.log4j.Logger;
+import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 
 import java.io.File;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author apanasenko aka dieu
@@ -16,21 +24,25 @@ import java.util.concurrent.BlockingQueue;
 public class Scheduler {
     private long endParsing;
     private long returning;
-    public static final ParseContext parseContext = new ParseContext();
     public static BlockingQueue<TaskDownloading> queue = new LinkedBlockingQueue<TaskDownloading>();
+    public static ConcurrentStringMap<Pipe<ConcurrentStringMap<Long>>> pipes = new ConcurrentStringMap<Pipe<ConcurrentStringMap<Long>>>();
     public static CountdownLatch cdl = new CountdownLatch();
     public static String workerDir;
     private String masterDir;
     private String masterUrl;
     private int workerCount;
     private Aggregator aggregator;
-    private static Logger logger = Logger.getLogger(Scheduler.class);    
+    private static Logger logger = Logger.getLogger(Scheduler.class);
 
     public Scheduler(String workerCount, String masterDir, String masterUrl, String workerDir) {
         this.workerCount = new Integer(workerCount);
         this.masterDir = masterDir;
         Scheduler.workerDir = workerDir;
         this.masterUrl = masterUrl;
+        this.aggregator = new Aggregator();
+        Scheduler.queue = new LinkedBlockingQueue<TaskDownloading>();
+        Scheduler.pipes = new ConcurrentStringMap<Pipe<ConcurrentStringMap<Long>>>();
+        Scheduler.cdl = new CountdownLatch();
     }
 
     public void run() throws InterruptedException {
@@ -52,20 +64,36 @@ public class Scheduler {
         logger.info("Downloaded in " + (System.currentTimeMillis() - startedDownloading));
     }
 
-    private void parse() {
+    private void parse() throws InterruptedException {
         logger.info("Parsing...");
         long startedParsing = System.currentTimeMillis();
-        synchronized (parseContext) {
-            cdl.reset(workerCount);
-            parseContext.notifyAll();
+        for(Pipe<ConcurrentStringMap<Long>> pipe: pipes.values()) {
+            synchronized (pipe) {
+                pipe.notify();
+            }
         }
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        List<Thread> threads = new ArrayList<Thread>();
+        for(Pipe<ConcurrentStringMap<Long>> pipe: pipes.values()) {
+            Thread thread = new Thread(new WaitPipe(pipe));
+            thread.start();
+            threads.add(thread);
+        }
+        boolean flagWait = true;
+        while(flagWait){
+            for(Iterator<Thread> iterator = threads.iterator(); iterator.hasNext();) {
+                Thread thread = iterator.next();
+                if(!thread.isAlive()) {
+                    iterator.remove();
+                    logger.info("Size: " + threads.size());
+                }
+            }
+            flagWait = !threads.isEmpty();
         }
         returning = System.currentTimeMillis();
-        aggregator = parseContext.getAggregator();
+        for(String hostWorker: pipes.keySet()) {
+            Pipe<ConcurrentStringMap<Long>> pipe = pipes.get(hostWorker);
+            aggregator.add(hostWorker, pipe.getPipe(), pipe.getTime());
+        }
         returning = System.currentTimeMillis() - returning;
         endParsing = System.currentTimeMillis() - startedParsing;
         logger.info("Parsed in " + endParsing);
@@ -90,3 +118,4 @@ public class Scheduler {
         logger.info("Returning <or>" + returning + "</or>");
     }
 }
+    

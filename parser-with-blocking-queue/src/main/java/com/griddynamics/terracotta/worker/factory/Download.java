@@ -2,10 +2,14 @@ package com.griddynamics.terracotta.worker.factory;
 
 import com.griddynamics.terracotta.helpers.TaskDownloading;
 import com.griddynamics.terracotta.helpers.Wget;
+import com.griddynamics.terracotta.helpers.Pipe;
 import com.griddynamics.terracotta.helpers.util.FileUtil;
 import com.griddynamics.terracotta.helpers.util.NetUtil;
 import static com.griddynamics.terracotta.scheduler.Scheduler.*;
 import org.apache.log4j.Logger;
+import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
+
+import java.util.HashMap;
 
 /**
  * @author apanasenko aka dieu
@@ -25,15 +29,15 @@ public class Download implements Runnable {
 
     private void runDownload() throws InterruptedException {
         logger.info("Downloading...");
-        while (true) {
+        do {
             TaskDownloading task = queue.take();
             logger.info("<dow>" + NetUtil.host() + "</dow>");
             logger.info(task.getUrl());
             FileUtil.createDirIfNotExists(workerDir);
             Wget wget = new Wget(task.getUrl(), workerDir);
             wget.startDownloading();
-            wget.waitUntilDownloadCompletes();
+            wget.waitUntilDownloadCompletes();            
             cdl.countDown();
-        }
+        } while (cdl.getCount() > 0);
     }
 }

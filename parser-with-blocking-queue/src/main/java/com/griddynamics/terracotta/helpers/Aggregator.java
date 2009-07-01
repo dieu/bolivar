@@ -1,28 +1,27 @@
 package com.griddynamics.terracotta.helpers;
 
-import java.util.concurrent.ConcurrentMap;
-import java.util.Map;
 import java.util.HashMap;
-
-import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
+import java.util.Map;
 
 /**
  * @author agorbunov @ 08.05.2009 15:10:15
+ *         apanasenko @ 08.05.2009 15:10:15
  */
 public class Aggregator {
-    private ConcurrentMap<String, ConcurrentStringMap<Long>> traffic;
-    private ConcurrentStringMap<Long> times;
+    private HashMap<String, Map<String, Long>> traffic;
+    private HashMap<String, Long> times;
     private transient long maxTraffic = Integer.MIN_VALUE;
     private transient String ipMaxTraffic = null;
 
     public Aggregator() {
-        traffic = new ConcurrentStringMap<ConcurrentStringMap<Long>>();
-        times = new ConcurrentStringMap<Long>();
+        traffic = new HashMap<String, Map<String, Long>>();
+        times = new HashMap<String, Long>();
+
     }
 
-    public void add(String hostWorker, ConcurrentStringMap<Long> part, long time) {
-        traffic.putIfAbsent(hostWorker, part);
-        times.putIfAbsent(hostWorker, time);
+    public void add(String hostWorker, Map<String, Long> map, long endTime) {
+        traffic.put(hostWorker, map);
+        times.put(hostWorker, endTime);
     }
 
     public synchronized String ipWithMaxTraffic() {
@@ -64,7 +63,7 @@ public class Aggregator {
             sum += time;
             i++;
         }
-        sum /= i;        
+        sum /= i;
         return sum;
     }
 }

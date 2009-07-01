@@ -6,26 +6,30 @@ import org.terracotta.modules.concurrent.collections.ConcurrentStringMap;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author agorbunov @ 08.05.2009 15:11:36
  */
 public class ParseLogs {
     private static Logger logger = Logger.getLogger(ParseLogs.class);
-    private long startParsing;
-    private ConcurrentStringMap<Long> trafficByIp = new ConcurrentStringMap<Long>();
-    private Aggregator aggregator;
+    private ConcurrentStringMap<Long> trafficByIp;
+
     private String dir;
     private File[] logs;
 
-    public ParseLogs(String dir, Aggregator aggregator, long startParsing) {
+    public ParseLogs(String dir) {
         this.dir = dir;
-        this.aggregator = aggregator;
-        this.startParsing = startParsing;
+        trafficByIp = new ConcurrentStringMap<Long>();
     }
 
     public void run() {
         parseLogsInDir();
+    }
+
+    public ConcurrentStringMap<Long> getTrafficMap() {
+        return trafficByIp;
     }
 
     private void parseLogsInDir() {
@@ -48,9 +52,8 @@ public class ParseLogs {
     }
 
     private void report() {
-        if (!trafficByIp.isEmpty()) {
-            long endParsing = System.currentTimeMillis() - startParsing;
-            aggregator.add(NetUtil.worker(), trafficByIp, endParsing);
-        }
+//        if (!trafficByIp.isEmpty()) {
+//
+//        }
     }
 }

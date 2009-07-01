@@ -40,16 +40,13 @@
 
             <locks>
                 <autolock>
-                    <method-expression>* com.griddynamics.terracotta.helpers.Aggregator..*(..)</method-expression>
-                </autolock>
-                <autolock>
-                    <method-expression>* com.griddynamics.terracotta.helpers.ParseContext..*(..)</method-expression>
-                </autolock>
-                <autolock>
                     <method-expression>* com.griddynamics.terracotta.scheduler.Scheduler.*(..)</method-expression>
-                </autolock>                
+                </autolock>
                 <autolock>
                     <method-expression>* com.griddynamics.terracotta.worker.factory.Parsing.runParsing(..)</method-expression>
+                </autolock>
+                <autolock>
+                    <method-expression>* com.griddynamics.terracotta.helpers.WaitPipe.run(..)</method-expression>                    
                 </autolock>
                 <autolock>
                     <method-expression>* com.griddynamics.terracotta.helpers.CountdownLatch.countDown(..)</method-expression>
@@ -66,10 +63,6 @@
 
             <roots>
                 <root>
-                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.parseContext</field-name>
-                    <root-name>parseContext</root-name>
-                </root>
-                <root>
                     <field-name>com.griddynamics.terracotta.scheduler.Scheduler.cdl</field-name>
                     <root-name>cdl</root-name>
                 </root>
@@ -81,7 +74,11 @@
                     <field-name>com.griddynamics.terracotta.scheduler.Scheduler.queue</field-name>
                     <root-name>queue</root-name>
                 </root>
+                <root>
+                    <field-name>com.griddynamics.terracotta.scheduler.Scheduler.pipes</field-name>
+                    <root-name>pipes</root-name>
+                </root>
             </roots>
         </dso>
-    </application>                
+    </application>
 </tc:tc-config>
