@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public interface ParserHost {
     int parse(int n) throws Exception;
+    int parse() throws Exception;
     int getCountNode() throws Exception;
     void clear();
     Map<String, String> getNodeIp();

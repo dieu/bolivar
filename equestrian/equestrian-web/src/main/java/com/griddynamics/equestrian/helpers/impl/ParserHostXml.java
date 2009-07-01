@@ -56,6 +56,16 @@ public class ParserHostXml extends DefaultHandler implements ParserHost{
         return this.n;
     }
 
+    public int parse() throws Exception {
+        this.n = Integer.MAX_VALUE;
+        File hostLog = new File(this.pathLog);
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+        sp.parse(hostLog, this);
+        writeCapFile();
+        return workersIp.size();
+    }
+
     public int getCountNode() throws IOException, SAXException, ParserConfigurationException {
         clear();
         this.n = Integer.MAX_VALUE;

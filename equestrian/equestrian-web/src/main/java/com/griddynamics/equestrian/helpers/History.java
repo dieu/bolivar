@@ -75,7 +75,6 @@ public class History {
                 lineChartDataIdeal.put(nWorkers, timeNew);
             } else {
                 List<Integer> keys = new ArrayList<Integer>(lineChartDataReal.keySet());
-                List<Float> values = new ArrayList<Float>(lineChartDataIdeal.values());
                 if(nWorkers < keys.get(0)) {
                     lineChartDataIdeal.clear();
                     lineChartDataIdeal.put(nWorkers, timeNew);

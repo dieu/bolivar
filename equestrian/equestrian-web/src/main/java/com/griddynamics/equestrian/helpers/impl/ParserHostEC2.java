@@ -66,15 +66,13 @@ public class ParserHostEC2 implements ParserHost{
                     if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getDnsName());
-                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "starting");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getDnsName();
-                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
+
                         }
                         if(inst.getImageId().equals(aws.getSchedulerImageId())) {
                             schedulerIp = inst.getDnsName();
-                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                     }
                 }
@@ -83,6 +81,32 @@ public class ParserHostEC2 implements ParserHost{
         writeCapFile();
         this.n = workersIp.size();
         return this.n;
+    }
+
+    public int parse() throws Exception {
+        this.n = Integer.MAX_VALUE;
+        Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
+        List<String> params = new ArrayList<String>();
+        List<ReservationDescription> instances = ec2.describeInstances(params);
+        for (ReservationDescription res : instances) {
+            if (res.getInstances() != null) {
+                for (ReservationDescription.Instance inst : res.getInstances()) {
+                    if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
+                        if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
+                            workersIp.add(inst.getDnsName());
+                        }
+                        if(inst.getImageId().equals(aws.getServerImageId())) {
+                            serverIp = inst.getDnsName();
+                        }
+                        if(inst.getImageId().equals(aws.getSchedulerImageId())) {
+                            schedulerIp = inst.getDnsName();
+                        }
+                    }
+                }
+            }
+        }
+        writeCapFile();
+        return workersIp.size();
     }
 
     public int getCountNode() throws Exception {
@@ -97,12 +121,15 @@ public class ParserHostEC2 implements ParserHost{
                     if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "active");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getPrivateDnsName();
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                         if(inst.getImageId().equals(aws.getSchedulerImageId())) {
                             schedulerIp = inst.getPrivateDnsName();
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "running");
                         }
                     }
                 }
@@ -116,6 +143,7 @@ public class ParserHostEC2 implements ParserHost{
 
     public void clear() {
         workersIp = new ArrayList<String>();
+        nodes = new HashMap<String, String>();
         serverIp = "";
         schedulerIp = "";
         n = 0;
@@ -123,6 +151,10 @@ public class ParserHostEC2 implements ParserHost{
 
     public Map<String,String> getNodeIp() {
         return nodes;
+    }
+
+    public String getNodeInfo() {
+        return  nodes.toString().replace("{", "").replace("}", "");
     }
 
     public int getSchedulerSize() {

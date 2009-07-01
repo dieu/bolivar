@@ -10,6 +10,7 @@ import com.xerox.amazonws.typica.jaxb.TerminateInstances;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author: apanasenko aka dieu
@@ -27,7 +28,6 @@ public class StopVirtualMachinesImpl implements StopVirtualMachines{
     }
 
     public void stop() {
-
         try {
             Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
             List<String> terminateInstances = monitoringInstance(ec2);
@@ -44,6 +44,27 @@ public class StopVirtualMachinesImpl implements StopVirtualMachines{
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void stopNode(String nodeIp) {
+        if(!nodeIp.equals("")) {
+            try {
+                Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
+                List<String> params = new ArrayList<String>();
+                List<ReservationDescription> instances = ec2.describeInstances(params);
+                for (ReservationDescription res : instances) {
+                    if (res.getInstances() != null) {
+                        for (ReservationDescription.Instance inst : res.getInstances()) {
+                            if(inst.isRunning() && inst.getPrivateDnsName().startsWith(nodeIp)) {
+                                ec2.terminateInstances(new ArrayList<String>(Arrays.asList(inst.getInstanceId())));
+                            }
+                        }
+                    }
+                }
+            } catch (EC2Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
