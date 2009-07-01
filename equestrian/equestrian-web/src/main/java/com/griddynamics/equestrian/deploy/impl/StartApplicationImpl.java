@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.util.regex.Pattern;
 import java.util.*;
+import java.text.MessageFormat;
 
 /**
 * @author: apanasenko aka dieu
@@ -83,6 +84,11 @@ public class StartApplicationImpl implements StartApplication<Application> {
             nWorkers = parserHost.parse(n);
             parserHost.getCountNode();
             nodes = parserHost.getNodeIp();
+            if(date == null) {
+                date = Calendar.getInstance().getTime();
+                minute = Calendar.getInstance().get(Calendar.MINUTE);
+            }
+            init(nWorkers, minute);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -94,11 +100,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
 
     public void start() {
         try {
-            if(date == null) {
-                date = Calendar.getInstance().getTime();
-                minute = Calendar.getInstance().get(Calendar.MINUTE);
-            }
-            init(nWorkers, minute);
             Runtime.getRuntime().exec(runKillCommand, null, dir);
             Thread.sleep(1000L);
             server = Runtime.getRuntime().exec(runServerCommand, null, dir);
@@ -108,6 +109,8 @@ public class StartApplicationImpl implements StartApplication<Application> {
             scheduler = Runtime.getRuntime().exec(runSchedulerCommand, null, dir);
             isRunScheduler = true;
             Thread.sleep(1000L);
+            readSchedulerOut = new ReadSchedulerOut();
+            readWorkersOut = new ReadWorkersOut();
             readSchedulerOut.start();
             readWorkersOut.start();
         } catch (IOException e) {
@@ -128,24 +131,30 @@ public class StartApplicationImpl implements StartApplication<Application> {
                 String[] split = outScheduler.split(" ");
                 for(String word: split) {
                     if(word.startsWith("<op>")) {
-                        application.setParsing(word.replace("<op>","")
-                                .replace("</op>","").replace("\r","").replace("\n", ""));
+                        String time = word.replace("<op>","")
+                                .replace("</op>","").replace("\r","").replace("\n", "");
+                        time = String.format(Locale.US, "%.2f", (Long.parseLong(time) / 1000.0f));
+                        application.setParsing(time);
                     }
                     if(word.startsWith("<or>")) {
                         application.setReturning(word.replace("<or>","")
                                 .replace("</or>","").replace("\r","").replace("\n", ""));
                     }
                     if(word.startsWith("<to>")) {
-                        application.setTime(word.replace("<to>","")
-                                .replace("</to>","").replace("\r","").replace("\n", ""));
+                        String time = word.replace("<to>","")
+                                .replace("</to>","").replace("\r","").replace("\n", "");
+                        time = String.format(Locale.US, "%.2f", (Long.parseLong(time) / 1000.0f));
+                        application.setTime(time);
                     }
                     if(word.startsWith("<ip>")) {
                         application.setIp(word.replace("<ip>","")
                                 .replace("</ip>","").replace("\r","").replace("\n", ""));
                     }
                     if(word.startsWith("<traf>")) {
-                        application.setTraf(word.replace("<traf>","")
-                                .replace("</traf>","").replace("\r","").replace("\n", ""));
+                        String traff = word.replace("<traf>","")
+                                .replace("</traf>","").replace("\r","").replace("\n", "");
+                        traff = String.format(Locale.US, "%.2f", (Long.parseLong(traff) / (1024.0f * 1024.0f)));
+                        application.setTraf(traff);
                     }
                 }
             }

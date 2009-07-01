@@ -8,12 +8,10 @@ package com.griddynamics.equestrian.helpers;
 public class ApplicationPath {
     public static String APPLICATION_PATH;
     public static String CAPISTRANO_PATH;
-    public static String HOST_LOG_PATH;
 
     static {
         APPLICATION_PATH = System.getenv("BOLIVAR_HOME");
         CAPISTRANO_PATH = System.getenv("CAP_HOME");
-        HOST_LOG_PATH = APPLICATION_PATH + "host.xml";
     }
 
     public static void main(String[] arg) {

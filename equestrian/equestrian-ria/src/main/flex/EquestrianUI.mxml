@@ -37,8 +37,8 @@
                 <mx:HBox horizontalCenter="0" y="25">
                     <mx:Label id="countNode" text="Use node"/>
                     <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
-                    <mx:Button id="startApp" label="Start Application" click="startApplicationClick()"/>
-                    <mx:Button id="stop" label="Stop Application" click="stopApp()" />
+                    <mx:Button id="startApp" label="Process Batch" click="startApplicationClick()"/>
+                    <mx:Button id="stop" label="Stop Processing" click="stopApp()" />
                 </mx:HBox>
             </mx:Canvas>
             <!--/mx:Canvas-->
@@ -48,7 +48,8 @@
                 <mx:Panel width="100%" height="100%" id="clusterStatus" title="Status: ">
                     <mx:DataGrid id="tableNodeInfo" dataProvider="{dataNodeInfoTable}" width="100%" height="100%" itemClick="selectInfoTable(event)">
                         <mx:columns>
-                            <mx:DataGridColumn dataField="Role" width="40" textAlign="center"/>
+                            <mx:DataGridColumn dataField="role" itemRenderer="com.griddynamics.equestrian.helpers.CustomRole"
+                                               headerText="Role" width="40" textAlign="center"/>
                             <mx:DataGridColumn dataField="Node" width="200"/>
                             <mx:DataGridColumn dataField="Status" sortable="true" sortDescending="true"/>
                         </mx:columns>
@@ -66,11 +67,11 @@
                                 <mx:DataGridColumn dataField="N" headerText="#" width="40"/>
                                 <mx:DataGridColumn dataField="Date" minWidth="200"/>
                                 <mx:DataGridColumn dataField="Workers"/>
-                                <mx:DataGridColumn dataField="Parsing" headerText="Parsing avg., ms"/>
+                                <mx:DataGridColumn dataField="Parsing" headerText="Parsing avg., s"/>
                                 <mx:DataGridColumn dataField="Returning" headerText="Returning avg., ms"/>
-                                <mx:DataGridColumn dataField="Total" headerText="Total time, ms"/>
+                                <mx:DataGridColumn dataField="Total" headerText="Total time, s"/>
                                 <mx:DataGridColumn dataField="IP"/>
-                                <mx:DataGridColumn dataField="Traffic"/>
+                                <mx:DataGridColumn dataField="Traffic" headerText="Traffic, mb"/>
                             </mx:columns>
                         </mx:DataGrid>
                         <mx:TabNavigator width="100%" height="100%">
@@ -189,6 +190,7 @@
                     </mx:VDividedBox>
                 </mx:Panel>
                 <mx:Button label="Clear table result" y="5" right="10" click="clearResult()"/>
+                <mx:Button label="Copy result" y="5" right="135" click="copyResult()"/>
             </mx:Canvas>
         </mx:HBox>
     </mx:VBox>
@@ -231,6 +233,7 @@
 
 
     <mx:Script><![CDATA[
+        import mx.controls.DataGrid;
         import mx.events.ListEvent;
         import mx.events.MoveEvent;
         import mx.collections.ArrayCollection;
@@ -270,7 +273,7 @@
 
 
         private function linearAxis_labelFunc(item:Object, prevValue:Object, axis:IAxis):String {
-            return item + " ms";
+            return item + " s";
         }
 
         private function initApp():void {
@@ -421,7 +424,7 @@
                 remove.enabled = true;
                 if (app.time != "") {
                     nRun += 1;
-                    infoTestPanel.title = "Last total time: " + app.time + " ms";
+                    infoTestPanel.title = "Last total time: " + app.time + " s";
                     historyService.add(app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
                             app.parsing, app.returning, app.time, app.ip, app.traf);
                     addDataTable(String(nRun), app.date.toDateString() + " " + app.date.toTimeString(), app.workers,
@@ -449,10 +452,10 @@
                 var nodes:Array = info.split(", ");
                 for(var i:int = 0; i < nodes.length; i++) {
                     var data:Array = String(nodes[i]).split("=");
-                    if(data[1].toString() == "running") {
-                        dataNodeInfoTable.addItem({Role:"M",Node:data[0], Status:data[1]});
+                    if(data[1].toString() == "running") {                         
+                        dataNodeInfoTable.addItem({role:'M',Node:data[0], Status:data[1]});
                     } else {
-                        dataNodeInfoTable.addItem({Role:"W",Node:data[0], Status:data[1]});
+                        dataNodeInfoTable.addItem({role:'W',Node:data[0], Status:data[1]});
                     }
                 }
             }
@@ -610,6 +613,54 @@
             if(event.type) {
                 selectRemoveNode = event.itemRenderer.data.Node as String;
             }
+        }
+
+        private function copyResult():void {
+            exportToExcel(tableTestInfo,  [['N','#'], ['Date','Date'],
+                ['Workers', 'Workers'],['Parsing', 'Parsing avg., s'],
+                ['Returning', 'Returning avg., ms'], ['Total','Total time, s'],
+                ['IP', 'IP'], ['Traffic', 'Traffic, mb']]);
+        }
+
+
+        private function exportToExcel(dg:DataGrid, fields:Array):void {
+            var dp:ArrayCollection = dg.dataProvider as ArrayCollection;
+            if (dg == null || dp==null || dp.length==0 || fields == null || fields.length==0) {
+                Alert.show("Exeption export");
+                return;
+            }
+            var i:int;
+            var j:int;
+            var l_dp:int = dp.length;
+            var l_f:int = fields.length;
+            var result:String = "";
+            for (i=0; i<l_f; i++) {
+                result += fields[i][1];
+                if (i!=(l_f-1)) result+='\t';
+            }
+            result +='\r\n';
+            for (i=0; i<l_dp; i++) {
+                for (j=0; j<l_f; j++) {
+                    var prop:String = fields[j][0];
+                    var l_col:int = dg.columns.length;
+                    var k:int;
+                    for (k=0; k<l_col; k++) {
+                        if (prop == dg.columns[k].dataField) {
+                            break;
+                        }
+                    }
+                    var f:Function = dg.columns[k].labelFunction;
+                    if (f != null) {
+                        result += f(dp[i], dg.columns[k]);
+                    }
+                    else {
+                        result += dp[i][prop];
+                    }
+                    if (j!=(l_f-1)) result+='\t';
+                }
+                result +='\r\n';
+            }
+            System.setClipboard(result);
         }
         ]]></mx:Script>
 </mx:Application>

@@ -121,7 +121,7 @@ public class ParserHostEC2 implements ParserHost{
                     if(inst.isRunning() && (aws.getUserId().equals("") || inst.getKeyName().equals(aws.getUserId()))) {
                         if(inst.getImageId().equals(aws.getWorkerImageId()) && workersIp.size() < n) {
                             workersIp.add(inst.getPrivateDnsName());
-                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "active");
+                            nodes.put(inst.getPrivateDnsName().split("[.]")[0], "idle");
                         }
                         if(inst.getImageId().equals(aws.getServerImageId())) {
                             serverIp = inst.getPrivateDnsName();
