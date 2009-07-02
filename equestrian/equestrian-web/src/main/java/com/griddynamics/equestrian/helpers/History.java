@@ -42,7 +42,7 @@ public class History {
         int nWorkers = Integer.valueOf(workers);
         if(lineChartDataReal.containsKey(nWorkers)) {
             Float timeOld = lineChartDataReal.get(nWorkers);
-            Float timeNew = (Integer.valueOf(time) + timeOld) / 2;
+            Float timeNew = (Float.valueOf(time) + timeOld) / 2;
             lineChartDataReal.put(nWorkers, timeNew);
             if(nWorkers == lineChartDataIdeal.keySet().iterator().next()) {
                 List<Integer> keys = new ArrayList<Integer>(lineChartDataIdeal.keySet());
