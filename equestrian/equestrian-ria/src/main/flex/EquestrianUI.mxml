@@ -290,30 +290,29 @@
         private function init():void {
             historyService.getHistory();
             historyService.getLineData();
-            parseHostService.getCountNode();
             isRunAppTimer = new Timer(10000);
             isRunAppTimer.addEventListener("timer", isRunAppTimerHandler);
             equestrianService.isRun();
         }
 
         private function isUser(password:String):void {
-            if(password != truePsw) {
+            if (password != truePsw) {
                 cookies = SharedObject.getLocal("password");
                 var psw:String = cookies.data["password"] as String;
-                if(psw == truePsw) {
-                    if(application.getChildren().lastIndexOf(main) < 0) {
+                if (psw == truePsw) {
+                    if (application.getChildren().lastIndexOf(main) < 0) {
                         application.addChild(main);
                     }
                     application.removeChild(login);
                     init();
                 } else {
                     application.removeChild(main);
-                    if(application.getChildren().lastIndexOf(login) < 0) {
+                    if (application.getChildren().lastIndexOf(login) < 0) {
                         application.addChild(login);
                     }
                 }
             } else {
-                if(application.getChildren().lastIndexOf(main) < 0) {
+                if (application.getChildren().lastIndexOf(main) < 0) {
                     application.addChild(main);
                 }
                 application.removeChild(login);
@@ -349,8 +348,8 @@
                 for (var i:int = 0; i < array.length; i++) {
                     var data:Array = array[i].split(";");
                     dataLineChart.addItem({Workers:data[0], Ideal:data[1], Total:data[2]});
-                    dataLineChart2.addItem({Workers:data[0], Ideal:String((1/data[1]) * 1000),
-                        Total:String((1/data[2]) * 1000)});
+                    dataLineChart2.addItem({Workers:data[0], Ideal:String((1 / data[1]) * 1000),
+                        Total:String((1 / data[2]) * 1000)});
                 }
             }
         }
@@ -360,9 +359,6 @@
             clusterStatus.title = "Status: (";
             clusterStatus.title += String(event.result) + " Nodes)";
             parseHostService.getNodeInfo();
-            if(nMachines.maximum == 0) {
-                openWindow();
-            }
         }
 
         private function onResultGetNodeInfo(event:ResultEvent):void {
@@ -450,9 +446,9 @@
             dataNodeInfoTable = new ArrayCollection();
             if (info != "") {
                 var nodes:Array = info.split(", ");
-                for(var i:int = 0; i < nodes.length; i++) {
+                for (var i:int = 0; i < nodes.length; i++) {
                     var data:Array = String(nodes[i]).split("=");
-                    if(data[1].toString() == "running") {                         
+                    if (data[1].toString() == "running") {
                         dataNodeInfoTable.addItem({role:'M',Node:data[0], Status:data[1]});
                     } else {
                         dataNodeInfoTable.addItem({role:'W',Node:data[0], Status:data[1]});
@@ -513,7 +509,7 @@
         }
 
         private function removeMe(event:Event):void {
-            if(runCreate == false) {
+            if (!runCreate) {
                 PopUpManager.removePopUp(createNodeWindow);
             } else {
                 Alert.show("Please wait", "Create nodes");
@@ -525,10 +521,10 @@
             var count:int = int(countNewNodes.value);
             var countScheduler:int = 0;
             var countServer:int = 0;
-            if(scheduler.enabled == true) {
+            if (scheduler.enabled) {
                 countScheduler = scheduler.value as int;
             }
-            if(server.enabled == true) {
+            if (server.enabled) {
                 countServer = server.value as int;
             }
             startVirtualService.create(count, countScheduler, countServer);
@@ -539,7 +535,7 @@
         }
 
         private function onResultVerifyCreateNode(event:ResultEvent):void {
-            if(event.result as Boolean == true) {
+            if (event.result as Boolean) {
                 parseHostService.getCountNode();
                 runCreate = false;
                 PopUpManager.removePopUp(createNodeWindow);
@@ -557,22 +553,16 @@
             var countServer:int = int(event.result);
             scheduler.value = countScheduler;
             server.value = countServer;
-            if(countServer > 0) {
-                server.enabled = false;
-            } else {
-                server.enabled = true;
-            }
-            if(countScheduler > 0) {
-                scheduler.enabled = false;
-            } else {
-                scheduler.enabled = true;
-            }
+            server.enabled = countServer <= 0;
+            scheduler.enabled = countScheduler <= 0;
             addWorkers.text = "Workers: " + String(nMachines.maximum) + ". Add workers: ";
 
+            PopUpManager.removePopUp(createNodeWindow);
+
             createNodeWindow = new TitleWindow();
-            createNodeWindow.title = "Create workers";
-            createNodeWindow.width= 280;
-            createNodeWindow.height= 170;
+            createNodeWindow.title = "Create nodes";
+            createNodeWindow.width = 280;
+            createNodeWindow.height = 170;
             createNodeWindow.showCloseButton = true;
             createNodeWindow.addEventListener("close", removeMe);
 
@@ -594,7 +584,7 @@
         }
 
         private function alertListenerShutdown(eventObj:CloseEvent):void {
-            if (eventObj.detail==Alert.OK) {
+            if (eventObj.detail == Alert.OK) {
                 stopVirtualService.stop();
             }
         }
@@ -604,19 +594,19 @@
         }
 
         private function alertListenerRemoveNode(eventObj:CloseEvent):void {
-            if (eventObj.detail==Alert.OK) {
+            if (eventObj.detail == Alert.OK) {
                 stopVirtualService.stopNode(selectRemoveNode);
             }
         }
 
         private function selectInfoTable(event:ListEvent):void {
-            if(event.type) {
+            if (event.type) {
                 selectRemoveNode = event.itemRenderer.data.Node as String;
             }
         }
 
         private function copyResult():void {
-            exportToExcel(tableTestInfo,  [['N','#'], ['Date','Date'],
+            exportToExcel(tableTestInfo, [['N','#'], ['Date','Date'],
                 ['Workers', 'Workers'],['Parsing', 'Parsing avg., s'],
                 ['Returning', 'Returning avg., ms'], ['Total','Total time, s'],
                 ['IP', 'IP'], ['Traffic', 'Traffic, mb']]);
@@ -625,7 +615,7 @@
 
         private function exportToExcel(dg:DataGrid, fields:Array):void {
             var dp:ArrayCollection = dg.dataProvider as ArrayCollection;
-            if (dg == null || dp==null || dp.length==0 || fields == null || fields.length==0) {
+            if (dg == null || dp == null || dp.length == 0 || fields == null || fields.length == 0) {
                 Alert.show("Exeption export");
                 return;
             }
@@ -634,17 +624,17 @@
             var l_dp:int = dp.length;
             var l_f:int = fields.length;
             var result:String = "";
-            for (i=0; i<l_f; i++) {
+            for (i = 0; i < l_f; i++) {
                 result += fields[i][1];
-                if (i!=(l_f-1)) result+='\t';
+                if (i != (l_f - 1)) result += '\t';
             }
-            result +='\r\n';
-            for (i=0; i<l_dp; i++) {
-                for (j=0; j<l_f; j++) {
+            result += '\r\n';
+            for (i = 0; i < l_dp; i++) {
+                for (j = 0; j < l_f; j++) {
                     var prop:String = fields[j][0];
                     var l_col:int = dg.columns.length;
                     var k:int;
-                    for (k=0; k<l_col; k++) {
+                    for (k = 0; k < l_col; k++) {
                         if (prop == dg.columns[k].dataField) {
                             break;
                         }
@@ -656,9 +646,9 @@
                     else {
                         result += dp[i][prop];
                     }
-                    if (j!=(l_f-1)) result+='\t';
+                    if (j != (l_f - 1)) result += '\t';
                 }
-                result +='\r\n';
+                result += '\r\n';
             }
             System.setClipboard(result);
         }

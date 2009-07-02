@@ -14,4 +14,7 @@ public interface ParserHost {
     int getCountNode() throws Exception;
     void clear();
     Map<String, String> getNodeIp();
+    String getNodeInfo();
+    int getSchedulerSize();
+    public int getServerSize();
 }

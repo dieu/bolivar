@@ -46,14 +46,6 @@ public class ParserHostEC2 implements ParserHost{
         this.aws = aws;
     }
 
-    public static void main(String [] args) throws Exception {
-        ParserHostEC2 s = new ParserHostEC2();
-        s.setAws(new AmazonKeys());
-        s.parse(30);
-        return;
-    }
-
-
     public int parse(int n) throws Exception {
         this.n = n;
         nodes.clear();
@@ -112,6 +104,7 @@ public class ParserHostEC2 implements ParserHost{
     public int getCountNode() throws Exception {
         clear();
         this.n = Integer.MAX_VALUE;
+        nodes = new HashMap<String, String>();
         Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
         List<String> params = new ArrayList<String>();
         List<ReservationDescription> instances = ec2.describeInstances(params);
@@ -143,7 +136,6 @@ public class ParserHostEC2 implements ParserHost{
 
     public void clear() {
         workersIp = new ArrayList<String>();
-        nodes = new HashMap<String, String>();
         serverIp = "";
         schedulerIp = "";
         n = 0;
@@ -174,16 +166,18 @@ public class ParserHostEC2 implements ParserHost{
     private void writeCapFile() throws IOException {
         if(!serverIp.equals("") && !schedulerIp.equals("") && workersIp.size() != 0) {
             StringBuilder contentFile = new StringBuilder("");
-            contentFile.append("SERVER_ADDR = \"" + serverIp + "\" \n");
-            contentFile.append("COUNT_WORKERS = \"" + workersIp.size() + "\" \n");
+            contentFile.append("SERVER_ADDR = \"").append(serverIp).append("\" \n");
+            contentFile.append("COUNT_WORKERS = \"").append(workersIp.size()).append("\" \n");
             contentFile.append("JAVA_HOME = \"/usr/lib/jvm/java-6-sun\" \n\n");
             contentFile.append("role :workers, ");
             for(String ip: workersIp) {
-                contentFile.append("\"" + ip + "\",");
+                contentFile.append("\"");
+                contentFile.append(ip);
+                contentFile.append("\",");
             }
             contentFile.deleteCharAt(contentFile.length() - 1);
             contentFile.append(" \n");
-            contentFile.append("role :scheduler, \"" + schedulerIp + "\" \n");
+            contentFile.append("role :scheduler, \"").append(schedulerIp).append("\" \n");
             contentFile.append("role :server, SERVER_ADDR\n" +
                     "\n" +
                     "set :user, 'agorbunov'\n" +

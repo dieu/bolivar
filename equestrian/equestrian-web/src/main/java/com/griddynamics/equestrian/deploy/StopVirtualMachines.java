@@ -7,5 +7,6 @@ package com.griddynamics.equestrian.deploy;
  */
 public interface StopVirtualMachines {
 	void stop();
+    void stopNode(String nodeIp);
 	boolean verify();
 }

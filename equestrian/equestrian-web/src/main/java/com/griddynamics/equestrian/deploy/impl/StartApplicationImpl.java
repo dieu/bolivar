@@ -13,10 +13,10 @@ import java.util.*;
 import java.text.MessageFormat;
 
 /**
-* @author: apanasenko aka dieu
-* Date: 29.04.2009
-* Time: 19:46:27
-*/
+ * @author: apanasenko aka dieu
+ * Date: 29.04.2009
+ * Time: 19:46:27
+ */
 public class StartApplicationImpl implements StartApplication<Application> {
     private String uploadCommand;
     private String runServerCommand;
@@ -162,8 +162,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             stop();
             application.setNodeIp(infoNodes);
             application.setSchedulerStatus(false);
-        } else {
-            application.setApplicationStatus("Wait...");
         }
         return application;
     }
@@ -173,45 +171,65 @@ public class StartApplicationImpl implements StartApplication<Application> {
     }
 
     public void stop() {
-         closeLogs();
-         clear();
-         if(server != null) {
-             server.destroy();
-         }
-         if(workers != null) {
-             workers.destroy();
-         }
-         if(scheduler != null) {
-             scheduler.destroy();
-         }
-         try {
-             readWorkersOut.interrupt();
-             readSchedulerOut.interrupt();
-             killApplication();
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-     }
+        closeLogs();
+        clear();
+        if(server != null) {
+            server.destroy();
+        }
+        if(workers != null) {
+            workers.destroy();
+        }
+        if(scheduler != null) {
+            scheduler.destroy();
+        }
+        try {
+            readWorkersOut.interrupt();
+            readSchedulerOut.interrupt();
+            killApplication();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-     private void closeLogs() {
-         if(separator.equals("/") && schedulerLogs != null && workersLogs != null) {
-             try {
-                 schedulerLogs.close();
-                 workersLogs.close();
-             } catch (IOException e) {
-                 e.printStackTrace();
-             }
-         }
-     }
+    private void init(int n, int minute) {
+        if(separator.equals("\\")) {
 
-     private void clear() {
-         isRunScheduler = false;
-         outWorkers = "";
-         outScheduler = "";
-         infoNodes = "";
-         date = null;
-         minute = 0;
-     }
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            String dir = ApplicationPath.APPLICATION_PATH + "remote-logs/"
+                    + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
+                    + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
+            String files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
+            try {
+                schedulerLogs = new FileWriter(files + "scheduler.txt");
+                workersLogs = new FileWriter(files + "workers.txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            new File(dir).mkdirs();
+        }
+
+    }
+
+    private void closeLogs() {
+        if(separator.equals("/") && schedulerLogs != null && workersLogs != null) {
+            try {
+                schedulerLogs.close();
+                workersLogs.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void clear() {
+        isRunScheduler = false;
+        outWorkers = "";
+        outScheduler = "";
+        infoNodes = "";
+        date = null;
+        minute = 0;
+    }
 
     private void killApplication() throws IOException {
         isRunKill = true;
@@ -222,7 +240,7 @@ public class StartApplicationImpl implements StartApplication<Application> {
         kill.destroy();
     }
 
-   private String getData(Process process, int id) {
+    private String getData(Process process, int id) {
         StringBuilder out = new StringBuilder("");
         if(process != null) {
             int j = 0;
@@ -276,25 +294,6 @@ public class StartApplicationImpl implements StartApplication<Application> {
             }
         }
         return out.toString();
-    }
-    private void init(int n, int minute) {
-        if(separator.equals("\\")) {
-
-        } else {
-            Calendar calendar = Calendar.getInstance();
-            String dir = ApplicationPath.APPLICATION_PATH + "remote-logs/"
-                    + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DATE) + "/"
-                    + calendar.get(Calendar.HOUR_OF_DAY) + "-" + minute + "_" + n + "/";
-            String files = dir + calendar.get(Calendar.MINUTE) + "-" + calendar.get(Calendar.MILLISECOND) + "_";
-            try {
-                schedulerLogs = new FileWriter(files + "scheduler.txt");
-                workersLogs = new FileWriter(files + "workers.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            new File(dir).mkdirs();
-        }
-
     }
 
     private class ReadSchedulerOut extends Thread {

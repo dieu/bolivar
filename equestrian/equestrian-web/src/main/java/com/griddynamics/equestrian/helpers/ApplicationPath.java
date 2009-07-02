@@ -13,8 +13,4 @@ public class ApplicationPath {
         APPLICATION_PATH = System.getenv("BOLIVAR_HOME");
         CAPISTRANO_PATH = System.getenv("CAP_HOME");
     }
-
-    public static void main(String[] arg) {
-        new ApplicationPath();
-    }
 }

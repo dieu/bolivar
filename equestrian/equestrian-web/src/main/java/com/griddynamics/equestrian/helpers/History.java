@@ -17,21 +17,6 @@ public class History {
     private Map<Integer, Float> lineChartDataReal;
     private Map<Integer, Float> lineChartDataIdeal;
 
-    public static void main(String[] arg) {
-        History s = new History();
-        s.add("1", "10", "12", "12", "24348", "12", "23");
-        s.add("1", "1", "12", "12", "124452", "12", "232");
-        s.add("1", "2", "12", "12", "72308", "12", "232");
-        s.add("1", "3", "12", "12", "50728", "12", "232");
-        s.add("1", "5", "12", "12", "34649", "12", "232");
-        s.add("1", "6", "12", "12", "29109", "12", "232");
-        s.add("1", "15", "12", "12", "23206", "12", "232");
-        s.add("1", "20", "12", "12", "60403", "12", "232");
-        s.add("1", "22", "12", "12", "20919", "12", "232");
-        s.add("1", "1", "12", "12", "131531", "12", "232");
-        return;
-    }
-
     public History() {
         lineChartDataReal = new TreeMap<Integer, Float>();
         lineChartDataIdeal = new TreeMap<Integer, Float>();
@@ -102,13 +87,13 @@ public class History {
     public String getHistory() {
         StringBuilder result = new StringBuilder("");
         for(int i = 0; i < historyEntity.getDate().size(); i++) {
-            result.append(historyEntity.getDate().get(i) + ";")
-                    .append(historyEntity.getWorkers().get(i) + ";")
-                    .append(historyEntity.getParsing().get(i) + ";")
-                    .append(historyEntity.getReturning().get(i) + ";")
-                    .append(historyEntity.getTime().get(i) + ";")
-                    .append(historyEntity.getIp().get(i) + ";")
-                    .append(historyEntity.getTraf().get(i) + ";")
+            result.append(historyEntity.getDate().get(i)).append(";")
+                    .append(historyEntity.getWorkers().get(i)).append(";")
+                    .append(historyEntity.getParsing().get(i)).append(";")
+                    .append(historyEntity.getReturning().get(i)).append(";")
+                    .append(historyEntity.getTime().get(i)).append(";")
+                    .append(historyEntity.getIp().get(i)).append(";")
+                    .append(historyEntity.getTraf().get(i)).append(";")
                     .append("|");
         }
         if(result.toString().equals("")) {
@@ -124,9 +109,9 @@ public class History {
         List<Float> valueReal = new ArrayList<Float>(lineChartDataReal.values());
         List<Float> valueIdeal = new ArrayList<Float>(lineChartDataIdeal.values());
         for(int i = 0; i < workers.size(); i++) {
-            result.append(workers.get(i) + ";")
-                    .append(valueIdeal.get(i) + ";")
-                    .append(valueReal.get(i) + ";")
+            result.append(workers.get(i)).append(";")
+                    .append(valueIdeal.get(i)).append(";")
+                    .append(valueReal.get(i)).append(";")
                     .append("|");
         }
         if(result.toString().equals("")) {
@@ -134,10 +119,6 @@ public class History {
         } else {
             return result.deleteCharAt(result.length() - 1).toString();
         }
-    }
-
-    public void finalize() {
-
     }
 }
 

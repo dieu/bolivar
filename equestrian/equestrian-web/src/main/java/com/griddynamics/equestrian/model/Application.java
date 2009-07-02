@@ -11,7 +11,6 @@ public class Application {
     private boolean schedulerStatus = true;
     private Date date = null;
     private String workers = "";
-    private String applicationStatus = "";
     private String parsing = "";
     private String returning = "";
     private String time = "";
@@ -44,14 +43,6 @@ public class Application {
 
     public void setWorkers(String workers) {
         this.workers = workers;
-    }
-
-    public String getApplicationStatus() {
-        return applicationStatus;
-    }
-
-    public void setApplicationStatus(String applicationStatus) {
-        this.applicationStatus = applicationStatus;
     }
 
     public String getParsing() {

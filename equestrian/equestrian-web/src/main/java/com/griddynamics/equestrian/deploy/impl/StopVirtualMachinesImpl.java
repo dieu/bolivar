@@ -31,7 +31,7 @@ public class StopVirtualMachinesImpl implements StopVirtualMachines{
         try {
             Jec2 ec2 = new Jec2(aws.getAWSAccessKeyId(), aws.getSecretAccessKey());
             List<String> terminateInstances = monitoringInstance(ec2);
-            List<TerminatingInstanceDescription> terminateInstancesList = ec2.terminateInstances(terminateInstances);
+            ec2.terminateInstances(terminateInstances);
             while(true) {
                 terminateInstances = monitoringInstance(ec2);
                 if(terminateInstances.size() == 0) {

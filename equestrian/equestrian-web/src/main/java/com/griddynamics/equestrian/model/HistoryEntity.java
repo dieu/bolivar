@@ -9,18 +9,18 @@ import java.util.ArrayList;
  * Time: 16:00:30
  */
 public class HistoryEntity {                                     
-    private List date = new ArrayList();
-    private List parsing = new ArrayList();
-    private List returning = new ArrayList();
-    private List time = new ArrayList();
-    private List traf = new ArrayList();
-    private List ip = new ArrayList();
-    private List workers = new ArrayList();
+    private List<String> date = new ArrayList<String>();
+    private List<String> parsing = new ArrayList<String>();
+    private List<String> returning = new ArrayList<String>();
+    private List<String> time = new ArrayList<String>();
+    private List<String> traf = new ArrayList<String>();
+    private List<String> ip = new ArrayList<String>();
+    private List<String> workers = new ArrayList<String>();
 
     public HistoryEntity() {
     }
 
-    public List getDate() {
+    public List<String> getDate() {
         return date;
     }
 
@@ -28,7 +28,7 @@ public class HistoryEntity {
         this.date.add(date);
     }
             
-    public List getParsing() {
+    public List<String> getParsing() {
         return parsing;
     }
 
@@ -36,7 +36,7 @@ public class HistoryEntity {
         this.parsing.add(parsing);
     }
 
-    public List getReturning() {
+    public List<String> getReturning() {
         return returning;
     }
 
@@ -44,7 +44,7 @@ public class HistoryEntity {
         this.returning.add(returning);
     }
 
-    public List getTime() {
+    public List<String> getTime() {
         return time;
     }
 
@@ -52,7 +52,7 @@ public class HistoryEntity {
         this.time.add(time);
     }
 
-    public List getTraf() {
+    public List<String> getTraf() {
         return traf;
     }
 
@@ -60,7 +60,7 @@ public class HistoryEntity {
         this.traf.add(traf);
     }
 
-    public List getIp() {
+    public List<String> getIp() {
         return ip;
     }
 
@@ -68,7 +68,7 @@ public class HistoryEntity {
         this.ip.add(ip);
     }
 
-    public List getWorkers() {
+    public List<String> getWorkers() {
         return workers;
     }
 

@@ -22,10 +22,6 @@ public class AmazonKeys {
     private String serverImageId = "";
     private String schedulerImageId = "";
 
-    public static void main(String[] ars) {
-        new AmazonKeys();
-    }
-
     public AmazonKeys() {
         File aws = new File(ApplicationPath.APPLICATION_PATH + "aws.keys");
         try {
