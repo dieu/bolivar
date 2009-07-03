@@ -35,7 +35,7 @@
             <!--mx:Canvas width="200" height="100%"-->
             <mx:Canvas>
                 <mx:HBox horizontalCenter="0" y="25">
-                    <mx:Label id="countNode" text="Use node"/>
+                    <mx:Label id="countNode" text="Use workers"/>
                     <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
                     <mx:Button id="startApp" label="Process Batch" click="startApplicationClick()"/>
                     <mx:Button id="stop" label="Stop Processing" click="stopApp()" />
@@ -476,6 +476,8 @@
         private function startApplicationClick():void {
             infoTestPanel.label = "Last total time: ";
             shutdown.enabled = false;
+            startApp.enabled = false;
+            stop.enabled = false;
             remove.enabled = false;
             isRunAppTimer.stop();
             if (!runApplication) {
