@@ -50,7 +50,7 @@
                                     trackHeight="30"
                                     width="100%"
                                     barColor="#8080c0"
-                                    />
+                            />
                 </mx:HBox>
             </mx:Canvas>
             <!--/mx:Canvas-->
@@ -489,15 +489,15 @@
         }
 
         private function startApplicationClick():void {
-            infoTestPanel.label = "Last total time: ";
-            shutdown.enabled = false;
-            startApp.enabled = false;
-            stop.enabled = false;
-            remove.enabled = false;
-            progressBar.indeterminate = true;
-            isRunAppTimer.stop();
-            if (!runApplication) {
-                n = int(nMachines.value);
+            n = int(nMachines.value);             
+            if (!runApplication && n <= int(nMachines.value)) {
+                infoTestPanel.label = "Last total time: ";
+                shutdown.enabled = false;
+                startApp.enabled = false;
+                stop.enabled = false;
+                remove.enabled = false;
+                progressBar.indeterminate = true;
+                isRunAppTimer.stop();
                 equestrianService.deploy(nMachines.value as int);
             }
         }
