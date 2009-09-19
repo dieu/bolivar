@@ -429,8 +429,7 @@
                 verifyAppTimer.stop();
                 isRunAppTimer.start();
                 progressBar.indeterminate = false;
-                startApp.enabled = true;
-                stop.enabled = true;
+                startApp.enabled = true;                
                 shutdown.enabled = true;
                 remove.enabled = true;
                 if (app.time != "") {
@@ -494,7 +493,6 @@
                 infoTestPanel.label = "Last total time: ";
                 shutdown.enabled = false;
                 startApp.enabled = false;
-                stop.enabled = false;
                 remove.enabled = false;
                 progressBar.indeterminate = true;
                 isRunAppTimer.stop();
