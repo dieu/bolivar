@@ -17,7 +17,7 @@
         </mx:HBox>
     </mx:VBox>
     <mx:HBox id="createButton" horizontalAlign="center" width="100%">
-        <mx:Button  label="Create" horizontalCenter="0" click="createNode()"/>
+        <mx:Button id="createBN"  label="Create" horizontalCenter="0" click="createNode()"/>
     </mx:HBox>
 
 
@@ -30,7 +30,8 @@
     <mx:VBox id="main" left="10" right="10" top="10" bottom="10" height="100%" width="100%">
         <mx:HBox>
             <mx:Canvas width="350" height="80">
-                <mx:TextArea width="100%" height="100%" text="This application demonstrates calculating some OLAP analytics on historical data. In this concrete example,	we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
+                <mx:TextArea width="100%" height="100%"
+                             text="This application demonstrates calculating some OLAP analytics on historical data. In this concrete example,	we will parse NetFlow logs to find the maximum traffic usage over the last month."/>
             </mx:Canvas>
             <!--mx:Canvas width="200" height="100%"-->
             <mx:Canvas>
@@ -39,6 +40,17 @@
                     <mx:NumericStepper id="nMachines" minimum="1" maximum="15" />
                     <mx:Button id="startApp" label="Process Batch" click="startApplicationClick()"/>
                     <mx:Button id="stop" label="Stop Processing" click="stopApp()" />
+                </mx:HBox>
+                <mx:HBox horizontalCenter="0" y="50" width="100%">
+                    <mx:ProgressBar id="progressBar"
+                                    label="Process Batch"
+                                    labelPlacement="center"
+                                    indeterminate="false"
+                                    indeterminateMoveInterval="20"
+                                    trackHeight="30"
+                                    width="100%"
+                                    barColor="#8080c0"
+                                    />
                 </mx:HBox>
             </mx:Canvas>
             <!--/mx:Canvas-->
@@ -416,6 +428,9 @@
                 runApplication = false;
                 verifyAppTimer.stop();
                 isRunAppTimer.start();
+                progressBar.indeterminate = false;
+                startApp.enabled = true;
+                stop.enabled = true;
                 shutdown.enabled = true;
                 remove.enabled = true;
                 if (app.time != "") {
@@ -479,6 +494,7 @@
             startApp.enabled = false;
             stop.enabled = false;
             remove.enabled = false;
+            progressBar.indeterminate = true;
             isRunAppTimer.stop();
             if (!runApplication) {
                 n = int(nMachines.value);
@@ -519,6 +535,7 @@
         }
 
         private function createNode():void {
+            createBN.enabled = false;
             runCreate = true;
             var count:int = int(countNewNodes.value);
             var countScheduler:int = 0;
@@ -540,6 +557,7 @@
             if (event.result as Boolean) {
                 parseHostService.getCountNode();
                 runCreate = false;
+                createBN.enabled = true;
                 PopUpManager.removePopUp(createNodeWindow);
             } else {
                 startVirtualService.verify();
