@@ -490,7 +490,7 @@
 
         private function startApplicationClick():void {
             n = int(nMachines.value);             
-            if (!runApplication && n <= int(nMachines.value)) {
+            if (!runApplication && n > 0 && n <= int(nMachines.value)) {
                 infoTestPanel.label = "Last total time: ";
                 shutdown.enabled = false;
                 startApp.enabled = false;
