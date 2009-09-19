@@ -385,6 +385,7 @@
                     stop.enabled = false;
                     shutdown.enabled = false;
                     remove.enabled = false;
+                    progressBar.indeterminate = true;
                 }
             } else {
                 if (!startApp.enabled) {
@@ -393,6 +394,7 @@
                     stop.enabled = true;
                     shutdown.enabled = true;
                     remove.enabled = true;
+                    progressBar.indeterminate = false;
                     historyService.getHistory();
                     historyService.getLineData();
                 }
@@ -402,7 +404,7 @@
             isRunAppTimer.start();
         }
 
-        private function OnResultStop(event:ResultEvent):void {
+        private function OnResultStop(event:ResultEvent):void {            
             runApplication = false;
             verifyAppTimer.stop();
         }
